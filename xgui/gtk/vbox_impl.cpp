@@ -15,7 +15,7 @@
 
 namespace xguimpl
 {
-	VBox::VBox(xgui::Container * parent, int space, bool border) : Widget(gtk_vbox_new(FALSE, space)), this_box(0)
+	VBox::VBox(xgui::Container * parent, int space, bool border) : Widget(gtk_box_new(GTK_ORIENTATION_VERTICAL, space)), this_box(0)
 	{
 		gtk_container_set_border_width ( GTK_CONTAINER ( widget ), border );
 	}

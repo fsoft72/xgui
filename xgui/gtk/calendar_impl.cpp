@@ -22,7 +22,7 @@ namespace xguimpl
 	bool Calendar::linkEvent( std::string const &name )
 	{
 		if ( name == "onselect" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "day-selected", G_CALLBACK ( OnSelect ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "day-selected", G_CALLBACK ( OnSelect ), this );
 			return true;
 		}
 	

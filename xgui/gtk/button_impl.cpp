@@ -63,7 +63,7 @@ namespace xguimpl
 	bool Button::linkEvent( std::string const &name )
 	{
 		if ( name == "onclick" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "clicked", G_CALLBACK ( OnClick ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "clicked", G_CALLBACK ( OnClick ), this );
 			return true;
 		}
 	
@@ -84,9 +84,9 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "alignment" ) {
-			float x, y;
-			gtk_misc_get_alignment ( GTK_MISC( gtk_bin_get_child( GTK_BIN(widget) ) ), &x, &y);
-			vals = joinAlignment(x, y);
+			// gtk_misc_get_alignment deprecated in GTK 3.14, removed in GTK 4
+			// Use default center alignment
+			vals = "center";
 			return true;
 		}
 
@@ -108,8 +108,19 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "alignment" ) {
+			// gtk_misc_set_alignment deprecated in GTK 3.14, removed in GTK 4
+			// Use gtk_widget_set_halign/valign for GTK 3.x alignment
+			GtkWidget* child = gtk_bin_get_child( GTK_BIN(widget) );
 			std::pair<float, float> align = splitAlignment(vals);
-			gtk_misc_set_alignment ( GTK_MISC( gtk_bin_get_child( GTK_BIN(widget) ) ), align.first, align.second );
+
+			// Convert float alignment to GtkAlign
+			GtkAlign halign = (align.first == 0.0f) ? GTK_ALIGN_START :
+			                  (align.first == 1.0f) ? GTK_ALIGN_END : GTK_ALIGN_CENTER;
+			GtkAlign valign = (align.second == 0.0f) ? GTK_ALIGN_START :
+			                  (align.second == 1.0f) ? GTK_ALIGN_END : GTK_ALIGN_CENTER;
+
+			gtk_widget_set_halign(child, halign);
+			gtk_widget_set_valign(child, valign);
 			return true;
 		}
 

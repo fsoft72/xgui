@@ -18,18 +18,19 @@
 
 namespace xguimpl
 {
-	Widget::Widget(GtkWidget * real_w) 
-	: this_widget(0), widget(real_w), last_x(0), last_y(0), last_w(0), last_h(0) 
+	Widget::Widget(GtkWidget * real_w)
+	: this_widget(0), widget(real_w), last_x(0), last_y(0), last_w(0), last_h(0)
 	{
-		if (!(GTK_WIDGET_NO_WINDOW(widget))) {
-			if (widget->window != NULL) {
-				int emask = gdk_window_get_events(widget->window);
-				gdk_window_set_events(widget->window, (GdkEventMask)(emask | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK) );
+		if (gtk_widget_get_has_window(widget)) {
+			GdkWindow* window = gtk_widget_get_window(widget);
+			if (window != NULL) {
+				int emask = gdk_window_get_events(window);
+				gdk_window_set_events(window, (GdkEventMask)(emask | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK) );
 			}
 		}
 
-		gtk_signal_connect ( GTK_OBJECT ( widget ), "destroy", G_CALLBACK ( OnDestroy ), this );
-		gtk_signal_connect ( GTK_OBJECT ( widget ), "event", G_CALLBACK ( OnGdkEvent ), this );
+		g_signal_connect ( G_OBJECT ( widget ), "destroy", G_CALLBACK ( OnDestroy ), this );
+		g_signal_connect ( G_OBJECT ( widget ), "event", G_CALLBACK ( OnGdkEvent ), this );
 	}
 
 	Widget::~Widget() {}
@@ -67,7 +68,15 @@ namespace xguimpl
 	std::pair<int, int> Widget::getMousePos()
 	{
 		std::pair<int, int> pos;
-		gtk_widget_get_pointer(widget, &pos.first, &pos.second);
+		GdkWindow* window = gtk_widget_get_window(widget);
+		if (window) {
+			GdkDisplay* display = gdk_window_get_display(window);
+			GdkDevice* device = gdk_seat_get_pointer(gdk_display_get_default_seat(display));
+			gdk_window_get_device_position(window, device, &pos.first, &pos.second, NULL);
+		} else {
+			pos.first = 0;
+			pos.second = 0;
+		}
 		return pos;
 	}
 
@@ -128,22 +137,22 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "visible" ) {
-			if (GTK_WIDGET_VISIBLE(widget))
+			if (gtk_widget_get_visible(widget))
 				vals = "1";
 			else
 				vals = "0";
 			return true;
 		}
 		else if ( name == "width" ) {
-			vals =  xgui::semantic_cast<std::string>(widget->allocation.width);
+			vals =  xgui::semantic_cast<std::string>(gtk_widget_get_allocated_width(widget));
 			return true;
 		}
 		else if ( name == "height" ) {
-			vals =  xgui::semantic_cast<std::string>(widget->allocation.height);
+			vals =  xgui::semantic_cast<std::string>(gtk_widget_get_allocated_height(widget));
 			return true;
 		}
 		else if ( name == "enabled" ) {
-			vals = xgui::semantic_cast<std::string>(GTK_WIDGET_IS_SENSITIVE(widget));
+			vals = xgui::semantic_cast<std::string>(gtk_widget_get_sensitive(widget));
 			return true;
 		}
 		else if ( name == "focused" ) {
@@ -160,7 +169,7 @@ namespace xguimpl
 	{
 		if ( name == "tooltip-text" ) {
 			tip_text = vals;
-			gtk_tooltips_set_tip( GTK_TOOLTIPS(xgui::Master::Instance()->getImpl()->app_tooltips), widget, vals.c_str(), vals.c_str());
+			gtk_widget_set_tooltip_text(widget, vals.c_str());
 			return true;
 		}	
 		else if ( name == "visible" ) {
@@ -187,43 +196,43 @@ namespace xguimpl
 	bool Widget::linkEvent(std::string const &name)
 	{
 		if ( name == "onfocus" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "focus-in-event", G_CALLBACK ( OnFocus ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "focus-in-event", G_CALLBACK ( OnFocus ), this );
 			return true;
 		}
 		else if ( name == "onblur" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "focus-out-event", G_CALLBACK ( OnBlur ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "focus-out-event", G_CALLBACK ( OnBlur ), this );
 			return true;
 		}
 		else if ( name == "onmouseover" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "enter-notify-event", G_CALLBACK ( OnMouseOver ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "enter-notify-event", G_CALLBACK ( OnMouseOver ), this );
 			return true;
 		}
 		else if ( name == "onmouseout" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "leave-notify-event", G_CALLBACK ( OnMouseOut ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "leave-notify-event", G_CALLBACK ( OnMouseOut ), this );
 			return true;
 		}
 		else if ( name == "onmousemove" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "motion-notify-event", G_CALLBACK ( OnMouseMove ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "motion-notify-event", G_CALLBACK ( OnMouseMove ), this );
 			return true;
 		}
 		else if ( name == "onmousedown" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "button-press-event", G_CALLBACK ( OnMouseDown ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "button-press-event", G_CALLBACK ( OnMouseDown ), this );
 			return true;
 		}
 		else if ( name == "onmouseup" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "button-release-event", G_CALLBACK ( OnMouseUp ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "button-release-event", G_CALLBACK ( OnMouseUp ), this );
 			return true;
 		}
 		else if ( name == "onshow" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "show", G_CALLBACK ( OnShow ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "show", G_CALLBACK ( OnShow ), this );
 			return true;
 		}
 		else if ( name == "onhide" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "hide", G_CALLBACK ( OnHide ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "hide", G_CALLBACK ( OnHide ), this );
 			return true;
 		}
 		else if ( (name == "onenable") || (name == "ondisable") ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "state-changed", G_CALLBACK ( OnEnableDisable ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "state-changed", G_CALLBACK ( OnEnableDisable ), this );
 			return true;
 		}
 		else if ( name == "onresize" )
@@ -498,7 +507,7 @@ namespace xguimpl
 	
 		if ( state == GTK_STATE_INSENSITIVE )
 			cb = xw->this_widget->getEvent("ondisable");
-		else if ( !GTK_WIDGET_IS_SENSITIVE(w) )
+		else if ( !gtk_widget_get_sensitive(w) )
 			cb = xw->this_widget->getEvent("onenable" );
 	
 		if (cb) return !cb->call(xw->this_widget);

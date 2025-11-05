@@ -77,16 +77,16 @@ namespace xguimpl
 
 		gtk_drag_source_set(GTK_WIDGET(list_view), (GdkModifierType)(GDK_BUTTON1_MASK | GDK_BUTTON2_MASK), target_entry,        sizeof(target_entry) / sizeof(GtkTargetEntry), (GdkDragAction)(GDK_ACTION_MOVE | GDK_ACTION_COPY) );
 
-                gtk_signal_connect(
-                        GTK_OBJECT(list_view), "drag_data_get",
+                g_signal_connect(
+                        G_OBJECT(list_view), "drag_data_get",
                         GTK_SIGNAL_FUNC(DNDDataRequestCB), this
                 );
-                gtk_signal_connect(
-                        GTK_OBJECT(list_view), "drag_data_received",
+                g_signal_connect(
+                        G_OBJECT(list_view), "drag_data_received",
                         GTK_SIGNAL_FUNC(DNDDataRecievedCB), this
                 );
-                gtk_signal_connect(
-                        GTK_OBJECT(list_view), "drag_data_delete",
+                g_signal_connect(
+                        G_OBJECT(list_view), "drag_data_delete",
                         GTK_SIGNAL_FUNC(DNDDataDeleteCB), this
                 );
 	}

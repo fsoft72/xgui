@@ -36,7 +36,9 @@ namespace xguimpl
 		}
 		else if ( name == "alignment" ) {
 			std::pair<float, float> align = splitAlignment(vals);
-			gtk_misc_set_alignment ( GTK_MISC(widget), align.first, align.second );
+			// gtk_misc_set_alignment deprecated in GTK 3.14
+		gtk_label_set_xalign(GTK_LABEL(widget), align.first);
+		gtk_label_set_yalign(GTK_LABEL(widget), align.second);
 			return true;
 		}
 		return false;
@@ -51,7 +53,9 @@ namespace xguimpl
 		}
 		else if ( name == "alignment" ) {
 			float x, y;
-			gtk_misc_get_alignment ( GTK_MISC(widget), &x, &y);
+			// gtk_misc_get_alignment deprecated in GTK 3.14
+		x = gtk_label_get_xalign(GTK_LABEL(widget));
+		y = gtk_label_get_yalign(GTK_LABEL(widget));
 			vals = joinAlignment(x, y);
 			return true;
 		}

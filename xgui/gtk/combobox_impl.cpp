@@ -28,7 +28,7 @@ namespace xguimpl
 		gtk_container_add( GTK_CONTAINER(widget), real_widget );
 		gtk_event_box_set_visible_window ( GTK_EVENT_BOX(widget), 0 );
 	
-		gtk_signal_connect ( GTK_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
+		g_signal_connect ( G_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
 
 		if (editable)
 			entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(real_widget)));
@@ -53,12 +53,12 @@ namespace xguimpl
 		else if ( name == "onrefresh" )
 			return true;
 		else if ( name == "onsubmit" ) {
-			gtk_signal_connect ( GTK_OBJECT ( real_widget ), "activate", G_CALLBACK ( OnSubmit ), this );
+			g_signal_connect ( G_OBJECT ( real_widget ), "activate", G_CALLBACK ( OnSubmit ), this );
 			return true;
 		}
 		else if ( (name == "onchange") && (entry) ) {
-			gtk_signal_connect(GTK_OBJECT(entry), "insert-text", G_CALLBACK ( OnTextInsert ), this);
-			gtk_signal_connect(GTK_OBJECT(entry), "delete-text", G_CALLBACK ( OnTextDelete ), this);
+			g_signal_connect(G_OBJECT(entry), "insert-text", G_CALLBACK ( OnTextInsert ), this);
+			g_signal_connect(G_OBJECT(entry), "delete-text", G_CALLBACK ( OnTextDelete ), this);
 			return true;
 		}
 		
@@ -99,7 +99,7 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 	
-		gtk_signal_connect ( GTK_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 	
 	void Combobox::insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
@@ -114,7 +114,7 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 	
-		gtk_signal_connect ( GTK_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 	
 	void Combobox::removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
@@ -129,7 +129,7 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 	
-		gtk_signal_connect ( GTK_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 
 	void Combobox::appendText(std::string const &text) { gtk_entry_append_text( entry, text.c_str() ); }
@@ -169,7 +169,7 @@ namespace xguimpl
 			entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(real_widget)));
 
 		gtk_container_add ( GTK_CONTAINER(widget), real_widget );
-		gtk_signal_connect ( GTK_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
+		g_signal_connect ( G_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
 
 		if (visible) gtk_widget_show(real_widget);
 		refresh();
@@ -261,7 +261,7 @@ namespace xguimpl
 	
 	
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
-		gtk_signal_emit_stop_by_name ( GTK_OBJECT ( editable ), "insert-text" );
+		g_signal_emit_stop_by_name ( G_OBJECT ( editable ), "insert-text" );
 	}
 
 	void Combobox::OnTextDelete ( GtkEditable *editable, gint start_pos, gint end_pos, Combobox * e )
@@ -279,6 +279,6 @@ namespace xguimpl
 			gtk_editable_delete_text( GTK_EDITABLE(editable), start_pos, end_pos );
 		
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
-		gtk_signal_emit_stop_by_name ( GTK_OBJECT ( editable ), "delete-text" );
+		g_signal_emit_stop_by_name ( G_OBJECT ( editable ), "delete-text" );
 	}
 }

@@ -58,7 +58,7 @@ namespace xguimpl
 	bool Tab::linkEvent( std::string const &name )
 	{
 		if ( name == "onselect" ) {
-			gtk_signal_connect ( GTK_OBJECT(widget), "switch-page", G_CALLBACK(OnSelect), this );
+			g_signal_connect ( G_OBJECT(widget), "switch-page", G_CALLBACK(OnSelect), this );
 			return true;
 		}
 	
@@ -146,7 +146,7 @@ namespace xguimpl
 		if (old_box)
 			old_txt = (std::string*)g_object_get_data(G_OBJECT(old_box), "tab-text");
 
-		GtkBox * new_box = GTK_BOX(gtk_hbox_new(0, 0));
+		GtkBox * new_box = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 
 		img->ref();
 		GtkWidget * gtkimg = GTK_WIDGET(img->getImpl()->getImage());
@@ -179,7 +179,7 @@ namespace xguimpl
 		if (old_box)
 			old_img = (xgui::Image*)g_object_get_data(G_OBJECT(old_box), "tab-icon");
 
-		GtkBox * new_box = GTK_BOX(gtk_hbox_new(0, 0));
+		GtkBox * new_box = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 
 		if (old_img) {
 			old_img->ref();

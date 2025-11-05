@@ -106,7 +106,7 @@ namespace xguimpl
 			gtk_tool_item_set_tooltip ( item, xgui::Master::Instance()->getImpl()->app_tooltips, btn.tooltip.c_str(), btn.tooltip.c_str());
 	
 		gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, this_tb->nelements_ );
-		gtk_signal_connect ( GTK_OBJECT ( item ), "clicked", G_CALLBACK ( OnClick ), this );
+		g_signal_connect ( G_OBJECT ( item ), "clicked", G_CALLBACK ( OnClick ), this );
 	
 		if ( btn.image ) {
 			btn.image->ref();
@@ -132,7 +132,7 @@ namespace xguimpl
 			gtk_tool_item_set_tooltip ( item, xgui::Master::Instance()->getImpl()->app_tooltips, btn.tooltip.c_str(), btn.tooltip.c_str());
 	
 		gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, this_tb->nelements_ );
-		gtk_signal_connect ( GTK_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
+		g_signal_connect ( G_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
 	}
 	
 	void Toolbar::addRadioButtons ( std::vector<xgui::TbButtonInfo> const & checkgroup )
@@ -159,7 +159,7 @@ namespace xguimpl
 	
 			group = gtk_radio_tool_button_get_group ( GTK_RADIO_TOOL_BUTTON ( item ) );
 			gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, button_pos++ );
-			gtk_signal_connect ( GTK_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
+			g_signal_connect ( G_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
 		}
 	}
 

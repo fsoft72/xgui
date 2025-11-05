@@ -415,7 +415,7 @@ namespace xguimpl
 		gtk_tree_view_column_set_resizable(column, TRUE);
 		gtk_tree_view_column_set_alignment(column, int_map_align(calign));
 		
-		gtk_signal_connect ( GTK_OBJECT(column), "clicked", G_CALLBACK(OnHeaderClick), this );
+		g_signal_connect ( G_OBJECT(column), "clicked", G_CALLBACK(OnHeaderClick), this );
 		gtk_tree_view_insert_column ( GTK_TREE_VIEW( list_view ), column, (has_icons ? cpos + 1 : cpos) );
 	
 		rebuildGtkModel();

@@ -24,7 +24,7 @@ static GtkWidget * MkWindow(xgui::Window * modal_parent)
 	if (modal_parent) {
 		widget = gtk_dialog_new();
 		gtk_window_set_transient_for ( GTK_WINDOW ( widget ), GTK_WINDOW ( modal_parent->getImpl()->widget ) );
-		gtk_dialog_set_has_separator( GTK_DIALOG(widget), FALSE );
+		// gtk_dialog_set_has_separator removed in GTK 3
 	}
 	else
 		widget = gtk_window_new ( GTK_WINDOW_TOPLEVEL );
@@ -39,11 +39,11 @@ namespace xguimpl
 	: Widget(MkWindow(parent)), this_window(0), vbox(0), status(0)
 	{
 		if(!parent) {
-			vbox = gtk_vbox_new(FALSE, 0);
+			vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 			gtk_container_add( GTK_CONTAINER(widget), vbox );
 		}
 		else
-			vbox = GTK_DIALOG(widget)->vbox;
+			vbox = gtk_dialog_get_content_area(GTK_DIALOG(widget));
 	}
 
 	Window::Window(GtkWidget * real_w) : Widget(real_w), this_window(0), vbox(0), status(0)	{ }
@@ -244,7 +244,7 @@ namespace xguimpl
 	bool Window::linkEvent(std::string const &name)
 	{
 		if ( name == "onclose" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "delete_event", G_CALLBACK ( OnClose ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "delete_event", G_CALLBACK ( OnClose ), this );
 			return true;
 		}
 	
