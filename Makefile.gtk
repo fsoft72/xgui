@@ -1,0 +1,67 @@
+INSTALL_PATH=/usr/local/
+
+GTK_IMPL_PATH=./xgui/gtk/
+XGUI_IMPL_PATH=./xgui/
+
+LIBS=`pkg-config gtk+-2.0 --libs` `xml2-config --libs` -lgthread-2.0 -ldl
+XGUI_INCLUDES=-I$(XGUI_IMPL_PATH) -I$(GTK_IMPL_PATH) `pkg-config gtk+-2.0 --cflags` `xml2-config --cflags`
+CPP=g++
+CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fpermissive
+
+XGUI_OBJS = $(XGUI_IMPL_PATH)/class_info.o $(XGUI_IMPL_PATH)/object.o $(XGUI_IMPL_PATH)/container.o $(XGUI_IMPL_PATH)/widget.o $(XGUI_IMPL_PATH)/master.o $(XGUI_IMPL_PATH)/callback.o $(XGUI_IMPL_PATH)/window.o $(XGUI_IMPL_PATH)/image.o $(XGUI_IMPL_PATH)/button.o $(XGUI_IMPL_PATH)/menu.o $(XGUI_IMPL_PATH)/hbox.o $(XGUI_IMPL_PATH)/vbox.o $(XGUI_IMPL_PATH)/model.o $(XGUI_IMPL_PATH)/view.o $(XGUI_IMPL_PATH)/style.o $(XGUI_IMPL_PATH)/label.o $(XGUI_IMPL_PATH)/entry.o $(XGUI_IMPL_PATH)/list.o $(XGUI_IMPL_PATH)/calendar.o $(XGUI_IMPL_PATH)/slider.o $(XGUI_IMPL_PATH)/imageview.o $(XGUI_IMPL_PATH)/progressbar.o $(XGUI_IMPL_PATH)/tab.o $(XGUI_IMPL_PATH)/spin.o $(XGUI_IMPL_PATH)/checkbox.o $(XGUI_IMPL_PATH)/combobox.o $(XGUI_IMPL_PATH)/frame.o $(XGUI_IMPL_PATH)/toolbar.o $(XGUI_IMPL_PATH)/space.o $(XGUI_IMPL_PATH)/tree.o $(XGUI_IMPL_PATH)/dmaster.o $(XGUI_IMPL_PATH)/dnd_list.o
+
+GTK_OBJS = $(GTK_IMPL_PATH)/master_impl.o $(GTK_IMPL_PATH)/widget_impl.o $(GTK_IMPL_PATH)/window_impl.o $(GTK_IMPL_PATH)/image_impl.o $(GTK_IMPL_PATH)/button_impl.o $(GTK_IMPL_PATH)/menu_impl.o $(GTK_IMPL_PATH)/hbox_impl.o $(GTK_IMPL_PATH)/vbox_impl.o $(GTK_IMPL_PATH)/view_impl.o $(GTK_IMPL_PATH)/label_impl.o $(GTK_IMPL_PATH)/entry_impl.o $(GTK_IMPL_PATH)/list_impl.o $(GTK_IMPL_PATH)/calendar_impl.o $(GTK_IMPL_PATH)/slider_impl.o $(GTK_IMPL_PATH)/imageview_impl.o $(GTK_IMPL_PATH)/progressbar_impl.o $(GTK_IMPL_PATH)/tab_impl.o $(GTK_IMPL_PATH)/spin_impl.o $(GTK_IMPL_PATH)/checkbox_impl.o $(GTK_IMPL_PATH)/combobox_impl.o $(GTK_IMPL_PATH)/frame_impl.o $(GTK_IMPL_PATH)/space_impl.o $(GTK_IMPL_PATH)/toolbar_impl.o $(GTK_IMPL_PATH)/tree_impl.o $(GTK_IMPL_PATH)/dndlist_impl.o
+
+all: debug test
+
+%.o: %.cpp
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -c -o $@ $<
+
+
+lib: $(XGUI_OBJS) $(GTK_OBJS)
+	$(CPP) $(LIBS) $(XGUI_OBJS) $(GTK_OBJS) -fPIC -shared -rdynamic -o libxgui.so
+
+debug:
+	test ! `$(CPP) $(CPPFLAGS) -I$(XGUI_IMPL_PATH) -I$(GTK_IMPL_PATH) -c tests/ctime_debug.cpp`
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) tests/debug.cpp -o tests/debug
+
+test: $(XGUI_OBJS) $(GTK_OBJS) tests/exe_test/main.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(GTK_OBJS) $(LIBS) tests/exe_test/main.o -o output/main
+
+python: $(XGUI_OBJS) $(GTK_OBJS)
+	cd pywrap && swig -c++ -python -I../xgui/ -o ../xgui_wrap.cpp xgui.i
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -I`python -c "import distutils.sysconfig as sc; print sc.get_python_inc ()"` $(LIBS) $(XGUI_OBJS) $(GTK_OBJS) xgui_wrap.cpp -shared -o output/_xguimodule.so
+	mv xgui.py output/xgui.py
+
+pexplorer: $(XGUI_OBJS) $(GTK_OBJS) tests/pexplorer/pexplorer.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(GTK_OBJS) $(LIBS) tests/pexplorer/pexplorer.o -o output/pexplorer
+	
+plan: $(XGUI_OBJS) $(GTK_OBJS) tests/plan/main.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(GTK_OBJS) $(LIBS) -rdynamic tests/plan/main.o -o output/plan
+
+plugin:
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -fPIC -shared -rdynamic tests/plugin_test/plugin_test.cpp -o output/plugin_test.so
+
+xml: $(XGUI_OBJS) $(GTK_OBJS) plugin tests/xml_test/xml.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(GTK_OBJS) $(LIBS) -rdynamic  tests/xml_test/xml.o -o output/xml
+
+install: lib
+	mkdir -p $(INSTALL_PATH)/include/xgui/
+	mkdir -p $(INSTALL_PATH)/lib/
+	cp xgui/*.h $(INSTALL_PATH)/include/xgui/
+	mv libxgui.so $(INSTALL_PATH)/lib/
+	ldconfig
+
+uninstall:
+	rm -rf $(INSTALL_PATH)/include/xgui
+	rm -rf $(INSTALL_PATH)/lib/libxgui.so
+
+clean:
+	rm -f xgui_wrap.cpp
+	rm -rf *.o
+	rm -rf $(XGUI_IMPL_PATH)/*.o
+	rm -f tests/*/*.o
+	rm -rf tests/debug
+	rm -rf tests/_xguimodule.so
+	rm -rf tests/xgui.py
+	rm -rf $(GTK_IMPL_PATH)/*.o

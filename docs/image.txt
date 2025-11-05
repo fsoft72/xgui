@@ -1,0 +1,41 @@
+Image
+	derives from Object
+
+DESCR
+	Image class represents an image loaded from a file.
+	This class cannot be directly instantiated, but must be created using the
+	Master::LoadImage() function.
+
+
+METHODS
+
+*
+int ref()
+	- increments the reference count of the image object and returns the incremented value.
+
+*
+int unref()
+	- decrements the reference count of the image object and destroyes the object when it reaches 0.
+	  Returns the decremented value.
+
+
+*
+std::string const &getPath()
+	- returns the path of the file containing the image that this object represents.
+
+*
+int getWidth()
+	- returns the width of the image in pixels.
+
+*
+int getHeight()
+	- returns the height of the image in pixels.
+
+*
+xguimpl::Image * getImpl()
+	- returns a reference to the implementation class.
+
+*
+bool isValid()
+	- returns true if this object represents a valid image; false otherwise.
+

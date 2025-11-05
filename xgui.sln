@@ -1,0 +1,74 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xgui", "xgui\xgui.vcproj", "{687C8FD0-1AD1-4202-9892-4464F6808DEE}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugin_test", "tests\plugin_test\plugin_test.vcproj", "{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE} = {687C8FD0-1AD1-4202-9892-4464F6808DEE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exe_test", "tests\exe_test\exe_test.vcproj", "{222E501E-21EB-4CDB-944E-F4A6967B9685}"
+	ProjectSection(ProjectDependencies) = postProject
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE} = {687C8FD0-1AD1-4202-9892-4464F6808DEE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xml_test", "tests\xml_test\xml_test.vcproj", "{9FF33BB6-3398-4431-8525-4CBFCE114C55}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E} = {BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE} = {687C8FD0-1AD1-4202-9892-4464F6808DEE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plan", "tests\plan\plan.vcproj", "{36C48586-F862-48F1-BB63-AE481443BDCE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE} = {687C8FD0-1AD1-4202-9892-4464F6808DEE}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		DebugDLL = DebugDLL
+		DebugPYD = DebugPYD
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.Debug.ActiveCfg = Debug|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.Debug.Build.0 = Debug|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.DebugDLL.ActiveCfg = DebugDLL|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.DebugDLL.Build.0 = DebugDLL|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.DebugPYD.ActiveCfg = DebugPYD|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.DebugPYD.Build.0 = DebugPYD|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.Release.ActiveCfg = Release|Win32
+		{687C8FD0-1AD1-4202-9892-4464F6808DEE}.Release.Build.0 = Release|Win32
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}.Debug.ActiveCfg = Debug|Win32
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}.DebugDLL.ActiveCfg = Debug|Win32
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}.DebugDLL.Build.0 = Debug|Win32
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}.DebugPYD.ActiveCfg = Debug|Win32
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}.Release.ActiveCfg = Release|Win32
+		{BF2ADD6C-4842-49B8-9403-C82CAC7DBB9E}.Release.Build.0 = Release|Win32
+		{222E501E-21EB-4CDB-944E-F4A6967B9685}.Debug.ActiveCfg = Debug|Win32
+		{222E501E-21EB-4CDB-944E-F4A6967B9685}.Debug.Build.0 = Debug|Win32
+		{222E501E-21EB-4CDB-944E-F4A6967B9685}.DebugDLL.ActiveCfg = Debug|Win32
+		{222E501E-21EB-4CDB-944E-F4A6967B9685}.DebugPYD.ActiveCfg = Debug|Win32
+		{222E501E-21EB-4CDB-944E-F4A6967B9685}.Release.ActiveCfg = Release|Win32
+		{222E501E-21EB-4CDB-944E-F4A6967B9685}.Release.Build.0 = Release|Win32
+		{9FF33BB6-3398-4431-8525-4CBFCE114C55}.Debug.ActiveCfg = Debug|Win32
+		{9FF33BB6-3398-4431-8525-4CBFCE114C55}.DebugDLL.ActiveCfg = Debug|Win32
+		{9FF33BB6-3398-4431-8525-4CBFCE114C55}.DebugDLL.Build.0 = Debug|Win32
+		{9FF33BB6-3398-4431-8525-4CBFCE114C55}.DebugPYD.ActiveCfg = Debug|Win32
+		{9FF33BB6-3398-4431-8525-4CBFCE114C55}.Release.ActiveCfg = Release|Win32
+		{9FF33BB6-3398-4431-8525-4CBFCE114C55}.Release.Build.0 = Release|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.Debug.ActiveCfg = Debug|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.Debug.Build.0 = Debug|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.DebugDLL.ActiveCfg = Debug|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.DebugDLL.Build.0 = Debug|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.DebugPYD.ActiveCfg = Debug|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.DebugPYD.Build.0 = Debug|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.Release.ActiveCfg = Release|Win32
+		{36C48586-F862-48F1-BB63-AE481443BDCE}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

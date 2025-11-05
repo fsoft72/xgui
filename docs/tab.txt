@@ -1,0 +1,61 @@
+Tab
+	derives from Container
+
+METHODS
+
+*
+void setPageIcon(xgui::Widget *, xgui::Image * icon)
+	- sets the image displayed on the specified tab page near the label text
+
+
+*
+void setPageLabel(xgui::Widget *, std::string const &str)
+	- sets the text displayed on the label for the specified tab page.
+
+
+*
+xgui::Image * getPageIcon(xgui::Widget * w)
+	- returns the icon displayed on the specified tab page near the label text
+
+
+*
+std::string const &getPageLabel(xgui::Widget * w)
+	- returns the label text of the specified tab page
+
+
+PROPERTIES
+
++
+page-count (RO)
+	- retrieves the number of pages that the tab widgets currently holds
+
++
+selected-page (RW)
+	- sets or retrieves the id of the currently selected page of the tab.
+
++
+selected-index (RW)
+	- sets or retrieves the zero-based index of the currently selected page of the tab.
+
+
+EVENTS
+
+@
+onselect (linked to xgui::TextStatusCallback)
+	- fired when the currently selected tab page changes.
+	  the string parameter passed to the callback function is the id of the new selected page.
+	  The status parameter is the index of the new selected page.
+
+
+
+PUSHED PROPERTIES (properties registered on all children)
+
+#
+tab-icon (RW)
+	- sets or retrieves the path of the file containing the icon displayed near the label text of the tab page
+	  containing this child.
+
+tab-label (RW)
+	- sets or retrieves the label text of the tab page containing this child.
+
+

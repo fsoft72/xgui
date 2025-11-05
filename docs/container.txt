@@ -1,0 +1,30 @@
+Container
+	derives from Widget
+
+METHODS
+
+*
+xgui::Widget * findChild(std::string const &child_name)
+	- returns the child identified by <child_name>, or NULL if no child is found.
+	  The child is searched in the container and recursively in the children of all the contained containers.
+
+
+*
+xgui::Widget * findDirectChild(std::string const &child_name)
+	- returns the child identified by <child_name>, or NULL if no child is found.
+	  No recursive search is performed, just the direct children of the container are searched.
+
+
+*
+xgui::Widget * getChild(int pos)
+	- returns the child widget at the specified position in the contained children list, or NULL if there is no child at the specified position.
+
+
+
+PROPERTIES
+	none.
+
+
+EVENTS
+	none.
+

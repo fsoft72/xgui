@@ -1,0 +1,37 @@
+Spin
+	derives from Widget
+
+METHODS
+	none.
+
+
+PROPERTIES
+
++
+value (RW)
+	- sets or retrieves the current spin box value.
+
++
+min (RW)
+	- sets or retrieves the minimum spin box value.
+	  default: "0"
+
++
+max (RW)
+	- sets or retrieves the maximum spin box value.
+	  default: "100"
+
+
+EVENTS
+
+@
+onchange (linked to xgui::TextCallback)
+	- fired when the spin box value changes.
+	  the string parameter passed to the callback function is the new spin box value.
+	  Returning xgui::EVT_BLOCK from the callback function prevents the value to change.
+
+@
+onsubmit (linked to xgui::TextCallback)
+	- fired when the enter key is pressed while the spin widget has the keyboard focus.
+	  the string parameter passed to the callback function is the spin box value
+

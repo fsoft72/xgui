@@ -1,0 +1,38 @@
+Slider
+	derives from Widget
+
+METHODS
+
+*
+int getPos ()
+	- returns the current position of the slider
+
+*
+void setPos ( int pos )
+	- sets the current postition of the slider
+
+
+PROPERTIES
+
++
+pos (RW)
+	- sets or retrieves the current position of the slider
+
++
+min (RW)
+	- sets or retrieves the starting position of the slider
+	  default: "0"
+
++
+max (RW)
+	- sets or retrieves the maximum position of the slider
+	  default: "100"
+
+
+EVENTS
+
+@
+onchange (linked to xgui::TextCallback)
+	- fired when the position of the slider changes.
+	  the string parameter passed to the callback function is the current slider position.
+

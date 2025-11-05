@@ -1,0 +1,29 @@
+TextCallback
+	derives from Callbabk
+
+DESCR
+	Interface for callback functions with a text parameter.
+
+
+METHODS
+
+*
+call ( Widget *, std::string const &text )
+	- calls the method wrapped by this callback object. The method accepts the widget reference and a text parameter.
+
+==============================================
+
+CppFTextCallback
+	derives from TextCallback
+
+DESCR
+	Standard C++ wrapper for callbacks with a text parameter.
+
+
+CONSTRUCTOR
+
+*
+CppFTextCallback ( int(*fptr)(Widget *, std::string const &) )
+	- initializes the CppFCallback class with the specified function pointer
+
+

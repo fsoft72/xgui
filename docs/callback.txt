@@ -1,0 +1,32 @@
+Callback
+
+DESCR
+	Basic interface for all callback types.
+
+
+METHODS
+
+*
+call ( Widget * )
+	- calls the method wrapped by this callback object. The method accepts the widget reference as the only parameter.
+	  It can return one of the follwing values:
+	  	xgui::EVT_PROPAGATE		the event is propagated to the next event handlers
+		xgui::EVT_BLOCK			the event is not propagated
+
+
+==============================================
+
+CppFCallback
+	derives from Callback
+
+DESCR
+	Standard C++ wrapper for basic callback.
+
+
+CONSTRUCTOR
+
+*
+CppFCallback ( int(*fptr)(Widget*) )
+	- initializes the CppFCallback class with the specified function pointer
+	
+

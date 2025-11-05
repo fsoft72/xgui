@@ -1,0 +1,42 @@
+INSTALL_PATH=/usr/local/
+
+NS_IMPL_PATH=./xgui/openstep/
+XGUI_IMPL_PATH=./xgui/
+
+CPP=g++
+CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -DOPENSTEP
+
+OBJC=gcc
+OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString
+
+XGUI_INCLUDES= `xml2-config --cflags`  -I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
+LIBS= `xml2-config --libs` -lobjc -lstdc++ -framework cocoa
+
+XGUI_OBJS = $(XGUI_IMPL_PATH)/class_info.o $(XGUI_IMPL_PATH)/object.o $(XGUI_IMPL_PATH)/container.o $(XGUI_IMPL_PATH)/widget.o $(XGUI_IMPL_PATH)/master.o $(XGUI_IMPL_PATH)/callback.o $(XGUI_IMPL_PATH)/window.o $(XGUI_IMPL_PATH)/image.o $(XGUI_IMPL_PATH)/button.o $(XGUI_IMPL_PATH)/menu.o $(XGUI_IMPL_PATH)/hbox.o $(XGUI_IMPL_PATH)/vbox.o $(XGUI_IMPL_PATH)/model.o $(XGUI_IMPL_PATH)/view.o $(XGUI_IMPL_PATH)/style.o $(XGUI_IMPL_PATH)/label.o $(XGUI_IMPL_PATH)/entry.o $(XGUI_IMPL_PATH)/list.o $(XGUI_IMPL_PATH)/calendar.o $(XGUI_IMPL_PATH)/slider.o $(XGUI_IMPL_PATH)/imageview.o $(XGUI_IMPL_PATH)/progressbar.o $(XGUI_IMPL_PATH)/tab.o $(XGUI_IMPL_PATH)/spin.o $(XGUI_IMPL_PATH)/checkbox.o $(XGUI_IMPL_PATH)/combobox.o $(XGUI_IMPL_PATH)/frame.o $(XGUI_IMPL_PATH)/toolbar.o $(XGUI_IMPL_PATH)/space.o $(XGUI_IMPL_PATH)/tree.o $(XGUI_IMPL_PATH)/dmaster.o
+
+NS_OBJS = $(NS_IMPL_PATH)/openstep_object.o $(NS_IMPL_PATH)/master_impl.o $(NS_IMPL_PATH)/widget_impl.o $(NS_IMPL_PATH)/window_impl.o $(NS_IMPL_PATH)/image_impl.o $(NS_IMPL_PATH)/button_impl.o $(NS_IMPL_PATH)/menu_impl.o $(NS_IMPL_PATH)/hbox_impl.o $(NS_IMPL_PATH)/vbox_impl.o $(NS_IMPL_PATH)/view_impl.o $(NS_IMPL_PATH)/label_impl.o $(NS_IMPL_PATH)/entry_impl.o $(NS_IMPL_PATH)/list_impl.o $(NS_IMPL_PATH)/calendar_impl.o $(NS_IMPL_PATH)/slider_impl.o $(NS_IMPL_PATH)/imageview_impl.o $(NS_IMPL_PATH)/progressbar_impl.o $(NS_IMPL_PATH)/tab_impl.o $(NS_IMPL_PATH)/spin_impl.o $(NS_IMPL_PATH)/checkbox_impl.o $(NS_IMPL_PATH)/combobox_impl.o $(NS_IMPL_PATH)/frame_impl.o $(NS_IMPL_PATH)/space_impl.o $(NS_IMPL_PATH)/toolbar_impl.o $(NS_IMPL_PATH)/tree_impl.o
+
+all: test
+
+%.o: %.mm %.h
+	$(OBJC) $(OBJCFLAGS) $(XGUI_INCLUDES) -c -o $@ $<
+
+%.o: %.cpp
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -c -o $@ $<
+
+lib: $(XGUI_OBJS) $(NS_OBJS)
+	$(CPP) $(LIBS) $(XGUI_OBJS) $(NS_OBJS) -fPIC -shared -rdynamic -o output/libxgui.so
+
+test: $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(LIBS) $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o -o output/main
+
+clean:
+	rm -f xgui_wrap.cpp
+	rm -rf *.o
+	rm -rf $(XGUI_IMPL_PATH)/*.o
+	rm -f tests/*/*.o
+	rm -rf tests/debug
+	rm -rf tests/_xguimodule.so
+	rm -rf tests/xgui.py
+	rm -rf $(NS_IMPL_PATH)/*.o
+	rm -f output/libxgui.so

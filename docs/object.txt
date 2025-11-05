@@ -1,0 +1,148 @@
+Object
+
+METHODS
+
+
+/////// DA SPOSTARE IN CLASSINFO ////////////////////
+*
+bool isWidget()
+	- returns true if the object is a widget (i.e.: it's castable to Widget class), false otherwise
+
+*
+bool isModel()
+	- returns true if the object is a model (i.e.: it's castable to Model class), false otherwise
+
+*
+bool isStyleManager()
+	- returns true if the object is a style manager (i.e.: it's castable to StyleManager class), false otherwise
+
+*
+bool isContainer()
+	- returns true if the object is a container (i.e.: it's castable to Container class), false otherwise
+/////// DA SPOSTARE IN CLASSINFO ////////////////////
+
+
+*
+std::string const &className()
+	- returns the name of the class this object belongs to
+
+*
+xgui::ClassInfo * getClass()
+	- returns a pointer to a ClassInfo structure that represents the object class.
+
+*
+bool isIdentifiedAs(std::string const &id)
+	- returns true if the object's id is equal to the specified id; false otherwise
+
+*
+std::string const &id()
+	- returns the object's id
+
+*
+void setId(std::string const &id)
+	- sets a new id for the object
+
+*
+void store(std::string const &name, xgui::Object * o, bool destroy = false)
+	- stores a reference to an object <o> within this object. <name> is a string used for retrieving the object reference later.
+	  If <destroy> is set to true then the object <o> is explicitly destroyed (i.e. passed to the Master::Destroy() function) when removed
+	  from the store.
+
+*
+xgui::Object * retrieve(std::string const &name)
+	- returns an object reference previously set with the store() method.
+	
+*
+void unstore(std::string const &name)
+	- removes an object reference previously set with the store() method.
+
+*
+bool set(std::string const &name, std::string const &val)
+	- sets the property specified by <name> to the value <val>
+
+*
+bool get(std::string const &name, std::string &dest)
+	- gets the property specified by <name> filling the <dest> string with its value; return true
+	  if the specified property exists, false otherwise
+	
+*
+void registerProperty(std::string const &prop, xgui::PropertySetter setter, xgui::PropertyGetter getter)
+	- register a new property handler for the object;
+	  <prop> specifies the property name,
+	  <setter> is a pointer to the function that will be called for setting the property value,
+	  <getter> is a pointer to the function that will be called for retrieving the property value
+
+*
+std::vector<std::string> properties()
+	- returns a vector of all property names of the object
+
+*
+xgui::PropertyType hasProperty(std::string const &property)
+	- returns xgui::PROPERTY_NOT_FOUND if the object doesn't have the specified property
+	  returns xgui::PROPERTY_READ_ONLY if the property is read-only
+	  returns xgui::PROPERTY_READ_WRITE if the property is read-write
+
+
+*
+virtual void addOwner(void *o)
+	- adds <o> among the object owners
+
+*
+virtual void delOwner(void *o)
+	- removes <o> from the object owners
+
+*
+virtual void setOwnerDestructionNotifier(void (*notifier)(void *, xgui::Object *))
+	- sets a function the will be called for each registered owner when the object is destroyed
+	
+
+*
+std::string pack()
+	returns a string representing the object
+
+
+*
+static xgui::Object * Unpack(std::string const &obj)
+	- returns an object given a pack string
+
+*
+DMethod * findMethod(std::string const &name)
+	- returns the dynamic method called <name> or NULL if the object doesn't have one
+
+
+*
+void registerMethod(std::string const &name, DMethod * m)
+	- register a new dynamic method; <name> is the method name and <m> is the reference to an object that encapsulate the method
+
+
+*
+std::string call(std::string const &method, std::string const &p1)
+	- calls a dynamic method with one parameter
+
+
+*
+std::string call(std::string const &method, std::string const &p1, std::string const &p2);
+	- calls a dynamic method with two parameters
+
+
+*
+std::string call(std::string const &method, std::string const &p1, std::string const &p2, std::string const &p3);
+	- calls a dynamic method with three parameters
+
+
+*
+std::string call(std::string const &method, std::string const &p1, std::string const &p2, std::string const &p3, std::string const &p4);
+	- calls a dynamic method with four parameters
+
+
+*
+std::string call(std::string const &method, std::string const &p1, std::string const &p2, std::string const &p3, std::string const &p4, std::string const &p5);
+	- calls a dynamic method with five parameters
+
+
+PROPERTIES
+
++
+id (RW)
+	- sets or retrieves the object ID
+

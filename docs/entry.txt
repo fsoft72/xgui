@@ -1,0 +1,59 @@
+Entry
+	derives from Widget
+
+METHODS
+
+*
+void appendText ( const std::string & text )
+	- appends a text string to the end of the entry text
+
+*
+void prependText ( const std::string & text )
+	- inserts a text string at the beginning of the entry text
+
+
+*
+void insertText ( const std::string & text, int pos )
+	- inserts a text string at the specified position in the entry text
+
+
+PROPERTIES
+
++
+text (RW)
+	- sets or retrieves the text displayed in the entry
+
++
+editable (RW)
+	- if set to "1" the entry can be edited (i.e.: the contained text can be changed); if set to "0" the entry text is read-only.
+	  default: "1"
+
++
+maxlength (RW)
+	- sets or retrieves the maximum length of the entry text
+
++
+password-mode (RW)
+	- if set to "1" then a password character (usually '*') is displayed in place of the characters typed by the user.
+	  default: "0"
+
++
+alignment (RW)
+	- sets or retrieves the text alignment of the entry box.
+	  It can be one of the following strings: "left, "center", "right".
+	  default: "left"
+
+
+EVENTS
+
+@
+onsubmit (linked to xgui::TextCallback)
+	- fired when the enter key is pressed while the entry widget has the keyboard focus.
+	  the string parameter of the callback function is the entry text.
+
+@
+onchange (linked to xgui::TextCallback)
+	- fired when the user has taken an action that may have altered text in the entry widget.
+	  the string parameter is the altered entry text.
+	  Returning xgui::EVT_BLOCK from the callback function prevents the text changing.
+

@@ -1,0 +1,50 @@
+Checkbox
+	derives from Widget
+
+METHODS
+
+*
+void setValue(std::string const &)
+	- assigns a value to the checkbox (the value will be passed as a parameter to the "onclick" event callback)
+
+
+*
+std::string const &getValue()
+	- returns the value assigned to the checkbox
+
+
+PROPERTIES
+
++
+text (RW)
+	- sets or retrieves the text displayed near the checkbox
+
++
+alignment (RW)
+	- sets or retrieves the alignment of the checkbox text; it can be one of the following values:
+		"left": the text is displayed to the left of the checkbox
+		"right": the text is displayed to the right of the checkbox
+	  default: "right"
+
++
+value (RW)
+	- sets or retrieves the value assigned to the checkbox
+	  this value will be passed as a parameter to the "onclick" event callback
+	  default: "on"
+
++
+checked (RW)
+	- set it to "1" for changing the checkbox to the checked state; set to "0" to uncheck it
+
+
+EVENTS
+
+@
+onclick (linked to xgui::TextCallback)
+	- fired when the checkbox is clicked
+	  the string parameter is equal to the value assigned to the checkbox (see "value" property or setValue() method)
+	  if the click changes the state to the "checked" state; otherwise the string parameter is emtpy
+
+
+
+

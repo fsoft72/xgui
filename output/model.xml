@@ -1,0 +1,16 @@
+<model id="model1">
+	<model style="red-blue">
+		<modelentry>A</modelentry>
+		<modelentry>A-1</modelentry>
+		<model>
+			<modelentry>A1</modelentry>
+		</model>
+	</model>
+	<model style="bold">
+		<modelentry>B</modelentry>
+		<modelentry>B-1</modelentry>
+		<model>
+			<modelentry>B1</modelentry>
+		</model>
+	</model>
+</model>

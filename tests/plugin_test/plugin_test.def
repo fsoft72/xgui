@@ -1,0 +1,7 @@
+LIBRARY	plugin_test
+
+EXPORTS
+
+xgui_module_init
+xgui_module_close
+

@@ -1,0 +1,42 @@
+View
+	derives from Widget
+
+METHODS
+
+*
+void setModel ( xgui::Model * model )
+	- sets a new model for the view. The model holds all the data that the view will display.
+
+
+*
+xgui::Model * getModel()
+	- returns the model assigned to the view.
+
+*
+void refresh()
+	- updates the view contents retrieving the data from the assigned model.
+
+
+*
+bool isSelected(xgui::Model * parent, int child_pos)
+	- returns true if the model item identified by <parent> and <child_pos> is currently selected in this view
+	
+*
+void select(xgui::Model * parent, int child_pos, bool state)
+	- changes the selected state of the model item identified by <parent> and <child_pos> in this view.
+	  If <state> is true the state is changed to "selected"; otherwise it's changed to "unselected".
+
+
+*
+void selectAll(xgui::Model * parent, bool state)
+	- changes the selected state of all the children of the model item identified by <parent> in this view.
+	  If <state> is true the state is changed to "selected"; otherwise it's changed to "unselected".
+
+
+PROPERTIES
+	none.
+
+
+EVENTS
+	none.
+

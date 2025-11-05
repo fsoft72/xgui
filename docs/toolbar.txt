@@ -1,0 +1,67 @@
+Toolbar
+	derives from Widget
+
+METHODS
+
+*
+int addItem ( std::string const &id, std::string const &text, xgui::Image * icon, std::string const &tooltip, std::string const & type = "" )
+	- adds a new toolbar item. <id> specifies the id of the element to be added, <text> is the text displayed on the item when the toolbar has
+	  a style that displays text, <icon> is the image to show when the toolbar has a style that displays images and <tooltip> is the
+	  tooltip to show for the item.
+	  <type> can be an empty string for a standard toolbar button or any
+	  of the following values:
+	  	- "separator"	-> creates an empty space
+		- "check"	-> creates a checkable button
+		- "radio_begin"	-> pseudo-item that specifies the beginning of a radio group
+		- "radio_end"	-> pseudo-item that specifies the end of a radio group
+
+*
+void delItem ( const std::string & name )
+	- removes the specified item from the toolbar.
+
+
+*
+void enableButton ( const std::string & name )
+	- enables the specified toolbar button (the button can be clicked)
+
+
+*
+void disableButton ( const std::string & name )
+	- disables the specified toolbar button (the button can't be clicked and is grayed)
+
+
+*
+void checkButton ( const std::string & name )
+	- puts the specified checkable toolbar button in the "checked" state.
+
+
+*
+void uncheckButton ( const std::string & name )
+	- puts the specified checkable toolbar button in the "unchecked" state.
+
+
+*
+bool isButtonChecked ( const std::string & name )
+	- returns true if the specified checkable toolbar button is in the "checked" state.
+
+
+PROPERTIES
+
++
+style (RW)
+	- sets or retrieves the toolbar style. It can be one of the following values:
+		"icons"		-> only icons are displayed on toolbar buttons (no text is displayed,
+				   if a button does not have a tooltip text then the text is displayed as a tooltip)
+		"text"		-> only text is displayed on toolbar buttons (no image is displayed)
+		"both"		-> both icons and text are displayed on toolbar buttons
+	  default: "both"
+
+
+EVENTS
+
+@
+onclick (linked to xgui::TextStatusCallback)
+	- fired when the user clicks on a toolbar button.
+	  the string parameter of the callback function is the name of the clicked toolbar button.
+	  The status parameter is set to 1 if the clicked button has been checked, otherwise is set to 1.
+

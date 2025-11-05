@@ -1,0 +1,40 @@
+HBox
+	derives from Container
+
+METHODS
+
+*
+void setExpand(xgui::Widget * w, float expand)
+	- sets the expansion mode for a HBox child specified by <w>.
+	  Children are always vertically expanded.
+	  If <expand> is set to 0.0 the child is not horizontally expanded.
+	  If set to 1.0 the child is expanded with a ratio based on its minimum horizontal size.
+	
+*
+float getExpand(xgui::Widget * w)
+	- returns the expansion mode set by the setExpand() method for the specified HBox child. 
+
+
+PROPERTIES
+
++
+space (RW)
+	- sets or retrieves the border space in pixels.
+
++
+border (RW)
+	- if set to "1" the HBox is sorrounded by a border, if set to "0" no border is displayed.
+	  default: "0"
+
+
+EVENTS
+	none.
+
+
+PUSHED PROPERTIES (properties registered on all children)
+
+#
+expand (RW)
+	- sets or retrieves the expansion mode for the child. See also setExpand() method.
+
+

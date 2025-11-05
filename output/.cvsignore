@@ -1,0 +1,12 @@
+Release
+Debug
+*.exe
+*.dll
+*.pdb
+*.lib
+*.exp
+*.py
+*.pyc
+*.pyd
+*.ilk
+*.dtd

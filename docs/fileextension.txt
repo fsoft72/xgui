@@ -1,0 +1,29 @@
+FileExtension
+
+DESCR
+	Information class used to describe a file type with its extensions (used in Master::OpenFileDialog() and Master::SaveFileDialog() functions).
+
+
+CONSTRUCTORS
+
+*
+FileExtension()
+	- initializes a FileExtension with just the "All files" file type
+
+*
+FileExtension ( std::string const &n, std::string const &ext )
+	- initializes a file extension structure with the specified information. See the member variables description.
+
+
+MEMBER VERIABLES
+
+%
+std::string name
+	- the file type (e.g.: "Image files")
+
+
+%
+std::string extension
+	- a semicolon separated list of file extensions (e.g: "*.jpg;*.png;*.bmp")
+
+

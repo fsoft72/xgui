@@ -1,0 +1,344 @@
+Master
+	derives from Object
+
+DESCR
+	This class contains a set of static functions that can be used to create and manage all the other
+	XGui objects.
+
+
+METHODS
+
+*
+xguimpl::Master * getImpl()
+	- returns a pointer to the Master implementation object.
+
+*
+static Master * Instance()
+	- returns the current instance of the Master class or creates a new instance if it does not exist yet.
+
+*
+static void Quit()
+	- exits XGui main event loop started with the Run() method.
+
+*
+static int Run()
+	- enters the main XGui event loop.
+
+
+*
+static void RegisterIdleCallback ( xgui::Callback * cbk, xgui::Widget * wid )
+	- register a callback funtion that will be executed after the main event loop has finished processing currently pending events.
+	  <wid> will be passed as a parameter to the callback function.
+
+
+*
+static xgui::Container * FindContext(std::string const &id)
+	- returns the context (usually a top-level window) with the specified id.
+
+
+*
+static void RegisterContext(xgui::Container * w)
+	- registers a new context in the internal contexts list.
+
+
+*
+static void UnregisterContext(xgui::Container * w)
+	- removes a context from the internal contexts list.
+	
+
+*
+static xgui::Image * LoadImage(std::string const &path)
+	- loads an image from the specified file and returns an xgui::Image object that represents it.
+	  If the specified file has already benn loaded then the same Image object is returned.
+
+
+*
+static xgui::Image * GetImage(std::string const &path)
+	- returns a pointer to an Image object of an already loaded image, or NULL if the specified image file
+	  is not loaded.
+
+
+*
+static xgui::Image * NullImage()
+	- returns a pointer to an Image object that does not represents a real image. It is used when a function argument
+	  requires an Image object reference.
+
+*
+static void InitThreads()
+	- initializes the XGui threading environment. This function should be called on application startup.
+
+
+*
+static void QuitThreads()
+	- terminates the XGui threading environment. This function should be called on application cleanup.
+
+
+*
+static void GuiLock()
+	- ???
+
+*
+static void GuiUnlock()
+	- ???
+
+*
+static xgui::Window * CreateWindow(xgui::Window * parent = 0)
+	- creates a new Window widget and returns a pointer to it.
+	  If <parent> is specified then a modal window is created.
+
+*
+static xgui::Button * CreateButton(xgui::Container * parent, std::string const &text, xgui::Image * image = 0, bool toggle_button = false)
+	- creates a new Button widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <text> is the text displayed on the button.
+	  If <image> is specified, then the image is displayed on the button.
+	  If <toggle_button> is true then a toggle button is created: a toggle button maintains its pressed/unpressed position
+	  as the user clicks on it.
+
+
+*
+static xgui::Menu * CreateMenu(xgui::Window * parent, bool visible = true)
+	- creates a new Menu widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  If <visible> is false the menu is initially hidden.
+
+
+*
+static xgui::VBox * CreateVBox(xgui::Container * parent, int space = 0, bool border = false)
+	- creates a new VBox widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <space> specifies the space in pixels to be left as a margin.
+	  If <border> is set to true a 3d border is displayed around the widget.
+
+
+*
+static xgui::HBox * CreateHBox(xgui::Container * parent, int space = 0, bool border = false)
+	- creates a new HBox widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <space> specifies the space in pixels to be left as a margin.
+	  If <border> is set to true a 3d border is displayed around the widget.
+
+*
+static xgui::Entry * CreateEntry(xgui::Container * parent, std::string const &text, int maxlen=0, bool editable=true, bool password_mode=false)
+	- creates a new Entry widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <text> specifies the text initially displayed in the entry.
+	  <maxlen> is the maximum length in characters of inserted text in the entry.
+	  If <editable> is false then the text in the entry widget is read-only.
+	  If <password_mode> is true then an asterisk is displayed for each character typed in by the user.
+
+*
+static xgui::Label * CreateLabel(xgui::Container * parent, std::string const &text)
+	- creates a new Label widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <text> is the text displayed in the label.
+
+
+*
+static xgui::List * CreateList(xgui::Container * parent, xgui::StyleManager * sm = 0)
+	- creates a new List widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <sm> is an optional pointer to a StyleManager object that defines the visual styles of list items.
+
+
+*
+static xgui::Tree * CreateTree(xgui::Container * parent, xgui::StyleManager * sm = 0)
+	- creates a new Tree widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <sm> is an optional pointer to a StyleManager object that defines the visual styles of tree items.
+
+
+*
+static xgui::Slider * CreateSlider(xgui::Container * parent, int min = 0, int max = 100, bool vertical = false)
+	- creates a new Slider widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <min> is the minimum position of the slider.
+	  <max> is the maximum position of the slider.
+	  If <vertical> is true the slider can be moved vertically, otherwise horizonatlly.
+
+
+*
+static xgui::Calendar * CreateCalendar(xgui::Container * parent)
+	- creates a new Calendar widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+
+
+*
+static xgui::ImageView * CreateImageView(xgui::Container * parent, xgui::Image * img = 0)
+	- creates a new Calendar widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <img> is the image to be displayed in the ImageView.
+
+
+*
+static xgui::Progressbar * CreateProgressbar(xgui::Container * parent, int min = 0, int max = 100)
+	- creates a new Calendar widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <min> is the minimum progressbar counter value.
+	  <max> is the maximum progressbar counter value.
+
+
+*
+static xgui::Tab * CreateTab(xgui::Container * parent, const std::string & alignment = "top")
+	- creates a new Tab widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <alignment> specifies where the tab labels are displayed. It can be one of the following:
+	  	"top", "left", "right", "bottom"
+
+
+*
+static xgui::Checkbox * CreateCheckbox(xgui::Container * parent, std::string const &text)
+	- creates a new Checkbox widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <text> is the text displayed near the checkbox.
+
+
+*
+static xgui::Spin * CreateSpin(xgui::Container * parent, int min = 0, int max = 100)
+	- creates a new Spin widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <min> is the minimum value.
+	  <max> is the maximum value.
+
+*
+static xgui::Frame * CreateFrame(xgui::Container * parent, const std::string & label)
+	- creates a new Frame widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <label> is the text displayed on the frame top border.
+
+
+*
+static xgui::Combobox * CreateCombobox(xgui::Container * parent, bool editable = false)
+	- creates a new Combobox widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  If <editable> is true then the entry part of the combobox can be manually edited
+	  (i.e.: text can be manually changed).
+
+
+*
+static xgui::Space * CreateSpace(xgui::Container * parent, int min_width = 1, int min_height = 1)
+	- creates a new Space widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+	  <min_width> and <min_height> specifiy the minimum dimensions of the space widget.
+
+
+*
+static xgui::Toolbar * CreateToolbar(xgui::Container * parent)
+	- creates a new Toolbar widget and returns a pointer to it.
+	  The newly created widget is inserted as a child of the <parent> container.
+
+
+*
+static void DestroyWidget(xgui::Widget * w)
+	- destroys the specified widget removing it from its parent container.
+
+
+*
+static xgui::Model * CreateModel()
+	- creates a new model to be used in widgets derived from the View class.
+	
+
+*
+static void DestroyModel(xgui::Model * model)
+	- destroyes the specified model. If the model is assigned to some views it's not destroyed.
+
+
+*
+static xgui::StyleManager * CreateStyleManager()
+	- creates a new StyleManager object that is responsible of holding the visual styles of styled items.
+
+
+*
+static void DestroyStyleManager(xgui::StyleManager * sm)
+	- destroyes a StyleManager object.
+	
+
+*
+static xgui::StrVector OpenFileDialog(xgui::Window * parent, const xgui::FileExtensionsVector &filter,
+		std::string const &title, std::string const &path = "", bool multiselection = false)
+	- opens a common requester for opening a file.
+	  <parent> is the the window over which the dialog will be displayed; it can be NULL.
+	  <filter> is a vector of xgui::FileExtension structures that specifies the list of file types that the dialog will display.
+	  <title> is the dialog window title.
+	  <path> is an optional path that represents the directory in which the dialog opens.
+	  <multiselection> can be true to allow the selection of multiple files.
+
+	  The return value is a vector of strings that represents the list of selected files with full paths.
+
+
+*
+static std::string SaveFileDialog(xgui::Window * parent, const xgui::FileExtensionsVector &filter,
+		std::string const &title, std::string const &path = "", std::string const &file_name = "")
+	- opens a common requester for saving a file.
+	  <parent> is the the window over which the dialog will be displayed; it can be NULL.
+	  <filter> is a vector of xgui::FileExtension structures that specifies the list of file types that the dialog will display.
+	  <title> is the dialog window title.
+	  <path> is an optional path that represents the directory in which the dialog opens.
+	  <file_name> is an optional name of a file initially proposed by the dialog as a save file name.
+
+	  The return value is the file name with full path of the selected file.
+
+
+*
+static int MessageDialog(xgui::Window * parent, const std::string & title, const std::string & text,
+		const std::string & type = "info", const std::string & buttons = "ok" )
+	- opens a common dialog for displaying a message text.
+	  <parent> is the the window over which the dialog will be displayed; it can be NULL.
+	  <title> is the dialog window title.
+	  <text> is the text that the dialog should display.
+	  <type> is a class for the message severity and can be one of the follwing strings: "warn", "question", "err" and "info".
+	  <buttons> determines what buttons are displayed in the dialog; it can be one of the following:
+	  	"ok", "ok-cancel", "yes-no", "yes-no-cancel"
+
+
+*
+static void InitDynamicClasses()
+	- initializes the dynamic class environment
+
+
+*
+static xgui::Object * LoadXml(std::string const &filename, xgui::Object * parent = 0)
+	- loads an XML file representing a structure of XGui widgets and returns the root object of the hierarchy.
+	  <parent> is the object that will contain the loaded object.
+
+*
+static void SaveXml(xgui::Object * root, std::string const &filename)
+	- saves the <root> object in an XML structured file.
+	
+
+*
+static void LoadLibrary(std::string const &filename)
+	- loads an external plugin containing XGui widgets.
+
+	
+*
+static void UnloadLibrary(std::string const &filename)
+	- unloads an external library previously loaded with the LoadLibrary() method.
+
+
+*
+static void RegisterClass(xgui::ClassInfo * ginfo)
+	- registers a new widget described by its ClassInfo class
+
+
+*
+static void UnregisterClass(std::string const &cname)
+	- unregisters the widget with the specified class name
+
+
+*
+static xgui::Object * CreateObject(std::string const &class_name, xgui::Object * parent, xgui::StringMap const &properties)
+	- creates an XGui object given its class name.
+	  <parent> is the obejct that will contain the newly created object.
+	  <properties> is a set of properties assigned to the object immediatly after creation.
+
+
+*
+static xgui::Object * FinalizeObject(xgui::Object * o)
+	- ???
+
+*
+static void DestroyObject(xgui::Object * o)
+	- destroyes an object
+
+

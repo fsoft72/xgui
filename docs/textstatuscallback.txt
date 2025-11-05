@@ -1,0 +1,30 @@
+TextStatusCallback
+	derives from Callbabk
+
+DESCR
+	Interface for callback functions with a text and an integer parameters.
+
+
+METHODS
+
+*
+call ( Widget *, std::string const &text, int status )
+	- calls the method wrapped by this callback object. The method accepts the widget reference, a text parameter and
+	  an integer parameter.
+
+==============================================
+
+CppFTextStatusCallback
+	derives from TextStatusCallback
+
+DESCR
+	Standard C++ wrapper for callbacks with a text and an integer parameters.
+
+
+CONSTRUCTOR
+
+*
+CppFTextStatusCallback ( int(*fptr)(Widget *, std::string const &, int status) )
+	- initializes the CppFStatusCallback class with the specified function pointer
+
+

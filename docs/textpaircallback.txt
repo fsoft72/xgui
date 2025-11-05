@@ -1,0 +1,29 @@
+TextPairCallback
+	derives from Callbabk
+
+DESCR
+	Interface for callback functions with two strings parameters.
+
+
+METHODS
+
+*
+call ( Widget *, std::string const &text1, std::string const &text2 )
+	- calls the method wrapped by this callback object. The method accepts the widget reference and two string parameters.
+
+==============================================
+
+CppFTextPairCallback
+	derives from TextPairCallback
+
+DESCR
+	Standard C++ wrapper for callbacks with two string parameters.
+
+
+CONSTRUCTOR
+
+*
+CppFTextPairCallback ( int(*fptr)(Widget *, std::string const &text1, std::string const &text2) )
+	- initializes the CppFTextPairCallback class with the specified function pointer
+
+

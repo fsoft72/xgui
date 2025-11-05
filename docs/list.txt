@@ -1,0 +1,95 @@
+List
+	derives from View
+
+DESCR
+	List widget is a widget that represents a group of data items placing them
+	on a grid of rows and columns. The data are gathered from the model.
+
+
+METHODS
+
+*
+void addColumn ( int cpos, const std::string & cid, const std::string & cname, int cwidth = 100, const std::string & calign = "left" )
+	- adds a column to the list widget.
+	The column will be added at position <cpos>, will be identified by
+	<cid> and will be displayed as <cname>.
+	The list will arrange the columns trying to mantain the given minimum
+	size specified by <cwidth> and the given alignment specified by
+	<calign>
+	
+	NOTE: on Win32 platform if the column position <cpos> is set to 0 then the text is always left-aligned.
+
+
+*
+void delColumn ( const std::string & id )
+	- removes the specified column from the list widget.
+
+
+*
+void sort ( const std::string & column_id, xgui::TextPairCallback * callback )
+	- sorts the list items. <column_id> is the id of the column on which the items are to be sorted and
+	  <callback> is a callback function for item comparison.
+
+
+*
+virtual bool isChecked ( xgui::Model * parent, int child_pos )
+	- returns true if the item identified by <parent> and <child_pos> is in the "checked" state; false otherwise.
+	
+
+*
+virtual void check ( xgui::Model * parent, int child_pos, bool state )
+	- changes the check state of the item identified by <parent> and <child_pos>.
+	  If <state> is set to true the state is changed to "checked", otherwise is changes to "unchecked".
+	
+*
+virtual void checkAll ( xgui::Model * parent, bool state )
+	- changes the check state of all list items.
+	  If <state> is set to true the state is changed to "checked", otherwise is changes to "unchecked".
+
+
+PROPERTIES
+
++
+visible-headers (RW)
+	- if set to "1" columns headers are visible and labeled with column titles; if set to "0"
+	  column headers are not displayed.
+
+
++
+has-icons (RW)
+	- if set to "1" an icon is displayed at the beginning of each row; if set to "0"
+	  no icon is displayed.
+
++
+has-checkboxes (RW)
+	- if set to "1" a checkbox is displayed at the beginning of each row; if set to "0"
+	  no checkbox is displayed.
+
+
+EVENTS
+
+@
+onselect (linked to xgui::TextStatusCallback)
+	- fired when the user changes the select state of an item of the list.
+	  the string parameter of the callback function is the path (see Widget::getPath()) of the item (de)selected.
+	  the status parameter is 1 if the item has been selected, 0 otherwise.
+
+
+@
+onrefresh (linked to xgui::Callback)
+	- fired when the user inserts or removes an item or calls the refresh() method.
+
+
+@
+oncheck (linked to xgui::TextStatusCallback)
+	- fired when the user changes the check state of an item of the list.
+	  the string parameter of the callback function is the path (see Widget::getPath()) of the item (un)checked.
+	  the status parameter is 1 if the item has been checked, 0 otherwise.
+
+
+@
+onheaderclick (linked to xgui::TextCallback)
+	- fired when the user clicks on a column header.
+	  the string parameter of the callback function is the name of the clicked column.
+
+
