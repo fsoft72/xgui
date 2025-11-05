@@ -8,7 +8,7 @@ So please, check the following dependencies:
 	1 - libgtk+-2.0-dev
 	2 - libxml2-dev
 	3 - swig (optional for Python bindings)
-	4 - python-dev (optional for Python bindings)
+	4 - python3-dev (optional for Python bindings)
 
 We are providing different Makefiles:
 

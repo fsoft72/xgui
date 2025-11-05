@@ -12,8 +12,8 @@ def modal_win_quit(win):
 modal_quit_cb = xgui.PyCallback(modal_win_quit)
 
 def count_func(win, spin):
-	print "Entering update thread"
-	
+	print("Entering update thread")
+
 	for i in range(0, 10):
 		xgui.Master.GuiLock()
 		spin.set("pos", str(i))
@@ -35,7 +35,7 @@ def btn_cb_impl(btn):
 	w.modalRun()
 
 	xgui.Master.DestroyWidget(w)
-	print "bye"
+	print("bye")
 
 	return None
 btn_cb = xgui.PyCallback(btn_cb_impl)
@@ -45,11 +45,11 @@ def win_cb_impl(win):
 win_cb = xgui.PyCallback(win_cb_impl)
 
 def menu_selected_impl ( menu, id, status ):
-	print id, status
-	 
+	print(id, status)
+
 	w = menu.getContext ()
 
-	print w
+	print(w)
 
 	if id == 'open':
 		xgui.Master.OpenFileDialog ( w,  
@@ -69,18 +69,18 @@ def menu_selected_impl ( menu, id, status ):
 menu_selected = xgui.PyTextStatusCallback( menu_selected_impl )
 
 def text_cb_impl(entry, text):
-	print "Testo della entry",text
+	print("Testo della entry", text)
 text_cb = xgui.PyTextCallback(text_cb_impl)
 
 
 def thread_func():
 	global quit
-	
+
 	while not quit:
 		time.sleep(1)
-		print "ciao"
-		
-	print "bye, bye"
+		print("ciao")
+
+	print("bye, bye")
 
 def gui_thread():
 	xgui.Master.InitThreads()
@@ -120,5 +120,5 @@ tc.spawn("one", thread_func, ())
 
 gui_thread()
 
-print "Quitting..."
+print("Quitting...")
 quit = True
