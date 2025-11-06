@@ -26,7 +26,7 @@ static GtkWidget * widget_find_by_name (GtkWidget *parent, std::string const &na
 
   else {
     if (GTK_CONTAINER(parent)) {
-      children = gtk_container_children (GTK_CONTAINER(parent));
+      children = gtk_container_get_children (GTK_CONTAINER(parent));
       for (l=children; l; l=l->next) {
         if (GTK_IS_WIDGET(l->data)) {
           w = GTK_WIDGET (l->data);
@@ -41,6 +41,7 @@ static GtkWidget * widget_find_by_name (GtkWidget *parent, std::string const &na
           }
         }
       }
+      g_list_free(children);
     }
   }
 
@@ -101,13 +102,13 @@ namespace xguimpl
 	{
 		GtkToolItem * item = gtk_tool_button_new( btn.image ? GTK_WIDGET ( btn.image->getImpl()->getImage() ) : 0, btn.text.c_str());
 		gtk_widget_set_name( GTK_WIDGET(item), btn.name.c_str() );
-	
+
 		if ( !btn.tooltip.empty() )
-			gtk_tool_item_set_tooltip ( item, xgui::Master::Instance()->getImpl()->app_tooltips, btn.tooltip.c_str(), btn.tooltip.c_str());
-	
+			gtk_tool_item_set_tooltip_text ( item, btn.tooltip.c_str());
+
 		gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, this_tb->nelements_ );
 		g_signal_connect ( G_OBJECT ( item ), "clicked", G_CALLBACK ( OnClick ), this );
-	
+
 		if ( btn.image ) {
 			btn.image->ref();
 			this_tb->images_.push_back(btn.image);
@@ -118,19 +119,19 @@ namespace xguimpl
 	{
 		GtkToolItem * item = gtk_toggle_tool_button_new();
 		gtk_widget_set_name( GTK_WIDGET(item), btn.name.c_str() );
-	
+
 		if ( !btn.text.empty() )
 			gtk_tool_button_set_label ( GTK_TOOL_BUTTON ( item ), btn.text.c_str() );
-	
+
 		if ( btn.image ) {
 			gtk_tool_button_set_icon_widget ( GTK_TOOL_BUTTON ( item ), GTK_WIDGET(btn.image->getImpl()->getImage()) );
 			btn.image->ref();
 			this_tb->images_.push_back(btn.image);
 		}
-	
+
 		if ( !btn.tooltip.empty() )
-			gtk_tool_item_set_tooltip ( item, xgui::Master::Instance()->getImpl()->app_tooltips, btn.tooltip.c_str(), btn.tooltip.c_str());
-	
+			gtk_tool_item_set_tooltip_text ( item, btn.tooltip.c_str());
+
 		gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, this_tb->nelements_ );
 		g_signal_connect ( G_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
 	}
@@ -153,10 +154,8 @@ namespace xguimpl
 				this_tb->images_.push_back(btn->image);
 			}
 			if ( !btn->tooltip.empty() )
-				gtk_tool_item_set_tooltip ( item,
-				                            xgui::Master::Instance()->getImpl()->app_tooltips, 
-			                                    btn->tooltip.c_str(), btn->tooltip.c_str() );
-	
+				gtk_tool_item_set_tooltip_text ( item, btn->tooltip.c_str() );
+
 			group = gtk_radio_tool_button_get_group ( GTK_RADIO_TOOL_BUTTON ( item ) );
 			gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, button_pos++ );
 			g_signal_connect ( G_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );

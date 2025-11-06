@@ -266,7 +266,7 @@ namespace xguimpl
 	{
 		if ( (!tree_view) || (!this_tree->getModel()) ) return;
 
-		if ( GTK_WIDGET_REALIZED ( tree_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
 			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
@@ -277,7 +277,7 @@ namespace xguimpl
 
 		insertSubTree(parent, child_pos, child);
 	
-		if ( GTK_WIDGET_REALIZED ( tree_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
 			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		xgui::Callback * refresh_cb = this_tree->getEvent("onrefresh");
@@ -290,7 +290,7 @@ namespace xguimpl
 	{
 		if ( (!tree_view) || (!this_tree->getModel()) ) return;
 	
-		if ( GTK_WIDGET_REALIZED ( tree_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
 			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
@@ -298,7 +298,7 @@ namespace xguimpl
 	
 		removeSubTree(child);
 	
-		if ( GTK_WIDGET_REALIZED ( tree_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
 			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		xgui::Callback * refresh_cb = this_tree->getEvent("onrefresh");
@@ -315,7 +315,7 @@ namespace xguimpl
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
 		
-		if ( GTK_WIDGET_REALIZED ( tree_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
 			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 		
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
@@ -329,7 +329,7 @@ namespace xguimpl
 			insertSubTree(0, curr_row_num++, child);
 		}
 	
-		if ( GTK_WIDGET_REALIZED ( tree_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
 			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 	
 		xgui::Callback * refresh_cb = this_tree->getEvent("onrefresh");
