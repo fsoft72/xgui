@@ -22,7 +22,7 @@ namespace xguimpl
 	struct Master
 	{
 		bool threaded;
-		GtkTooltips * app_tooltips;
+		GtkTooltip * app_tooltips;
 		xgui::Master * master_;
 
 
