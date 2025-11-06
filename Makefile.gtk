@@ -3,8 +3,8 @@ INSTALL_PATH=/usr/local/
 GTK_IMPL_PATH=./xgui/gtk/
 XGUI_IMPL_PATH=./xgui/
 
-LIBS=`pkg-config gtk+-2.0 --libs` `xml2-config --libs` -lgthread-2.0 -ldl
-XGUI_INCLUDES=-I$(XGUI_IMPL_PATH) -I$(GTK_IMPL_PATH) `pkg-config gtk+-2.0 --cflags` `xml2-config --cflags`
+LIBS=`pkg-config gtk+-3.0 --libs` `xml2-config --libs` -ldl
+XGUI_INCLUDES=-I$(XGUI_IMPL_PATH) -I$(GTK_IMPL_PATH) `pkg-config gtk+-3.0 --cflags` `xml2-config --cflags`
 CPP=g++
 CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fpermissive
 

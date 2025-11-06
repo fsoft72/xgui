@@ -58,32 +58,32 @@ namespace xguimpl
 	bool Tab::linkEvent( std::string const &name )
 	{
 		if ( name == "onselect" ) {
-			gtk_signal_connect ( GTK_OBJECT(widget), "switch-page", G_CALLBACK(OnSelect), this );
+			g_signal_connect ( G_OBJECT(widget), "switch-page", G_CALLBACK(OnSelect), this );
 			return true;
 		}
 	
 		return Widget::linkEvent(name);
 	}
 
-	void Tab::OnSelect( GtkNotebook * widget, GtkNotebookPage *gtk_page, int page, Tab * w )
+	void Tab::OnSelect( GtkNotebook * widget, GtkWidget *page, int page_num, Tab * w )
 	{
-		DMESSAGE("Notebook Page Switch: " << page);
-	
+		DMESSAGE("Notebook Page Switch: " << page_num);
+
 		xgui::Callback * cb = w->this_widget->getEvent("onselect");
 		if (!cb) return;
-	
+
 		xgui::TextStatusCallback * real_cb = dynamic_cast<xgui::TextStatusCallback*>(cb);
 		if (!real_cb) {
 			DMESSAGE("onselect event of xgui::Tab expected a TextStatusCallback");
 			return;
 		}
-	
 
-		xgui::Widget * child = w->this_tab->getChild(page);
+
+		xgui::Widget * child = w->this_tab->getChild(page_num);
 		std::string page_id;
 		child->get("id", page_id);
-	
-		real_cb->call(w->this_widget, page_id, page);
+
+		real_cb->call(w->this_widget, page_id, page_num);
 	}
 
 
@@ -146,7 +146,7 @@ namespace xguimpl
 		if (old_box)
 			old_txt = (std::string*)g_object_get_data(G_OBJECT(old_box), "tab-text");
 
-		GtkBox * new_box = GTK_BOX(gtk_hbox_new(0, 0));
+		GtkBox * new_box = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 
 		img->ref();
 		GtkWidget * gtkimg = GTK_WIDGET(img->getImpl()->getImage());
@@ -179,7 +179,7 @@ namespace xguimpl
 		if (old_box)
 			old_img = (xgui::Image*)g_object_get_data(G_OBJECT(old_box), "tab-icon");
 
-		GtkBox * new_box = GTK_BOX(gtk_hbox_new(0, 0));
+		GtkBox * new_box = GTK_BOX(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0));
 
 		if (old_img) {
 			old_img->ref();

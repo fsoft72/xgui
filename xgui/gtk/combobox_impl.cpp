@@ -21,14 +21,14 @@ namespace xguimpl
 	Combobox::Combobox ( GtkWidget * real_w ) 
 	: View ( gtk_event_box_new() ), real_widget(real_w), entry(0), this_cbox(0) { }
 
-	Combobox::Combobox ( xgui::Container * parent, bool editable ) 
+	Combobox::Combobox ( xgui::Container * parent, bool editable )
 	: View ( gtk_event_box_new() ), real_widget(0), entry(0), this_cbox(0)
 	{
-		real_widget = ((!editable) ? gtk_combo_box_new_text() : gtk_combo_box_entry_new_text());
+		real_widget = ((!editable) ? gtk_combo_box_text_new() : gtk_combo_box_text_new_with_entry());
 		gtk_container_add( GTK_CONTAINER(widget), real_widget );
 		gtk_event_box_set_visible_window ( GTK_EVENT_BOX(widget), 0 );
-	
-		gtk_signal_connect ( GTK_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
+
+		g_signal_connect ( G_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
 
 		if (editable)
 			entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(real_widget)));
@@ -53,12 +53,12 @@ namespace xguimpl
 		else if ( name == "onrefresh" )
 			return true;
 		else if ( name == "onsubmit" ) {
-			gtk_signal_connect ( GTK_OBJECT ( real_widget ), "activate", G_CALLBACK ( OnSubmit ), this );
+			g_signal_connect ( G_OBJECT ( real_widget ), "activate", G_CALLBACK ( OnSubmit ), this );
 			return true;
 		}
 		else if ( (name == "onchange") && (entry) ) {
-			gtk_signal_connect(GTK_OBJECT(entry), "insert-text", G_CALLBACK ( OnTextInsert ), this);
-			gtk_signal_connect(GTK_OBJECT(entry), "delete-text", G_CALLBACK ( OnTextDelete ), this);
+			g_signal_connect(G_OBJECT(entry), "insert-text", G_CALLBACK ( OnTextInsert ), this);
+			g_signal_connect(G_OBJECT(entry), "delete-text", G_CALLBACK ( OnTextDelete ), this);
 			return true;
 		}
 		
@@ -72,68 +72,81 @@ namespace xguimpl
 	
 		g_signal_handlers_disconnect_by_func( real_widget, (void*)OnSelect, this);
 		gtk_list_store_clear( GTK_LIST_STORE(gtk_combo_box_get_model( GTK_COMBO_BOX(real_widget) )) );
-	
-		if ( GTK_WIDGET_REALIZED ( real_widget ) ) {
+
+		if ( gtk_widget_get_realized ( real_widget ) ) {
 			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( real_widget ) );
 		}
-	
+
 		/*int selected = -1;*/
 		int sel_pos = 0;
 		for ( xgui::Model::iterator iter = model->begin(); iter != model->end(); ++iter )
 		{
 			xgui::Model * child = dynamic_cast<xgui::Model*>(*iter);
-	
-			gtk_combo_box_append_text ( GTK_COMBO_BOX(real_widget), child->getString(0).c_str() );
+
+			gtk_combo_box_text_append_text ( GTK_COMBO_BOX_TEXT(real_widget), child->getString(0).c_str() );
 			/*if ( this_cbox->isSelected(child) )
 				selected = sel_pos;*/
 			++sel_pos;
 		}
-	
+
 		/*if (selected != -1)
 			gtk_combo_box_set_active ( GTK_COMBO_BOX(real_widget), selected );*/
-	
-		if ( GTK_WIDGET_REALIZED ( real_widget ) ) {
+
+		if ( gtk_widget_get_realized ( real_widget ) ) {
 			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( real_widget ) );
 		}
 	
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 	
-		gtk_signal_connect ( GTK_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 	
 	void Combobox::insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
 	{
 		xgui::Model * model = this_cbox->getModel();
 		if(!model) return;
-	
+
 		g_signal_handlers_disconnect_by_func( real_widget, (void*)OnSelect, this);
-	
-		gtk_combo_box_insert_text( GTK_COMBO_BOX(real_widget), child_pos, child->getString(0).c_str() );
-	
+
+		gtk_combo_box_text_insert_text( GTK_COMBO_BOX_TEXT(real_widget), child_pos, child->getString(0).c_str() );
+
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
-	
-		gtk_signal_connect ( GTK_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+
+		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 	
 	void Combobox::removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
 	{
 		xgui::Model * model = this_cbox->getModel();
 		if(!model) return;
-	
+
 		g_signal_handlers_disconnect_by_func( real_widget, (void*)OnSelect, this);
-	
-		gtk_combo_box_remove_text( GTK_COMBO_BOX(real_widget), child_pos );
-	
+
+		gtk_combo_box_text_remove( GTK_COMBO_BOX_TEXT(real_widget), child_pos );
+
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
-	
-		gtk_signal_connect ( GTK_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+
+		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 
-	void Combobox::appendText(std::string const &text) { gtk_entry_append_text( entry, text.c_str() ); }
-	void Combobox::prependText(std::string const &text) { gtk_entry_prepend_text( entry, text.c_str() ); }
+	void Combobox::appendText(std::string const &text)
+	{
+		// gtk_entry_append_text removed in GTK 3
+		std::string str = gtk_entry_get_text( entry );
+		str += text;
+		gtk_entry_set_text( entry, str.c_str() );
+	}
+
+	void Combobox::prependText(std::string const &text)
+	{
+		// gtk_entry_prepend_text removed in GTK 3
+		std::string str = gtk_entry_get_text( entry );
+		str = text + str;
+		gtk_entry_set_text( entry, str.c_str() );
+	}
 	void Combobox::insertText(std::string const &text, unsigned int pos)
 	{
 		std::string str = gtk_entry_get_text( entry );
@@ -147,10 +160,12 @@ namespace xguimpl
 
 	void Combobox::setSelected(int num) { gtk_combo_box_set_active(GTK_COMBO_BOX(real_widget), num); }
 	int Combobox::getSelected() { return gtk_combo_box_get_active(GTK_COMBO_BOX(real_widget)); }
-	std::string Combobox::getSelectedItemText() 
+	std::string Combobox::getSelectedItemText()
 	{
-		char * txt = gtk_combo_box_get_active_text(GTK_COMBO_BOX(real_widget)); 
-		return txt ? txt : "";
+		gchar * txt = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(real_widget));
+		std::string result = txt ? txt : "";
+		g_free(txt);
+		return result;
 	}
 
 	void Combobox::setMaxLength(int len) { gtk_entry_set_max_length(entry, len); }
@@ -158,18 +173,18 @@ namespace xguimpl
 
 	void Combobox::setAsEditable(bool iseditable)
 	{
-		bool visible = GTK_WIDGET_VISIBLE(real_widget);
+		bool visible = gtk_widget_get_visible(real_widget);
 		g_signal_handlers_disconnect_matched ( G_OBJECT(real_widget), G_SIGNAL_MATCH_DATA, 0, 0, 0, 0, this );
 		gtk_widget_destroy(real_widget);
 
-		real_widget = ((!iseditable) ? gtk_combo_box_new_text() : gtk_combo_box_entry_new_text());
+		real_widget = ((!iseditable) ? gtk_combo_box_text_new() : gtk_combo_box_text_new_with_entry());
 		if (!iseditable)
 			entry = 0;
 		else
 			entry = GTK_ENTRY(gtk_bin_get_child(GTK_BIN(real_widget)));
 
 		gtk_container_add ( GTK_CONTAINER(widget), real_widget );
-		gtk_signal_connect ( GTK_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
+		g_signal_connect ( G_OBJECT(real_widget), "event", G_CALLBACK(Widget::OnGdkEvent), this );
 
 		if (visible) gtk_widget_show(real_widget);
 		refresh();
@@ -202,20 +217,20 @@ namespace xguimpl
 	{
 		xgui::Callback * base_cb = cbox->this_widget->getEvent("onselect");
 		if (!base_cb) return 0;
-	
+
 		int selection = gtk_combo_box_get_active ( GTK_COMBO_BOX( w ) );
 		xgui::TextStatusCallback * cb = dynamic_cast<xgui::TextStatusCallback*>(base_cb);
-		char * text = gtk_combo_box_get_active_text ( GTK_COMBO_BOX( w ) );
-		std::string txt(text);
-		free(text);
-	
+		gchar * text = gtk_combo_box_text_get_active_text ( GTK_COMBO_BOX_TEXT( w ) );
+		std::string txt(text ? text : "");
+		g_free(text);
+
 		if (!cb) {
 			DMESSAGE("onselect event of xgui::Combobox expected a TextStatusCallback");
 			return 0;
 		}
-	
+
 		cb->call( cbox->this_cbox, txt, selection );
-	
+
 		return 0;
 	}
 
@@ -223,16 +238,17 @@ namespace xguimpl
 	{
 		xgui::Callback * base_cb = e->this_cbox->getEvent("onsubmit");
 		if (!base_cb) return 0;
-		
+
 		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(base_cb);
 		if (!cb) {
 			DMESSAGE("onsubmit event of xgui::Entry expected a TextCallback");
 			return 0;
 		}
-	
-		char * text = gtk_combo_box_get_active_text ( GTK_COMBO_BOX( e ) );
-		int rv = cb->call ( e->this_cbox, text );
-		free(text);
+
+		gchar * text = gtk_combo_box_text_get_active_text ( GTK_COMBO_BOX_TEXT( e->real_widget ) );
+		std::string txt(text ? text : "");
+		g_free(text);
+		int rv = cb->call ( e->this_cbox, txt );
 
 		return rv;
 	}
@@ -261,7 +277,7 @@ namespace xguimpl
 	
 	
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
-		gtk_signal_emit_stop_by_name ( GTK_OBJECT ( editable ), "insert-text" );
+		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "insert-text" );
 	}
 
 	void Combobox::OnTextDelete ( GtkEditable *editable, gint start_pos, gint end_pos, Combobox * e )
@@ -279,6 +295,6 @@ namespace xguimpl
 			gtk_editable_delete_text( GTK_EDITABLE(editable), start_pos, end_pos );
 		
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
-		gtk_signal_emit_stop_by_name ( GTK_OBJECT ( editable ), "delete-text" );
+		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "delete-text" );
 	}
 }

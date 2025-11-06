@@ -45,11 +45,11 @@ namespace xguimpl
 		DMESSAGE("XGUI Initialized");
 		int argc = 0;
 		char **argv = 0;
-	
+
 		gtk_init ( &argc, &argv );
-	
-		app_tooltips = gtk_tooltips_new ();
-		gtk_tooltips_enable ( GTK_TOOLTIPS ( app_tooltips ) );
+
+		// Tooltips are now handled per-widget in GTK 3, no global object needed
+		app_tooltips = 0;
 	}
 
 	Master::~Master()
@@ -59,19 +59,21 @@ namespace xguimpl
 
 	void Master::initThreads()
 	{
+		// Thread support is automatic in GTK 3+, no initialization needed
 		threaded = true;
-		g_thread_init(0);
-		gdk_threads_init();
 	}
-	
+
 	void Master::guiLock()
 	{
+		// Thread locking is deprecated in GTK 3+
+		// Applications should use GLib's thread primitives instead
 		if (threaded)
 			gdk_threads_enter();
 	}
-	
+
 	void Master::guiUnlock()
 	{
+		// Thread unlocking is deprecated in GTK 3+
 		if (threaded) {
 			gdk_flush();
 			gdk_threads_leave();
@@ -122,8 +124,8 @@ namespace xguimpl
 		}
 	
 		GtkWidget *dialog = gtk_file_chooser_dialog_new ( title.c_str(), GTK_WINDOW(parent->getImpl()->widget),
-		                                                  GTK_FILE_CHOOSER_ACTION_OPEN,	GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-		                                                  GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL );
+		                                                  GTK_FILE_CHOOSER_ACTION_OPEN,	"_Cancel", GTK_RESPONSE_CANCEL,
+		                                                  "_Open", GTK_RESPONSE_ACCEPT, NULL );
 	
 		gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER(dialog), multiselection );
 	
@@ -158,8 +160,8 @@ namespace xguimpl
 		}
 	
 		GtkWidget *dialog = gtk_file_chooser_dialog_new ( title.c_str(), GTK_WINDOW(parent->getImpl()->widget), 
-		                                                  GTK_FILE_CHOOSER_ACTION_SAVE,	GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-		                                                  GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL );
+		                                                  GTK_FILE_CHOOSER_ACTION_SAVE,	"_Cancel", GTK_RESPONSE_CANCEL,
+		                                                  "_Save", GTK_RESPONSE_ACCEPT, NULL );
 	
 		for (std::vector<GtkFileFilter*>::iterator i = gtk_filters.begin(); i != gtk_filters.end(); ++i)
 			gtk_file_chooser_add_filter (GTK_FILE_CHOOSER(dialog), *i );
@@ -205,7 +207,7 @@ namespace xguimpl
 		                                            GTK_DIALOG_DESTROY_WITH_PARENT), t, b, text.c_str(), 0 );
 		gtk_window_set_title( GTK_WINDOW(mbox), title.c_str() );
 	
-		if ( buttons == "yes-no-cancel" ) gtk_dialog_add_buttons ( GTK_DIALOG(mbox), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 0);
+		if ( buttons == "yes-no-cancel" ) gtk_dialog_add_buttons ( GTK_DIALOG(mbox), "_Cancel", GTK_RESPONSE_CANCEL, NULL);
 	
 		int retval = gtk_dialog_run( GTK_DIALOG(mbox) );
 	

@@ -101,7 +101,7 @@ namespace xguimpl
 		}
 	
 		g_object_set_data_full(G_OBJECT(mnu_item), "xgui-mnuitem-id", (void*)new std::string(id), (GDestroyNotify)int_item_id_destroy_notify);
-		gtk_signal_connect ( GTK_OBJECT(mnu_item), "activate", G_CALLBACK(OnItemSelect), this );
+		g_signal_connect ( G_OBJECT(mnu_item), "activate", G_CALLBACK(OnItemSelect), this );
 	
 		GtkMenuShell * parent = 0;
 		if (parent_id.empty()) {
@@ -167,7 +167,7 @@ namespace xguimpl
 	{
 		std::pair<MenuItemMap::iterator, GtkMenuItem *> e = findMenuItem(id);
 		if (e.second)
-			return GTK_WIDGET_IS_SENSITIVE( GTK_WIDGET(e.second) );
+			return gtk_widget_is_sensitive( GTK_WIDGET(e.second) );
 		else
 			return false;
 	}

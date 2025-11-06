@@ -26,12 +26,12 @@ namespace xguimpl
 	bool Spin::linkEvent( std::string const &name )
 	{
 		if ( name == "onsubmit" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "activate", G_CALLBACK ( OnSubmit ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "activate", G_CALLBACK ( OnSubmit ), this );
 			return true;
 		}
 		else if (name == "onchange") {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
 			return true;
 		}
 
@@ -113,7 +113,7 @@ namespace xguimpl
 	
 	
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
-		gtk_signal_emit_stop_by_name ( GTK_OBJECT ( editable ), "insert-text" );
+		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "insert-text" );
 	}
 
 	void Spin::OnTextDelete ( GtkEditable *editable, gint start_pos, gint end_pos, Spin * e )
@@ -131,6 +131,6 @@ namespace xguimpl
 			gtk_editable_delete_text( GTK_EDITABLE(editable), start_pos, end_pos );
 		
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
-		gtk_signal_emit_stop_by_name ( GTK_OBJECT ( editable ), "delete-text" );
+		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "delete-text" );
 	}
 }

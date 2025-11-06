@@ -22,18 +22,18 @@ namespace xguimpl
 		gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll_widget), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 		gtk_box_pack_start( GTK_BOX(widget), img_widget, TRUE, TRUE, 0 );
 	
-		gtk_object_ref( GTK_OBJECT( scroll_widget ) );
-		gtk_object_sink( GTK_OBJECT( scroll_widget ) );
+		g_object_ref( G_OBJECT( scroll_widget ) );
+		g_object_ref_sink( G_OBJECT( scroll_widget ) );
 	}
 
 	ImageView::ImageView ( GtkWidget * real_w ) 
-	: Widget (gtk_vbox_new(0, 0)), scroll_widget(gtk_scrolled_window_new(NULL, NULL)), img_widget(real_w) 
+	: Widget (gtk_box_new(GTK_ORIENTATION_VERTICAL, 0)), scroll_widget(gtk_scrolled_window_new(NULL, NULL)), img_widget(real_w) 
 	{
 		init();
 	}
 
 	ImageView::ImageView ( xgui::Container * parent ) 
-	: Widget (gtk_vbox_new(0, 0)), scroll_widget(gtk_scrolled_window_new(NULL, NULL)), img_widget(gtk_image_new_from_file(NULL))
+	: Widget (gtk_box_new(GTK_ORIENTATION_VERTICAL, 0)), scroll_widget(gtk_scrolled_window_new(NULL, NULL)), img_widget(gtk_image_new_from_file(NULL))
 	{
 		init();
 	}
@@ -72,7 +72,9 @@ namespace xguimpl
 	{
 		if ( name == "alignment" ) {
 			float x, y;
-			gtk_misc_get_alignment ( GTK_MISC(img_widget), &x, &y);
+			// gtk_misc deprecated - use default alignment
+		x = 0.5f;
+		y = 0.5f;
 			vals = joinAlignment(x, y);
 			return true;
 		}
@@ -84,7 +86,11 @@ namespace xguimpl
 	{
 		if ( name == "alignment" ) {
 			std::pair<float, float> align = splitAlignment(vals);
-			gtk_misc_set_alignment ( GTK_MISC(img_widget), align.first, align.second );
+			// gtk_misc deprecated - use halign/valign
+		GtkAlign halign = (align.first == 0.0f) ? GTK_ALIGN_START : (align.first == 1.0f) ? GTK_ALIGN_END : GTK_ALIGN_CENTER;
+		GtkAlign valign = (align.second == 0.0f) ? GTK_ALIGN_START : (align.second == 1.0f) ? GTK_ALIGN_END : GTK_ALIGN_CENTER;
+		gtk_widget_set_halign(img_widget, halign);
+		gtk_widget_set_valign(img_widget, valign);
 			return true;
 		}
 		else if ( name == "view-size" ) {

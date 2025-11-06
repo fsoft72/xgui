@@ -88,7 +88,7 @@ namespace xgui
 	StyleManagerClass::StyleManagerClass() 
 	: ObjectClass()
 	{
-		registerMethod("addStyle", new DMethod5< Type<int>, StyleManager, TypeOf<std::string const &>::Type, TypeOf<xgui::Image*>::Type, TypeOf<std::string const &>::Type, TypeOf<std::string const &>::Type, TypeOf<unsigned int>::Type >(&StyleManager::addStyle));
+		registerMethod("addStyle", new DMethod5< Type<int>, StyleManager, TypeOf<std::string const &>::type, TypeOf<xgui::Image*>::type, TypeOf<std::string const &>::type, TypeOf<std::string const &>::type, TypeOf<unsigned int>::type >(&StyleManager::addStyle));
 	}
 
 	std::string const &StyleManagerClass::className() { static std::string const c_name = "xgui::StyleManager"; return c_name; }
@@ -286,13 +286,6 @@ namespace xgui
 			xml+=s->first;
 			xml+="\" ";
 
-			DLLEXPORT bool isTextBold();
-			DLLEXPORT bool isTextItalic();
-			DLLEXPORT bool isTextUnderlined();
-			DLLEXPORT bool isTextStriked();
-			DLLEXPORT xgui::Image * getIcon();
-			DLLEXPORT std::string const &getFgColor();
-			DLLEXPORT std::string const &getBgColor();
 			
 			xgui::Image * icon = style->getIcon();
 			if(icon) {

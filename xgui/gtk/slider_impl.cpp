@@ -36,7 +36,7 @@ namespace xguimpl
 	bool Slider::linkEvent( std::string const &name )
 	{
 		if ( name == "onchange" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "value-changed", G_CALLBACK ( OnChange ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "value-changed", G_CALLBACK ( OnChange ), this );
 			return true;
 		}
 	

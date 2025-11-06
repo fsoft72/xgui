@@ -42,7 +42,7 @@ namespace xguimpl
 	bool Checkbox::linkEvent( std::string const &name )
 	{
 		if ( name == "onclick" ) {
-			gtk_signal_connect ( GTK_OBJECT ( widget ), "clicked", G_CALLBACK ( OnClick ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "clicked", G_CALLBACK ( OnClick ), this );
 			return true;
 		}
 	

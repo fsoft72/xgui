@@ -44,8 +44,9 @@ namespace xguimpl
 
 		xgui::Model * m = l->getModel();
 
-		std::string data = (const char*)selection_data->data;
-		
+		const guchar* raw_data = gtk_selection_data_get_data(selection_data);
+		std::string data = raw_data ? (const char*)raw_data : "";
+
 		if(data != "ERROR")
 			m->appendChild(data);
 	}
@@ -77,17 +78,17 @@ namespace xguimpl
 
 		gtk_drag_source_set(GTK_WIDGET(list_view), (GdkModifierType)(GDK_BUTTON1_MASK | GDK_BUTTON2_MASK), target_entry,        sizeof(target_entry) / sizeof(GtkTargetEntry), (GdkDragAction)(GDK_ACTION_MOVE | GDK_ACTION_COPY) );
 
-                gtk_signal_connect(
-                        GTK_OBJECT(list_view), "drag_data_get",
-                        GTK_SIGNAL_FUNC(DNDDataRequestCB), this
+                g_signal_connect(
+                        G_OBJECT(list_view), "drag_data_get",
+                        G_CALLBACK(DNDDataRequestCB), this
                 );
-                gtk_signal_connect(
-                        GTK_OBJECT(list_view), "drag_data_received",
-                        GTK_SIGNAL_FUNC(DNDDataRecievedCB), this
+                g_signal_connect(
+                        G_OBJECT(list_view), "drag_data_received",
+                        G_CALLBACK(DNDDataRecievedCB), this
                 );
-                gtk_signal_connect(
-                        GTK_OBJECT(list_view), "drag_data_delete",
-                        GTK_SIGNAL_FUNC(DNDDataDeleteCB), this
+                g_signal_connect(
+                        G_OBJECT(list_view), "drag_data_delete",
+                        G_CALLBACK(DNDDataDeleteCB), this
                 );
 	}
 }

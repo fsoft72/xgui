@@ -45,7 +45,7 @@ namespace xguimpl
 			gtk_frame_get_label_align ( GTK_FRAME(widget), &halign_v, &valign_v );
 	
 			if (valign_v == 1.0f) valign = "bottom";
-			else if (valign_v == 0.0f) valign == "top";
+			else if (valign_v == 0.0f) valign = "top";
 	
 			if (halign_v == 1.0f) halign = "right";
 			else if (halign_v == 0.0f) halign = "left";
