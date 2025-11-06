@@ -323,7 +323,7 @@ namespace xguimpl
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
 		
-		if ( GTK_WIDGET_REALIZED ( list_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(list_view) ) )
 			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( list_view ) ) );
 		
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
@@ -384,7 +384,7 @@ namespace xguimpl
 			//if ( this_list->isSelected(child) ) gtk_tree_selection_select_iter ( sel, &curr_ele_iter );
 		}
 	
-		if ( GTK_WIDGET_REALIZED ( list_view ) )
+		if ( gtk_widget_get_realized ( GTK_WIDGET(list_view) ) )
 			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( list_view ) ) );
 	
 		xgui::Callback * refresh_cb = this_list->getEvent("onrefresh");

@@ -18,11 +18,13 @@
 #	include "dynamic.h"
 #endif
 
-struct CmpWidgetName : public std::binary_function<xgui::Widget *, std::string, bool> {
-	bool operator()( xgui::Widget * child, std::string name) const {
+struct CmpWidgetName {
+	std::string name;
+	CmpWidgetName(const std::string& n) : name(n) {}
+	bool operator()( xgui::Widget * child) const {
 		std::string id;
 		child->get("id", id);
-	
+
 		if (id == name) return true;
 		return false;
 	}
@@ -103,7 +105,7 @@ namespace xgui
 
 	xgui::Widget * Container::findDirectChild(std::string const &child_name)
 	{
-		WidgetsVector::iterator c = std::find_if(children_.begin(), children_.end(), std::bind2nd(CmpWidgetName(), child_name));
+		WidgetsVector::iterator c = std::find_if(children_.begin(), children_.end(), CmpWidgetName(child_name));
 		if (c != children_.end()) return *c;
 		return 0;	
 	}

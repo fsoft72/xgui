@@ -106,30 +106,31 @@ namespace xgui
 	template <typename T>
 	struct TypeOf
 	{
-		typedef Type<T> Type;
+		typedef Type<T> type;
 	};
 
 	template <typename T>
 	struct TypeOf<T&>
 	{
-		typedef Ref< typename TypeOf<T>::Type > Type;
+		typedef Ref< typename TypeOf<T>::type > type;
 	};
 
 	template <typename T>
 	struct TypeOf<const T>
 	{
-		typedef Const< typename TypeOf<T>::Type > Type;
+		typedef Const< typename TypeOf<T>::type > type;
 	};
 
 	template <typename T>
 	struct TypeOf<T *>
 	{
-		typedef Ptr< typename TypeOf<T>::Type > Type;
+		typedef Ptr< typename TypeOf<T>::type > type;
 	};
 	
 	struct DMethod
 	{
 		public:
+			DLLEXPORT virtual ~DMethod() {}
 			DLLEXPORT virtual unsigned int numberOfParameters() = 0;
 			DLLEXPORT virtual std::string call(Object *) { XGUI_ERROR("Calling dynamic method with 0 parameters"); return ""; }
 			DLLEXPORT virtual std::string call(Object *, std::string const &) { XGUI_ERROR("Calling dynamic method with 1 parameter"); return ""; }

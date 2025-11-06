@@ -167,7 +167,7 @@ namespace xguimpl
 	{
 		std::pair<MenuItemMap::iterator, GtkMenuItem *> e = findMenuItem(id);
 		if (e.second)
-			return GTK_WIDGET_IS_SENSITIVE( GTK_WIDGET(e.second) );
+			return gtk_widget_is_sensitive( GTK_WIDGET(e.second) );
 		else
 			return false;
 	}

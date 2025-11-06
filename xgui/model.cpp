@@ -42,9 +42,9 @@ namespace xgui
 
 		registerMethod("appendChild", new DMethod1< Type<int>, Model, Ptr< Type<TreeNode> > >((int(Model::*)(TreeNode*))(&Model::appendChild)));
 
-		registerMethod("addString", new DMethod1< Type<int>, Model, TypeOf<std::string const &>::Type >(&Model::addString));
+		registerMethod("addString", new DMethod1< Type<int>, Model, TypeOf<std::string const &>::type >(&Model::addString));
 
-		registerMethod("setString", new DMethod2< Type<int>, Model, TypeOf<std::string const &>::Type, Type<int> >(&Model::setString));
+		registerMethod("setString", new DMethod2< Type<int>, Model, TypeOf<std::string const &>::type, Type<int> >(&Model::setString));
 	}
 
 	xgui::ModelClass model_class_info;

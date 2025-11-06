@@ -69,7 +69,7 @@ namespace xgui
 		                                Ref<Const<Type<std::string> > >, Ref<Const<Type<std::string> > >,
 		                                Type<int>, Ref<Const<Type<std::string> > > >
 		                                (&xgui::List::addColumn));
-		registerMethod("delColumn", new DMethod1< Type<int>, xgui::List, TypeOf<std::string const &>::Type >
+		registerMethod("delColumn", new DMethod1< Type<int>, xgui::List, TypeOf<std::string const &>::type >
 		                                (&xgui::List::delColumn));
 		registerMethod("sort", new DMethod2< Type<int>, xgui::List, Ref<Const<Type<std::string> > >, 
 		                       Ptr< Type<TextPairCallback> > >(&List::sort));

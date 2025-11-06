@@ -32,8 +32,9 @@ namespace xgui
 	{
 		protected:
 			DLLEXPORT TextCallback();
-	
+
 		public:
+			using Callback::call;
 			DLLEXPORT virtual int call(Widget *, std::string const &text);
 			DLLEXPORT virtual ~TextCallback();
 	};
@@ -43,8 +44,9 @@ namespace xgui
 	{
 		protected:
 			DLLEXPORT TextStatusCallback();
-	
+
 		public:
+			using Callback::call;
 			DLLEXPORT virtual int call(Widget *, std::string const &text, int state);
 			DLLEXPORT virtual ~TextStatusCallback();
 
@@ -55,8 +57,9 @@ namespace xgui
 	{
 		protected:
 			DLLEXPORT TextPairCallback();
-	
+
 		public:
+			using Callback::call;
 			DLLEXPORT virtual int call(Widget *, std::string const &text1, std::string const &text2);
 			DLLEXPORT virtual ~TextPairCallback();
 

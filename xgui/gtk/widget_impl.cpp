@@ -347,11 +347,10 @@ namespace xguimpl
 	{
 		static unsigned int last_evt_time = 0;
 		static int last_event_type = 0;
-	
+
 		static Widget * last_pressed_widget = 0;
-	
+
 		static unsigned int last_key_pressed = 0;
-		static bool last_key_repeating = false;
 	
 		switch (event->type) {
 			case GDK_BUTTON_PRESS:
@@ -401,9 +400,10 @@ namespace xguimpl
 						cb = dynamic_cast<xgui::TextStatusCallback *>(xw->this_widget->getEvent("onmouseclick"));
 						if (cb) return !cb->call( xw->this_widget, button, status);
 					}
-					else 
+					else {
 						last_pressed_widget = 0;
 						return 0;
+					}
 				}
 			}
 				break;
@@ -424,19 +424,18 @@ namespace xguimpl
 				
 				if (key_event->type == GDK_KEY_PRESS) {
 					if (last_key_pressed != 0) {
-						last_key_repeating = true;
+						
 						cb = dynamic_cast<xgui::TextCallback *>(xw->this_widget->getEvent("onkeypress"));
 					}
 					else {
 						last_key_pressed = key_event->keyval;
-						if (cb = dynamic_cast<xgui::TextCallback *>(xw->this_widget->getEvent("onkeydown")))
+						if ((cb = dynamic_cast<xgui::TextCallback *>(xw->this_widget->getEvent("onkeydown"))))
 							cb->call(xw->this_widget, key_name);
 						cb = dynamic_cast<xgui::TextCallback *>(xw->this_widget->getEvent("onkeypress"));
 					}
 				}
 				else if (key_event->type == GDK_KEY_RELEASE) {
 					last_key_pressed = 0;
-					last_key_repeating = false;
 					cb = dynamic_cast<xgui::TextCallback *>(xw->this_widget->getEvent("onkeyup"));
 				}
 	
