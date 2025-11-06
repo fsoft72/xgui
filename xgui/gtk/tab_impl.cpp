@@ -65,25 +65,25 @@ namespace xguimpl
 		return Widget::linkEvent(name);
 	}
 
-	void Tab::OnSelect( GtkNotebook * widget, GtkNotebookPage *gtk_page, int page, Tab * w )
+	void Tab::OnSelect( GtkNotebook * widget, GtkWidget *page, int page_num, Tab * w )
 	{
-		DMESSAGE("Notebook Page Switch: " << page);
-	
+		DMESSAGE("Notebook Page Switch: " << page_num);
+
 		xgui::Callback * cb = w->this_widget->getEvent("onselect");
 		if (!cb) return;
-	
+
 		xgui::TextStatusCallback * real_cb = dynamic_cast<xgui::TextStatusCallback*>(cb);
 		if (!real_cb) {
 			DMESSAGE("onselect event of xgui::Tab expected a TextStatusCallback");
 			return;
 		}
-	
 
-		xgui::Widget * child = w->this_tab->getChild(page);
+
+		xgui::Widget * child = w->this_tab->getChild(page_num);
 		std::string page_id;
 		child->get("id", page_id);
-	
-		real_cb->call(w->this_widget, page_id, page);
+
+		real_cb->call(w->this_widget, page_id, page_num);
 	}
 
 

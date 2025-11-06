@@ -41,7 +41,7 @@ namespace xguimpl
 		void setPageIcon ( xgui::Widget * w, xgui::Image * img );
 		void setPageLabel ( xgui::Widget * w, const std::string & label );
 	
-		static void OnSelect(GtkNotebook * widget, GtkNotebookPage *gtk_page, int page_n, Tab * w);
+		static void OnSelect(GtkNotebook * widget, GtkWidget *page, int page_n, Tab * w);
 	};
 }
 
