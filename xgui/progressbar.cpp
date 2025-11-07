@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "progressbar.h"
-#	include "gtk/progressbar_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/progressbar_impl.h"
+#	else
+#		include "gtk/progressbar_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #	include "dynamic.h"

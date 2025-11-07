@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "label.h"
-#	include "gtk/label_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/label_impl.h"
+#	else
+#		include "gtk/label_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #endif

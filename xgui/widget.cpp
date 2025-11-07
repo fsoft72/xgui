@@ -16,9 +16,17 @@
 #	include "widget.h"
 #	include "container.h"
 #	include "window.h"
-#	include "gtk/widget_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/widget_impl.h"
+#	else
+#		include "gtk/widget_impl.h"
+#	endif
 #	include "image.h"
-#	include "gtk/image_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/image_impl.h"
+#	else
+#		include "gtk/image_impl.h"
+#	endif
 #	include "master.h"
 #	include "dynamic.h"
 #endif

@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "frame.h"
-#	include "gtk/frame_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/frame_impl.h"
+#	else
+#		include "gtk/frame_impl.h"
+#	endif
 #	include "master.h"
 #	include "dynamic.h"
 #endif

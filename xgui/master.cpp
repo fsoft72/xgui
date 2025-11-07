@@ -15,7 +15,11 @@
 #ifndef WIN32
 #	include "master.h"
 #	include "xgui.h"
-#	include "gtk/master_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/master_impl.h"
+#	else
+#		include "gtk/master_impl.h"
+#	endif
 #else
 #	ifdef CreateWindow
 #		undef CreateWindow

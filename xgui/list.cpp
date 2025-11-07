@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "list.h"
-#	include "gtk/list_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/list_impl.h"
+#	else
+#		include "gtk/list_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #	include "style.h"

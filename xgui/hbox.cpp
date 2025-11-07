@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "hbox.h"
-#	include "gtk/hbox_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/hbox_impl.h"
+#	else
+#		include "gtk/hbox_impl.h"
+#	endif
 #	include "master.h"
 #	include "dynamic.h"
 #endif

@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "entry.h"
-#	include "gtk/entry_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/entry_impl.h"
+#	else
+#		include "gtk/entry_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #	include "dynamic.h"

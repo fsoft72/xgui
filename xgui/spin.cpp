@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "spin.h"
-#	include "gtk/spin_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/spin_impl.h"
+#	else
+#		include "gtk/spin_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #endif

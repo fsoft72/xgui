@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "combobox.h"
-#	include "gtk/combobox_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/combobox_impl.h"
+#	else
+#		include "gtk/combobox_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #	include "model.h"

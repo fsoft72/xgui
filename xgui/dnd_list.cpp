@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "dnd_list.h"
-#	include "gtk/dndlist_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/dndlist_impl.h"
+#	else
+#		include "gtk/dndlist_impl.h"
+#	endif
 #	include "master.h"
 #	include "dynamic.h"
 #endif
