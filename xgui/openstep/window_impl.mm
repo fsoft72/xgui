@@ -180,7 +180,10 @@ namespace xguimpl
 		// Show the window first so dimensions are accurate
 		[widget->o makeKeyAndOrderFront:nil];
 
-		// Now that the window is visible, force layout with actual dimensions
+		// Force the window to layout its content views before we query dimensions
+		[(NSWindow*)widget->o display];
+
+		// Now that the window is visible and laid out, get actual dimensions
 		if (this_window->child_) {
 			NSRect content_rect = [[(NSWindow*)widget->o contentView] frame];
 			xguimpl::Widget * child_impl = this_window->child_->getImpl();
@@ -192,6 +195,9 @@ namespace xguimpl
 			else if (xguimpl::HBox * hbox = dynamic_cast<xguimpl::HBox*>(child_impl)) {
 				hbox->giveSize(std::make_pair(content_rect.size.width, content_rect.size.height));
 			}
+
+			// Force a redisplay after sizing
+			[(NSWindow*)widget->o display];
 		}
 	}
 
