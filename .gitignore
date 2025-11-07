@@ -1,3 +1,13 @@
 main
 pexplorer
 *.so
+
+# Build artifacts
+*.o
+tests/debug
+output/xml
+output/main
+tests/xml_test/xml.o
+xgui_wrap.cpp
+tests/_xguimodule.so
+tests/xgui.py

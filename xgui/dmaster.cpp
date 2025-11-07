@@ -21,8 +21,7 @@
 
 #	include "xgui.h"
 
-#	include <libxml/parser.h>
-#	include <libxml/tree.h>
+#	include "json.hpp"
 
 #	include <dlfcn.h>
 
@@ -146,41 +145,70 @@ namespace xgui
 			delete object;
 	}
 
+	// XML support removed - use LoadJson instead
 	xgui::Object * Master::ParseXmlNode(xgui::Object * parent_object, void * n)
 	{
-		xmlNode * node = (xmlNode*)n;
+		XGUI_ERROR("XML support has been removed. Please use LoadJson() instead.");
+		return 0;
+	}
+
+	DLLEXPORT xgui::Object * xgui::Master::LoadXml(std::string const &file, xgui::Object * parent)
+	{
+		XGUI_ERROR("XML support has been removed. Please use LoadJson() instead.");
+		return 0;
+	}
+
+	xgui::Object * Master::ParseJsonValue(xgui::Object * parent_object, const nlohmann::json &j)
+	{
 		xgui::Object * result = 0;
-	
+
 		xgui::StringMap properties;
-		std::vector<xmlNode*> children;
-		std::string node_name = (char const*)node->name;
+		std::vector<nlohmann::json> children;
+
+		// Get the widget type from the "type" field
+		if (!j.contains("type")) {
+			XGUI_ERROR("JSON object missing 'type' field");
+			return 0;
+		}
+
+		std::string node_name = j["type"];
 		xgui::ClassInfo * class_builder = 0;
-	
+
 		class_builder = Instance()->FindClassByTag(node_name);
 		if (class_builder == 0) {
 			XGUI_ERROR("Unable to find a class builder for node " << node_name);
 			return 0;
 		}
-	
-		//Parse Node Text content and children
-		for ( xmlNode *cur_node = node->children; cur_node; cur_node = cur_node->next) {
-			if (cur_node->type == XML_TEXT_NODE) {
-				std::string text_to_append = reinterpret_cast<const char*>(cur_node->content);
-				text_to_append = trim(text_to_append);
-				if (text_to_append.size())
-					properties["text"] += text_to_append;
+
+		// Parse all properties except "type" and "children"
+		for (auto& el : j.items()) {
+			const std::string& key = el.key();
+
+			if (key == "type" || key == "children")
+				continue;
+
+			if (el.value().is_string()) {
+				properties[key] = el.value().get<std::string>();
 			}
-			else if (cur_node->type == XML_ELEMENT_NODE)
-				children.push_back(cur_node);
+			else if (el.value().is_number()) {
+				properties[key] = std::to_string(el.value().get<double>());
+			}
+			else if (el.value().is_boolean()) {
+				properties[key] = el.value().get<bool>() ? "1" : "0";
+			}
+			else {
+				// For complex types, convert to string representation
+				properties[key] = el.value().dump();
+			}
 		}
 
-		//Parse Node properties
-		for ( xmlAttr * cur_prop = node->properties; cur_prop; cur_prop = cur_prop->next) {
-			xmlChar * prop = xmlGetProp(node, cur_prop->name);
-			properties[reinterpret_cast<const char*>(cur_prop->name)] = reinterpret_cast<const char*>(prop);
-			xmlFree(prop);
+		// Get children array if present
+		if (j.contains("children") && j["children"].is_array()) {
+			for (const auto& child : j["children"]) {
+				children.push_back(child);
+			}
 		}
-	
+
 		if (class_builder != 0) {
 			result = class_builder->create(parent_object, properties);
 
@@ -194,29 +222,36 @@ namespace xgui
 				}
 			}
 
-			for ( std::vector<xmlNode*>::iterator i = children.begin(); i != children.end(); ++i )
-				ParseXmlNode(result, *i);
+			for (std::vector<nlohmann::json>::iterator i = children.begin(); i != children.end(); ++i)
+				ParseJsonValue(result, *i);
 
 			if (class_builder->mustFinalize())
 				class_builder->finalize(result);
 		}
-	
+
 		return result;
 	}
 
-	DLLEXPORT xgui::Object * xgui::Master::LoadXml(std::string const &file, xgui::Object * parent)
+	DLLEXPORT xgui::Object * xgui::Master::LoadJson(std::string const &file, xgui::Object * parent)
 	{
-		LIBXML_TEST_VERSION
-		xmlDoc *doc = xmlReadFile(file.c_str(), NULL, 0);
-	
-		if (doc == 0)
+		std::ifstream input_file(file.c_str());
+
+		if (!input_file.is_open()) {
+			XGUI_ERROR("Unable to open JSON file: " << file);
 			return 0;
-	
-		xgui::Object * o = ParseXmlNode(parent, xmlDocGetRootElement(doc));
-	
-		xmlFreeDoc(doc);
-		xmlCleanupParser();
-	
+		}
+
+		nlohmann::json j;
+		try {
+			input_file >> j;
+		}
+		catch (const std::exception& e) {
+			XGUI_ERROR("JSON parse error: " << e.what());
+			return 0;
+		}
+
+		xgui::Object * o = ParseJsonValue(parent, j);
+
 		return o;
 	}
 

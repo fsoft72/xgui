@@ -1,0 +1,52 @@
+{
+  "type": "model",
+  "id": "model1",
+  "children": [
+    {
+      "type": "model",
+      "style": "red-blue",
+      "children": [
+        {
+          "type": "modelentry",
+          "text": "A"
+        },
+        {
+          "type": "modelentry",
+          "text": "A-1"
+        },
+        {
+          "type": "model",
+          "children": [
+            {
+              "type": "modelentry",
+              "text": "A1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "model",
+      "style": "bold",
+      "children": [
+        {
+          "type": "modelentry",
+          "text": "B"
+        },
+        {
+          "type": "modelentry",
+          "text": "B-1"
+        },
+        {
+          "type": "model",
+          "children": [
+            {
+              "type": "modelentry",
+              "text": "B1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
