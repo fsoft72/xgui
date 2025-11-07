@@ -3,14 +3,23 @@ INSTALL_PATH=/usr/local/
 NS_IMPL_PATH=./xgui/openstep/
 XGUI_IMPL_PATH=./xgui/
 
-CPP=g++
-CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -DOPENSTEP
+# Use clang for modern macOS compilation
+CPP=clang++
+OBJC=clang
 
-OBJC=gcc
-OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString
+# Target the latest macOS versions (macOS 13+ for broad compatibility, supports up to latest)
+MACOS_DEPLOYMENT_TARGET=13.0
+SDK_FLAGS=-mmacosx-version-min=$(MACOS_DEPLOYMENT_TARGET)
+
+# Compiler flags for C++
+CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -DOPENSTEP $(SDK_FLAGS) -std=c++11
+
+# Compiler flags for Objective-C/Objective-C++
+OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString $(SDK_FLAGS) -fobjc-arc
 
 XGUI_INCLUDES= `xml2-config --cflags`  -I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
-LIBS= `xml2-config --libs` -lobjc -lstdc++ -framework cocoa
+# Fixed: Cocoa framework name is case-sensitive
+LIBS= `xml2-config --libs` -lobjc -lstdc++ -framework Cocoa -framework Foundation
 
 XGUI_OBJS = $(XGUI_IMPL_PATH)/class_info.o $(XGUI_IMPL_PATH)/object.o $(XGUI_IMPL_PATH)/container.o $(XGUI_IMPL_PATH)/widget.o $(XGUI_IMPL_PATH)/master.o $(XGUI_IMPL_PATH)/callback.o $(XGUI_IMPL_PATH)/window.o $(XGUI_IMPL_PATH)/image.o $(XGUI_IMPL_PATH)/button.o $(XGUI_IMPL_PATH)/menu.o $(XGUI_IMPL_PATH)/hbox.o $(XGUI_IMPL_PATH)/vbox.o $(XGUI_IMPL_PATH)/model.o $(XGUI_IMPL_PATH)/view.o $(XGUI_IMPL_PATH)/style.o $(XGUI_IMPL_PATH)/label.o $(XGUI_IMPL_PATH)/entry.o $(XGUI_IMPL_PATH)/list.o $(XGUI_IMPL_PATH)/calendar.o $(XGUI_IMPL_PATH)/slider.o $(XGUI_IMPL_PATH)/imageview.o $(XGUI_IMPL_PATH)/progressbar.o $(XGUI_IMPL_PATH)/tab.o $(XGUI_IMPL_PATH)/spin.o $(XGUI_IMPL_PATH)/checkbox.o $(XGUI_IMPL_PATH)/combobox.o $(XGUI_IMPL_PATH)/frame.o $(XGUI_IMPL_PATH)/toolbar.o $(XGUI_IMPL_PATH)/space.o $(XGUI_IMPL_PATH)/tree.o $(XGUI_IMPL_PATH)/dmaster.o
 
@@ -25,10 +34,10 @@ all: test
 	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -c -o $@ $<
 
 lib: $(XGUI_OBJS) $(NS_OBJS)
-	$(CPP) $(LIBS) $(XGUI_OBJS) $(NS_OBJS) -fPIC -shared -rdynamic -o output/libxgui.so
+	$(CPP) $(XGUI_OBJS) $(NS_OBJS) -dynamiclib -o output/libxgui.dylib $(LIBS) -install_name @rpath/libxgui.dylib
 
 test: $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o
-	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(LIBS) $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o -o output/main
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o -o output/main $(LIBS)
 
 clean:
 	rm -f xgui_wrap.cpp
@@ -39,4 +48,5 @@ clean:
 	rm -rf tests/_xguimodule.so
 	rm -rf tests/xgui.py
 	rm -rf $(NS_IMPL_PATH)/*.o
-	rm -f output/libxgui.so
+	rm -f output/libxgui.dylib
+	rm -f output/main
