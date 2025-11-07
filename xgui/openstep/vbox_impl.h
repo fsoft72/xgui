@@ -18,8 +18,8 @@
  *  
  * */
 
-#ifndef _XGUI_HBOX_IMPL_H_
-#define _XGUI_HBOX_IMPL_H_
+#ifndef _XGUI_VBOX_IMPL_H_
+#define _XGUI_VBOX_IMPL_H_
 
 #include "widget_impl.h"
 

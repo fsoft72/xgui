@@ -53,7 +53,7 @@
 	rect.size.width = 640;
 	rect.size.height = 480;
 
-	unsigned mask = NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask;
+	NSWindowStyleMask mask = NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable;
 
 	return [[XGuiOSWindow alloc] initWithContentRect:rect styleMask:mask backing:NSBackingStoreBuffered defer:NO];
 }
