@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "tab.h"
-#	include "gtk/tab_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/tab_impl.h"
+#	else
+#		include "gtk/tab_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #	include "dynamic.h"

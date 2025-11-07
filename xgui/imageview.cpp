@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "imageview.h"
-#	include "gtk/imageview_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/imageview_impl.h"
+#	else
+#		include "gtk/imageview_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #	include "container.h"

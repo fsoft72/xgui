@@ -24,6 +24,8 @@
 #include "image.h"
 #include "image_impl.h"
 #include "menu.h"
+#include "vbox_impl.h"
+#include "hbox_impl.h"
 
 #include "openstep_object.h"
 
@@ -51,7 +53,7 @@
 	rect.size.width = 640;
 	rect.size.height = 480;
 
-	unsigned mask = NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask;
+	NSWindowStyleMask mask = NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable;
 
 	return [[XGuiOSWindow alloc] initWithContentRect:rect styleMask:mask backing:NSBackingStoreBuffered defer:NO];
 }
@@ -174,7 +176,29 @@ namespace xguimpl
 	void Window::show()
 	{
 		recalcLayout();
+
+		// Show the window first so dimensions are accurate
 		[widget->o makeKeyAndOrderFront:nil];
+
+		// Force the window to layout its content views before we query dimensions
+		[(NSWindow*)widget->o display];
+
+		// Now that the window is visible and laid out, get actual dimensions
+		if (this_window->child_) {
+			NSRect content_rect = [[(NSWindow*)widget->o contentView] frame];
+			xguimpl::Widget * child_impl = this_window->child_->getImpl();
+
+			// Try to cast to container types that support giveSize
+			if (xguimpl::VBox * vbox = dynamic_cast<xguimpl::VBox*>(child_impl)) {
+				vbox->giveSize(std::make_pair(content_rect.size.width, content_rect.size.height));
+			}
+			else if (xguimpl::HBox * hbox = dynamic_cast<xguimpl::HBox*>(child_impl)) {
+				hbox->giveSize(std::make_pair(content_rect.size.width, content_rect.size.height));
+			}
+
+			// Force a redisplay after sizing
+			[(NSWindow*)widget->o display];
+		}
 	}
 
 	void Window::recalcLayout()
@@ -202,7 +226,7 @@ namespace xguimpl
 	}
 
 
-	bool Window::addChild(xgui::Widget * w) 
+	bool Window::addChild(xgui::Widget * w)
 	{
 		bool done = false;
 		if (!this_window->child_) {
@@ -216,6 +240,15 @@ namespace xguimpl
 			[sub_view setFrameSize:fsize.size];
 		    [sub_view setNeedsDisplay:YES];
 			[sub_view setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+
+			// Propagate size to container children
+			xguimpl::Widget * child_impl = w->getImpl();
+			if (xguimpl::VBox * vbox = dynamic_cast<xguimpl::VBox*>(child_impl)) {
+				vbox->giveSize(std::make_pair(fsize.size.width, fsize.size.height));
+			}
+			else if (xguimpl::HBox * hbox = dynamic_cast<xguimpl::HBox*>(child_impl)) {
+				hbox->giveSize(std::make_pair(fsize.size.width, fsize.size.height));
+			}
 
 			done = true;
 		}

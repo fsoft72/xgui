@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "image.h"
-#	include "gtk/image_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/image_impl.h"
+#	else
+#		include "gtk/image_impl.h"
+#	endif
 #	include "master.h"
 #	include "dynamic.h"
 #endif

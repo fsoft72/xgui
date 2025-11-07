@@ -15,7 +15,11 @@
 #ifndef WIN32
 #	include "model.h"
 #	include "view.h"
-#	include "gtk/view_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/view_impl.h"
+#	else
+#		include "gtk/view_impl.h"
+#	endif
 #	include "dynamic.h"
 #	include "master.h"
 #endif

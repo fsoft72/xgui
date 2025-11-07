@@ -88,16 +88,20 @@ namespace xguimpl
 {
 	Button::Button ( OpenStepWidget * real_w ) : Widget ( real_w ) {}
 	Button::Button ( xgui::Container * parent, std::string const &text, xgui::Image * image, bool toggle_button )
-	: Widget ( new OpenStepWidget([XGuiOSButton Create:parent withText:text.c_str()]) ) 
+	: Widget ( new OpenStepWidget([XGuiOSButton Create:parent withText:text.c_str()]) )
 	{
 		if (image) {
 			image->ref();
 			set_widget_prop("tooltip-text", text);
 		}
 
-		NSSize size = [[widget->o cell] cellSize];
-		min_x = size.width > 1 ? size.width : 1;
-		min_y = size.height > 1 ? size.height : 1;
+		// Make the button calculate its proper size based on the title
+		[(NSButton*)widget->o sizeToFit];
+
+		// Now get the actual size after sizeToFit
+		NSRect frame = [(NSButton*)widget->o frame];
+		min_x = frame.size.width > 10 ? frame.size.width : 80;  // Reasonable minimum
+		min_y = frame.size.height > 10 ? frame.size.height : 24; // Standard button height
 	}
 
 	Button::~Button() {}

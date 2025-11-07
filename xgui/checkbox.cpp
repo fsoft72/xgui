@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "checkbox.h"
-#	include "gtk/checkbox_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/checkbox_impl.h"
+#	else
+#		include "gtk/checkbox_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #	include "container.h"

@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "menu.h"
-#	include "gtk/menu_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/menu_impl.h"
+#	else
+#		include "gtk/menu_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #endif

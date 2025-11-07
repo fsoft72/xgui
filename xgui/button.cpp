@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "button.h"
-#	include "gtk/button_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/button_impl.h"
+#	else
+#		include "gtk/button_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #	include "container.h"

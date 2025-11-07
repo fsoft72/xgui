@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "vbox.h"
-#	include "gtk/vbox_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/vbox_impl.h"
+#	else
+#		include "gtk/vbox_impl.h"
+#	endif
 #	include "master.h"
 #	include "dynamic.h"
 #endif

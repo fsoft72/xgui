@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "toolbar.h"
-#	include "gtk/toolbar_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/toolbar_impl.h"
+#	else
+#		include "gtk/toolbar_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #	include "container.h"

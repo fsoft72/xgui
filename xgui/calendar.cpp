@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "calendar.h"
-#	include "gtk/calendar_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/calendar_impl.h"
+#	else
+#		include "gtk/calendar_impl.h"
+#	endif
 #	include "master.h"
 #	include "image.h"
 #	include "container.h"

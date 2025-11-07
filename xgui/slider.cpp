@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "slider.h"
-#	include "gtk/slider_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/slider_impl.h"
+#	else
+#		include "gtk/slider_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #	include "dynamic.h"

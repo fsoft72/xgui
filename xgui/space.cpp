@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "space.h"
-#	include "gtk/space_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/space_impl.h"
+#	else
+#		include "gtk/space_impl.h"
+#	endif
 #	include "master.h"
 #	include "container.h"
 #endif

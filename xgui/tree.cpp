@@ -14,7 +14,11 @@
 
 #ifndef WIN32
 #	include "tree.h"
-#	include "gtk/tree_impl.h"
+#	ifdef OPENSTEP
+#		include "openstep/tree_impl.h"
+#	else
+#		include "gtk/tree_impl.h"
+#	endif
 #	include "master.h"
 #	include "style.h"
 #	include "container.h"
