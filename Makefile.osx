@@ -15,7 +15,8 @@ SDK_FLAGS=-mmacosx-version-min=$(MACOS_DEPLOYMENT_TARGET)
 CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -DOPENSTEP $(SDK_FLAGS) -std=c++11
 
 # Compiler flags for Objective-C/Objective-C++
-OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString $(SDK_FLAGS) -fobjc-arc
+# Note: ARC (-fobjc-arc) is disabled because the OpenStep implementation uses manual memory management
+OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString $(SDK_FLAGS)
 
 XGUI_INCLUDES= `xml2-config --cflags`  -I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
 # Fixed: Cocoa framework name is case-sensitive

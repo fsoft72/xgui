@@ -90,7 +90,7 @@ The Makefile.osx has been updated to support modern macOS versions with the foll
 
 2. **SDK Targeting**: Targets macOS 13.0+ with `-mmacosx-version-min=13.0` for broad compatibility while supporting the latest macOS versions
 
-3. **Automatic Reference Counting (ARC)**: Enabled `-fobjc-arc` for modern Objective-C memory management
+3. **Memory Management**: Uses manual reference counting (MRC) to maintain compatibility with the existing OpenStep implementation code
 
 4. **C++11 Standard**: Uses `-std=c++11` for modern C++ features
 
