@@ -11,9 +11,6 @@
 #include <stack>
 #include <locale>
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-
 #include "xgui.h"
 
 #define _WIN32_WINNT	0x0400

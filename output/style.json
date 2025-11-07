@@ -1,0 +1,18 @@
+{
+  "type": "stylemanager",
+  "id": "style1",
+  "children": [
+    {
+      "type": "style",
+      "id": "red-blue",
+      "fgcolor": "#FF0000",
+      "bgcolor": "#0000FF"
+    },
+    {
+      "type": "style",
+      "id": "bold",
+      "bold": "1",
+      "icon": "icon.png"
+    }
+  ]
+}

@@ -16,6 +16,10 @@
 #include "object.h"
 #include "callback.h"
 
+#ifndef WIN32
+#include "json.hpp"
+#endif
+
 /*
 #ifdef CreateWindow
 #undef CreateWindow
@@ -59,6 +63,7 @@ namespace xgui
 			DLLEXPORT ~Master();
 
 			DLLEXPORT static xgui::Object * ParseXmlNode(xgui::Object * parent_object, void * node);
+		DLLEXPORT static xgui::Object * ParseJsonValue(xgui::Object * parent_object, const nlohmann::json &j);
 
 		public:
 			DLLEXPORT xguimpl::Master * getImpl() { return master_impl_; }
@@ -123,6 +128,7 @@ namespace xgui
 			DLLEXPORT static xgui::ClassInfo * FindClass(std::string const &cname);
 			DLLEXPORT static std::vector<std::string> availableClasses();
 			DLLEXPORT static xgui::Object * LoadXml(std::string const &filename, xgui::Object * parent = 0);
+			DLLEXPORT static xgui::Object * LoadJson(std::string const &filename, xgui::Object * parent = 0);
 			DLLEXPORT static void SaveXml(xgui::Object * root, std::string const &filename);
 			DLLEXPORT static std::string GenerateDTD();
 
