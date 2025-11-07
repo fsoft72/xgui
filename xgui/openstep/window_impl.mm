@@ -24,6 +24,8 @@
 #include "image.h"
 #include "image_impl.h"
 #include "menu.h"
+#include "vbox_impl.h"
+#include "hbox_impl.h"
 
 #include "openstep_object.h"
 
@@ -174,6 +176,21 @@ namespace xguimpl
 	void Window::show()
 	{
 		recalcLayout();
+
+		// After calculating layout, actually resize the child widget to fill the window
+		if (this_window->child_) {
+			NSRect content_rect = [(NSWindow*)widget->o contentRectForFrameRect:[(NSWindow*)widget->o frame]];
+			xguimpl::Widget * child_impl = this_window->child_->getImpl();
+
+			// Try to cast to container types that support giveSize
+			if (xguimpl::VBox * vbox = dynamic_cast<xguimpl::VBox*>(child_impl)) {
+				vbox->giveSize(std::make_pair(content_rect.size.width, content_rect.size.height));
+			}
+			else if (xguimpl::HBox * hbox = dynamic_cast<xguimpl::HBox*>(child_impl)) {
+				hbox->giveSize(std::make_pair(content_rect.size.width, content_rect.size.height));
+			}
+		}
+
 		[widget->o makeKeyAndOrderFront:nil];
 	}
 
@@ -202,7 +219,7 @@ namespace xguimpl
 	}
 
 
-	bool Window::addChild(xgui::Widget * w) 
+	bool Window::addChild(xgui::Widget * w)
 	{
 		bool done = false;
 		if (!this_window->child_) {
@@ -216,6 +233,15 @@ namespace xguimpl
 			[sub_view setFrameSize:fsize.size];
 		    [sub_view setNeedsDisplay:YES];
 			[sub_view setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+
+			// Propagate size to container children
+			xguimpl::Widget * child_impl = w->getImpl();
+			if (xguimpl::VBox * vbox = dynamic_cast<xguimpl::VBox*>(child_impl)) {
+				vbox->giveSize(std::make_pair(fsize.size.width, fsize.size.height));
+			}
+			else if (xguimpl::HBox * hbox = dynamic_cast<xguimpl::HBox*>(child_impl)) {
+				hbox->giveSize(std::make_pair(fsize.size.width, fsize.size.height));
+			}
 
 			done = true;
 		}
