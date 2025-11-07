@@ -29,7 +29,7 @@
 namespace xguimpl
 {
 	Widget::Widget(OpenStepWidget * real_w)
-	: this_widget(0), widget(real_w), min_x(1), min_y(1), expand(false)
+	: this_widget(0), widget(real_w), min_x(1), min_y(1), expand(true)
 	{
 		ASSERT([widget->o conformsToProtocol:@protocol(XGui)])
 		[widget->o setOwner:this];
