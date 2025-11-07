@@ -177,9 +177,12 @@ namespace xguimpl
 	{
 		recalcLayout();
 
-		// After calculating layout, actually resize the child widget to fill the window
+		// Show the window first so dimensions are accurate
+		[widget->o makeKeyAndOrderFront:nil];
+
+		// Now that the window is visible, force layout with actual dimensions
 		if (this_window->child_) {
-			NSRect content_rect = [(NSWindow*)widget->o contentRectForFrameRect:[(NSWindow*)widget->o frame]];
+			NSRect content_rect = [[(NSWindow*)widget->o contentView] frame];
 			xguimpl::Widget * child_impl = this_window->child_->getImpl();
 
 			// Try to cast to container types that support giveSize
@@ -190,8 +193,6 @@ namespace xguimpl
 				hbox->giveSize(std::make_pair(content_rect.size.width, content_rect.size.height));
 			}
 		}
-
-		[widget->o makeKeyAndOrderFront:nil];
 	}
 
 	void Window::recalcLayout()
