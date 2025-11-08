@@ -107,7 +107,16 @@ class ComplexGUITest:
         Note: Spin onchange uses TextCallback (widget, text)
         """
         try:
-            value = int(text)  # Use text parameter
+            print(f"DEBUG: Spin callback - text='{text}', widget.get('pos')='{widget.get('pos')}'")
+
+            # The text parameter might be empty, so fall back to widget.get("pos")
+            if text and text.strip():
+                value = int(text)
+            else:
+                # Fallback: read the value from the widget
+                value = int(widget.get("pos"))
+
+            print(f"DEBUG: Spin value={value}")
 
             # Update slider widget
             slider = self.get_widget("brightnessSlider")
@@ -122,6 +131,8 @@ class ComplexGUITest:
             print(f"Brightness spin changed to: {value}")
         except Exception as e:
             print(f"Error in brightness spin callback: {e}")
+            import traceback
+            traceback.print_exc()
 
         return xgui.EVT_BLOCK
 
