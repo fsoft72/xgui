@@ -106,8 +106,9 @@ static std::string map_virtual_key ( int vk, int code )
 
 			default:
 				{
+					// GetKeyNameText requires proper LONG parameter cast
 					char str[256];
-					GetKeyNameText(code, str, sizeof(str) - 1);
+					GetKeyNameTextA(static_cast<LONG>(code), str, sizeof(str) - 1);
 					c = str;
 				}
 		}
@@ -560,11 +561,11 @@ namespace xguimpl
 	{
 		if ( name == "text" ) {
 
+			// Use modern C++ memory management with std::vector
 			int len = GetWindowTextLength ( widget );
-			char * pstr = (char*)malloc(len + 1);
-			GetWindowText ( widget, pstr, len + 1 );
-			vals = pstr;
-			free(pstr);
+			std::vector<char> buffer(len + 1);
+			GetWindowText ( widget, buffer.data(), len + 1 );
+			vals = buffer.data();
 		
 		} else if ( name == "tooltip-text" ) {
 		
