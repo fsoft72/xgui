@@ -100,7 +100,7 @@ namespace xguimpl
 		bool text_approved = true;
 	
 		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
-		text_after_change.insert(*position, text_after_change);
+		text_after_change.insert(*position, new_text, new_text_length);
 	
 		xgui::Callback * base_cb = e->this_widget->getEvent("onchange");
 		if (base_cb) {
