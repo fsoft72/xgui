@@ -124,7 +124,7 @@ namespace xgui
 				if (PyCallable_Check(callback)) {
 					PyObject *pw =  XGUIPyObjectCreate(w, false);
 					PyObject *args = Py_BuildValue("(O)", pw);
-					PyObject *result = PyEval_CallObject(callback, args);
+					PyObject *result = PyObject_CallObject(callback, args);
 					Py_XDECREF(args);
 					Py_XDECREF(pw);
 	
@@ -134,8 +134,8 @@ namespace xgui
 					else if (result == Py_None) {
 						Py_XDECREF(result);
 					}
-					else if (PyInt_Check(result)) {
-						rv = PyInt_AsLong(result);
+					else if (PyLong_Check(result)) {
+						rv = PyLong_AsLong(result);
 						Py_XDECREF(result);
 					}
 					else {
@@ -187,7 +187,7 @@ namespace xgui
 				if (PyCallable_Check(callback)) {
 					PyObject *pw =  XGUIPyObjectCreate(w, false);
 					PyObject *args = Py_BuildValue("(Os)", pw, text.c_str());
-					PyObject *result = PyEval_CallObject(callback, args);
+					PyObject *result = PyObject_CallObject(callback, args);
 					Py_XDECREF(args);
 					Py_XDECREF(pw);
 					
@@ -197,8 +197,8 @@ namespace xgui
 					else if (result == Py_None) {
 						Py_XDECREF(result);
 					}
-					else if (PyInt_Check(result)) {
-						rv = PyInt_AsLong(result);
+					else if (PyLong_Check(result)) {
+						rv = PyLong_AsLong(result);
 						Py_XDECREF(result);
 					}
 					else {
@@ -250,7 +250,7 @@ namespace xgui
 				if (PyCallable_Check(callback)) {
 					PyObject *pw =  XGUIPyObjectCreate(w, false);
 					PyObject *args = Py_BuildValue("(Osi)", pw, text.c_str(), status);
-					PyObject *result = PyEval_CallObject(callback, args);
+					PyObject *result = PyObject_CallObject(callback, args);
 					Py_XDECREF(args);
 					Py_XDECREF(pw);
 					
@@ -260,8 +260,8 @@ namespace xgui
 					else if (result == Py_None) {
 						Py_XDECREF(result);
 					}
-					else if (PyInt_Check(result)) {
-						rv = PyInt_AsLong(result);
+					else if (PyLong_Check(result)) {
+						rv = PyLong_AsLong(result);
 						Py_XDECREF(result);
 					}
 					else {
@@ -313,7 +313,7 @@ namespace xgui
 				if (PyCallable_Check(callback)) {
 					PyObject *pw =  XGUIPyObjectCreate(w, false);
 					PyObject *args = Py_BuildValue("(Oss)", pw, text.c_str(), text2.c_str());
-					PyObject *result = PyEval_CallObject(callback, args);
+					PyObject *result = PyObject_CallObject(callback, args);
 					Py_XDECREF(args);
 					Py_XDECREF(pw);
 					
@@ -323,8 +323,8 @@ namespace xgui
 					else if (result == Py_None) {
 						Py_XDECREF(result);
 					}
-					else if (PyInt_Check(result)) {
-						rv = PyInt_AsLong(result);
+					else if (PyLong_Check(result)) {
+						rv = PyLong_AsLong(result);
 						Py_XDECREF(result);
 					}
 					else {
