@@ -1,0 +1,147 @@
+{
+  "type": "window",
+  "text": "Application Settings",
+  "size": "450 300",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "children": [
+        {
+          "type": "tab",
+          "id": "settingsTabs",
+          "selected-index": "0",
+          "expand": "1",
+          "children": [
+            {
+              "type": "tabpage",
+              "label": "General",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "checkbox",
+                      "text": "Start on system boot",
+                      "checked": "0"
+                    },
+                    {
+                      "type": "checkbox",
+                      "text": "Show system notifications",
+                      "checked": "1"
+                    },
+                    {
+                      "type": "checkbox",
+                      "text": "Check for updates automatically",
+                      "checked": "1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "label": "Display",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "Theme:"
+                    },
+                    {
+                      "type": "hbox",
+                      "children": [
+                        {
+                          "type": "button",
+                          "text": "Light",
+                          "id": "lightTheme",
+                          "pressed": "1"
+                        },
+                        {
+                          "type": "button",
+                          "text": "Dark",
+                          "id": "darkTheme",
+                          "pressed": "0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "label",
+                      "text": "Font size:"
+                    },
+                    {
+                      "type": "spin",
+                      "id": "fontSize",
+                      "value": "12",
+                      "min": "8",
+                      "max": "24"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "label": "Advanced",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "checkbox",
+                      "text": "Enable debug mode",
+                      "checked": "0"
+                    },
+                    {
+                      "type": "checkbox",
+                      "text": "Use hardware acceleration",
+                      "checked": "1"
+                    },
+                    {
+                      "type": "hbox",
+                      "children": [
+                        {
+                          "type": "label",
+                          "text": "Cache size (MB):",
+                          "expand": "0"
+                        },
+                        {
+                          "type": "spin",
+                          "id": "cacheSize",
+                          "value": "100",
+                          "min": "10",
+                          "max": "1000",
+                          "expand": "1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "hbox",
+          "expand": "0",
+          "children": [
+            {
+              "type": "space",
+              "expand": "1"
+            },
+            {
+              "type": "button",
+              "text": "OK",
+              "id": "okBtn"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

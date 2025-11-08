@@ -39,6 +39,9 @@ pexplorer: $(XGUI_OBJS) $(GTK_OBJS) tests/pexplorer/pexplorer.o
 plan: $(XGUI_OBJS) $(GTK_OBJS) tests/plan/main.o
 	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(GTK_OBJS) $(LIBS) -rdynamic tests/plan/main.o -o output/plan
 
+xgui-example: $(XGUI_OBJS) $(GTK_OBJS) tests/xgui-example/main.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(GTK_OBJS) $(LIBS) -rdynamic tests/xgui-example/main.o -o output/xgui-example
+
 plugin:
 	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -fPIC -shared -rdynamic tests/plugin_test/plugin_test.cpp -o output/plugin_test.so
 

@@ -1,0 +1,26 @@
+{
+  "type": "window",
+  "text": "Slider Control",
+  "size": "350 120",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Adjust volume:",
+          "alignment": "left"
+        },
+        {
+          "type": "slider",
+          "id": "volumeSlider",
+          "min": "0",
+          "max": "100",
+          "pos": "50"
+        }
+      ]
+    }
+  ]
+}

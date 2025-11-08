@@ -1,0 +1,378 @@
+{
+  "type": "window",
+  "text": "Complete Widget Showcase",
+  "size": "700 600",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "5",
+      "children": [
+        {
+          "type": "tab",
+          "selected-index": "0",
+          "expand": "1",
+          "children": [
+            {
+              "type": "tabpage",
+              "label": "Basic Controls",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "8",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Buttons",
+                      "children": [
+                        {
+                          "type": "hbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "button",
+                              "text": "Normal Button",
+                              "id": "normalBtn"
+                            },
+                            {
+                              "type": "button",
+                              "text": "Toggle Button",
+                              "id": "toggleBtn",
+                              "pressed": "0"
+                            },
+                            {
+                              "type": "button",
+                              "text": "Disabled",
+                              "id": "disabledBtn",
+                              "enabled": "0"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Text Input",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "hbox",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Regular:",
+                                  "expand": "0"
+                                },
+                                {
+                                  "type": "entry",
+                                  "id": "regularEntry",
+                                  "text": "Type here...",
+                                  "expand": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "hbox",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Password:",
+                                  "expand": "0"
+                                },
+                                {
+                                  "type": "entry",
+                                  "id": "passwordEntry",
+                                  "password-mode": "1",
+                                  "expand": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "hbox",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Read-only:",
+                                  "expand": "0"
+                                },
+                                {
+                                  "type": "entry",
+                                  "id": "readonlyEntry",
+                                  "text": "Cannot edit this",
+                                  "editable": "0",
+                                  "expand": "1"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Checkboxes",
+                      "children": [
+                        {
+                          "type": "hbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "checkbox",
+                              "text": "Unchecked",
+                              "checked": "0"
+                            },
+                            {
+                              "type": "checkbox",
+                              "text": "Checked",
+                              "checked": "1"
+                            },
+                            {
+                              "type": "checkbox",
+                              "text": "Disabled",
+                              "checked": "0",
+                              "enabled": "0"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "label": "Value Controls",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Slider",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "label",
+                              "id": "sliderLabel",
+                              "text": "Value: 50",
+                              "alignment": "center"
+                            },
+                            {
+                              "type": "slider",
+                              "id": "demoSlider",
+                              "min": "0",
+                              "max": "100",
+                              "pos": "50"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Spin Control",
+                      "children": [
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Quantity:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "spin",
+                              "id": "quantitySpin",
+                              "value": "1",
+                              "min": "1",
+                              "max": "99",
+                              "expand": "1"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Progress Bar",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "progressbar",
+                              "id": "demoProgress",
+                              "min": "0",
+                              "max": "100",
+                              "pos": "75"
+                            },
+                            {
+                              "type": "hbox",
+                              "children": [
+                                {
+                                  "type": "button",
+                                  "text": "Start",
+                                  "id": "progressStart"
+                                },
+                                {
+                                  "type": "button",
+                                  "text": "Stop",
+                                  "id": "progressStop"
+                                },
+                                {
+                                  "type": "button",
+                                  "text": "Reset",
+                                  "id": "progressReset"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Combobox",
+                      "children": [
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Select Item:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "combobox",
+                              "id": "demoCombo",
+                              "model": "demoModel",
+                              "editable": "0",
+                              "expand": "1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "label": "Date & Time",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Calendar Widget",
+                      "children": [
+                        {
+                          "type": "calendar",
+                          "id": "showcaseCalendar"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "hbox",
+                      "children": [
+                        {
+                          "type": "label",
+                          "text": "Selected Date:",
+                          "expand": "0"
+                        },
+                        {
+                          "type": "entry",
+                          "id": "calendarDate",
+                          "editable": "0",
+                          "expand": "1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "label": "Alignment",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Label Alignment",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Left Aligned",
+                              "alignment": "left"
+                            },
+                            {
+                              "type": "label",
+                              "text": "Center Aligned",
+                              "alignment": "center"
+                            },
+                            {
+                              "type": "label",
+                              "text": "Right Aligned",
+                              "alignment": "right"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Button Alignment",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "button",
+                              "text": "Left Aligned",
+                              "alignment": "left"
+                            },
+                            {
+                              "type": "button",
+                              "text": "Center Aligned",
+                              "alignment": "center"
+                            },
+                            {
+                              "type": "button",
+                              "text": "Right Aligned",
+                              "alignment": "right"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

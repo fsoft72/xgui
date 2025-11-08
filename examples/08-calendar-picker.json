@@ -1,0 +1,47 @@
+{
+  "type": "window",
+  "text": "Date Picker",
+  "size": "400 350",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Select a date:",
+          "alignment": "center"
+        },
+        {
+          "type": "calendar",
+          "id": "datePicker",
+          "day": "15",
+          "month": "6",
+          "year": "2024"
+        },
+        {
+          "type": "hbox",
+          "children": [
+            {
+              "type": "label",
+              "text": "Selected:",
+              "expand": "0"
+            },
+            {
+              "type": "entry",
+              "id": "selectedDate",
+              "editable": "0",
+              "expand": "1"
+            }
+          ]
+        },
+        {
+          "type": "button",
+          "text": "Confirm",
+          "id": "confirmBtn"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+{
+  "type": "window",
+  "text": "System Dashboard",
+  "size": "800 600",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "5",
+      "children": [
+        {
+          "type": "label",
+          "text": "System Monitoring Dashboard",
+          "alignment": "center",
+          "expand": "0"
+        },
+        {
+          "type": "hbox",
+          "space": "10",
+          "expand": "1",
+          "children": [
+            {
+              "type": "vbox",
+              "space": "5",
+              "expand": "1",
+              "children": [
+                {
+                  "type": "frame",
+                  "text": "CPU Usage",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "space": "5",
+                      "children": [
+                        {
+                          "type": "progressbar",
+                          "id": "cpuProgress",
+                          "min": "0",
+                          "max": "100",
+                          "pos": "45"
+                        },
+                        {
+                          "type": "label",
+                          "id": "cpuLabel",
+                          "text": "45%",
+                          "alignment": "center"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "text": "Memory Usage",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "space": "5",
+                      "children": [
+                        {
+                          "type": "progressbar",
+                          "id": "memProgress",
+                          "min": "0",
+                          "max": "100",
+                          "pos": "67"
+                        },
+                        {
+                          "type": "label",
+                          "id": "memLabel",
+                          "text": "67% (5.4GB / 8GB)",
+                          "alignment": "center"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "text": "Disk Usage",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "space": "5",
+                      "children": [
+                        {
+                          "type": "progressbar",
+                          "id": "diskProgress",
+                          "min": "0",
+                          "max": "100",
+                          "pos": "82"
+                        },
+                        {
+                          "type": "label",
+                          "id": "diskLabel",
+                          "text": "82% (410GB / 500GB)",
+                          "alignment": "center"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "vbox",
+              "space": "5",
+              "expand": "2",
+              "children": [
+                {
+                  "type": "frame",
+                  "text": "System Information",
+                  "expand": "0",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "space": "3",
+                      "children": [
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "OS:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "label",
+                              "text": "Linux 5.15.0",
+                              "expand": "1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Uptime:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "label",
+                              "id": "uptimeLabel",
+                              "text": "5 days, 3 hours",
+                              "expand": "1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Processes:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "label",
+                              "text": "245",
+                              "expand": "1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "text": "Active Processes",
+                  "expand": "1",
+                  "children": [
+                    {
+                      "type": "list",
+                      "id": "processList",
+                      "model": "processModel",
+                      "stylemanager": "processStyle",
+                      "visible-headers": "1",
+                      "children": [
+                        {
+                          "type": "listcolumn",
+                          "position": "0",
+                          "id": "pidCol",
+                          "name": "PID",
+                          "width": "60",
+                          "alignment": "right"
+                        },
+                        {
+                          "type": "listcolumn",
+                          "position": "1",
+                          "id": "nameCol",
+                          "name": "Name",
+                          "width": "150",
+                          "alignment": "left"
+                        },
+                        {
+                          "type": "listcolumn",
+                          "position": "2",
+                          "id": "cpuCol",
+                          "name": "CPU %",
+                          "width": "70",
+                          "alignment": "right"
+                        },
+                        {
+                          "type": "listcolumn",
+                          "position": "3",
+                          "id": "memCol",
+                          "name": "Memory",
+                          "width": "80",
+                          "alignment": "right"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "hbox",
+          "space": "5",
+          "expand": "0",
+          "children": [
+            {
+              "type": "button",
+              "text": "Refresh",
+              "id": "refreshBtn"
+            },
+            {
+              "type": "space",
+              "expand": "1"
+            },
+            {
+              "type": "label",
+              "id": "updateLabel",
+              "text": "Last update: 10:35:42"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

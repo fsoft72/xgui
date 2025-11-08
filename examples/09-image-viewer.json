@@ -1,0 +1,54 @@
+{
+  "type": "window",
+  "text": "Image Viewer",
+  "size": "600 450",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "children": [
+        {
+          "type": "hbox",
+          "space": "5",
+          "expand": "0",
+          "children": [
+            {
+              "type": "button",
+              "text": "Open Image",
+              "id": "openBtn"
+            },
+            {
+              "type": "button",
+              "text": "Zoom In",
+              "id": "zoomInBtn"
+            },
+            {
+              "type": "button",
+              "text": "Zoom Out",
+              "id": "zoomOutBtn"
+            },
+            {
+              "type": "button",
+              "text": "Fit to Window",
+              "id": "fitBtn"
+            }
+          ]
+        },
+        {
+          "type": "imageview",
+          "id": "imageViewer",
+          "scrolled": "1",
+          "alignment": "center",
+          "expand": "1"
+        },
+        {
+          "type": "label",
+          "id": "statusLabel",
+          "text": "No image loaded",
+          "alignment": "left",
+          "expand": "0"
+        }
+      ]
+    }
+  ]
+}

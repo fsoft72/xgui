@@ -1,0 +1,24 @@
+{
+  "type": "window",
+  "text": "Simple Button Example",
+  "size": "300 150",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Click the button below",
+          "alignment": "center"
+        },
+        {
+          "type": "button",
+          "text": "Click Me!",
+          "id": "myButton"
+        }
+      ]
+    }
+  ]
+}
