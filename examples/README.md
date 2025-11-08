@@ -2,6 +2,10 @@
 
 This directory contains a comprehensive collection of JSON examples demonstrating all XGUI capabilities, from simple interfaces to complex applications.
 
+## Important Note
+
+**Standalone vs. Programmatic Examples**: Examples 01-10 are fully standalone and work with the `xgui-example` viewer. Examples 11-18 reference data models (for List, Tree, and Combobox widgets) which need to be populated programmatically in C++ code. These examples demonstrate the correct JSON structure but won't display data when loaded with the simple viewer alone. See the [C++ Examples](#using-models-in-c) section for how to populate models.
+
 ## Simple Examples (2-3 widgets)
 
 These examples demonstrate basic XGUI usage with minimal widgets:
@@ -64,11 +68,11 @@ These examples combine multiple widgets and demonstrate layout techniques:
 - **Complexity**: Intermediate
 - **Description**: Image viewer with zoom and navigation controls
 
-### 10-combobox-demo.json
-- **Widgets**: Window, VBox, HBox, Frame, Label, Combobox, Button
-- **Features**: Dropdown selection, editable and non-editable combos, data models
+### 10-spin-and-slider.json
+- **Widgets**: Window, VBox, HBox, Frame, Label, Slider, Spin, ProgressBar
+- **Features**: Numeric input controls, value sliders, progress indication
 - **Complexity**: Intermediate
-- **Description**: Demonstrates dropdown menus with cascading selections
+- **Description**: Temperature and quantity controls demonstrating sliders and spinners
 
 ## Complex Examples
 
@@ -243,6 +247,52 @@ Use examples 16-18 as reference for specific features like layouts, radio groups
 - **06-10**: Medium complexity (multiple features)
 - **11-15**: Complex applications (full featured)
 - **16-18**: Specialized demonstrations
+
+## Using Models in C++
+
+Examples 11, 12, 14, 15, and 18 use data models for List, Tree, and Combobox widgets. These models must be created and populated programmatically. Here's a basic example:
+
+```cpp
+#include <xgui/xgui.h>
+
+int main() {
+    // Create a model
+    xgui::Model* model = xgui::Master::CreateModel();
+
+    // Add data to the model
+    std::vector<std::string> row1;
+    row1.push_back("John Doe");
+    row1.push_back("john@example.com");
+    model->appendChild(row1);
+
+    std::vector<std::string> row2;
+    row2.push_back("Jane Smith");
+    row2.push_back("jane@example.com");
+    model->appendChild(row2);
+
+    // Load the JSON GUI
+    xgui::Object* gui = xgui::Master::LoadJson("11-data-list.json", 0);
+    xgui::Window* window = dynamic_cast<xgui::Window*>(gui);
+
+    // Find the list widget and assign the model
+    xgui::List* list = dynamic_cast<xgui::List*>(
+        window->findChild("contactList")
+    );
+    if (list) {
+        list->setModel(model);
+    }
+
+    window->show();
+    xgui::Master::Run();
+
+    return 0;
+}
+```
+
+For complete examples of model usage, see:
+- `/tests/exe_test/main.cpp` - Basic model creation and usage
+- `/tests/plan/main.cpp` - Advanced model manipulation
+- `/output/model.json` - Model JSON structure reference
 
 ## Additional Resources
 

@@ -1,0 +1,86 @@
+{
+  "type": "window",
+  "text": "Spin and Slider Demo",
+  "size": "400 250",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "frame",
+          "text": "Value Controls",
+          "children": [
+            {
+              "type": "vbox",
+              "space": "10",
+              "children": [
+                {
+                  "type": "label",
+                  "text": "Temperature (°C):",
+                  "alignment": "left"
+                },
+                {
+                  "type": "slider",
+                  "id": "tempSlider",
+                  "min": "-10",
+                  "max": "40",
+                  "pos": "20"
+                },
+                {
+                  "type": "label",
+                  "text": "Current: 20°C",
+                  "id": "tempLabel",
+                  "alignment": "center"
+                },
+                {
+                  "type": "label",
+                  "text": "Quantity:",
+                  "alignment": "left"
+                },
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "spin",
+                      "id": "quantitySpin",
+                      "value": "5",
+                      "min": "1",
+                      "max": "100",
+                      "expand": "1"
+                    },
+                    {
+                      "type": "label",
+                      "text": "items",
+                      "expand": "0"
+                    }
+                  ]
+                },
+                {
+                  "type": "label",
+                  "text": "Brightness:",
+                  "alignment": "left"
+                },
+                {
+                  "type": "slider",
+                  "id": "brightnessSlider",
+                  "min": "0",
+                  "max": "100",
+                  "pos": "75"
+                },
+                {
+                  "type": "progressbar",
+                  "id": "brightnessBar",
+                  "min": "0",
+                  "max": "100",
+                  "pos": "75"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
