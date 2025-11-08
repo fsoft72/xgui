@@ -222,6 +222,10 @@ progress.set("pos", str(value))
 ```
 
 #### Creating and Binding Callbacks
+
+There are different callback types depending on the widget and event:
+
+**PyCallback** - For buttons, checkboxes, sliders, etc. (receives widget only):
 ```python
 def my_callback(widget):
     # Do something
@@ -230,6 +234,21 @@ def my_callback(widget):
 callback = xgui.PyCallback(my_callback)
 widget.linkEvent("onclick", callback)
 ```
+
+**PyTextCallback** - For Entry widgets (receives widget and text):
+```python
+def entry_callback(widget, text):
+    # Handle text change
+    print(f"Text changed to: {text}")
+    return xgui.EVT_BLOCK
+
+callback = xgui.PyTextCallback(entry_callback)
+entry.linkEvent("onchange", callback)
+```
+
+**Other callback types**:
+- `PyTextStatusCallback(func)` - receives (widget, text, status)
+- `PyTextPairCallback(func)` - receives (widget, text1, text2)
 
 ## Widget Properties Reference
 

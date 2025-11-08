@@ -181,11 +181,12 @@ class ComplexGUITest:
 
     # ===== Text Input Callbacks =====
 
-    def on_text_entry_change(self, widget):
-        """Callback when text entry changes - mirrors to label"""
-        try:
-            text = widget.get("text")
+    def on_text_entry_change(self, widget, text):
+        """Callback when text entry changes - mirrors to label
 
+        Note: Entry callbacks receive (widget, text) - this is a TextCallback
+        """
+        try:
             # Update mirror label
             label = self.get_widget("mirrorLabel")
             if label:
@@ -197,10 +198,12 @@ class ComplexGUITest:
 
         return xgui.EVT_BLOCK
 
-    def on_counter_entry_change(self, widget):
-        """Callback when counter entry changes - updates character count"""
+    def on_counter_entry_change(self, widget, text):
+        """Callback when counter entry changes - updates character count
+
+        Note: Entry callbacks receive (widget, text) - this is a TextCallback
+        """
         try:
-            text = widget.get("text")
             char_count = len(text)
 
             # Update character count label
@@ -499,15 +502,19 @@ class ComplexGUITest:
             reset_button.linkEvent("onclick", self.create_callback(self.on_reset_download))
             print("  ✓ Bound reset button")
 
-        # Text inputs
+        # Text inputs (use PyTextCallback for Entry widgets)
         text_entry = self.get_widget("textEntry")
         if text_entry:
-            text_entry.linkEvent("onchange", self.create_callback(self.on_text_entry_change))
+            text_callback = xgui.PyTextCallback(self.on_text_entry_change)
+            self.callbacks['on_text_entry_change'] = text_callback
+            text_entry.linkEvent("onchange", text_callback)
             print("  ✓ Bound text entry")
 
         counter_entry = self.get_widget("counterEntry")
         if counter_entry:
-            counter_entry.linkEvent("onchange", self.create_callback(self.on_counter_entry_change))
+            counter_callback = xgui.PyTextCallback(self.on_counter_entry_change)
+            self.callbacks['on_counter_entry_change'] = counter_callback
+            counter_entry.linkEvent("onchange", counter_callback)
             print("  ✓ Bound counter entry")
 
         # Enable checkbox and apply button
