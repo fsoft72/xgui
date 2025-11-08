@@ -10,10 +10,14 @@ This directory contains a comprehensive test example demonstrating the xgui Pyth
 
 ## Features Demonstrated
 
-### 1. GUI Loading from JSON
-- Loads a complete GUI layout from JSON file using `xgui.Master.LoadJson()`
+### 1. GUI Creation
+- **Currently**: Creates GUI programmatically using `xgui.Master.Create*()` methods
+- **Future**: A JSON file (`complex_gui.json`) is provided for when `LoadJson()` is available in Python bindings
 - Multi-level widget hierarchy with tabs, frames, and containers
 - Multiple widget types: sliders, progress bars, entries, labels, buttons, checkboxes, comboboxes
+
+**Note**: The `xgui.Master.LoadJson()` method exists in C++ but is not yet exposed to Python bindings.
+The SWIG interface file has been updated (`pywrap/master.i`) and will be available after the next rebuild.
 
 ### 2. Event Binding
 - Demonstrates binding multiple event types: `onclick`, `onchange`, `onclose`
@@ -51,6 +55,16 @@ Examples of widgets affecting other widgets:
 - Python 3.x
 - X11 or Wayland display server (graphical environment)
 - `DISPLAY` environment variable set
+
+## Important Note
+
+The test currently creates the GUI programmatically because `xgui.Master.LoadJson()` is not yet available in the Python bindings. The SWIG interface file (`pywrap/master.i`) has been updated to include LoadJson, but the bindings need to be rebuilt with:
+
+```bash
+make python
+```
+
+Once rebuilt, you can modify the test to use `xgui.Master.LoadJson("complex_gui.json")` instead of programmatic creation.
 
 ## Running the Test
 
@@ -168,9 +182,25 @@ class ComplexGUITest:
 
 ### Key Patterns
 
-#### Getting Widgets by ID
+#### Storing and Getting Widgets
+Since widgets are created programmatically, we store references in a dictionary:
+
 ```python
-widget = xgui.Master.GetWidgetById("myWidgetId")
+# Store a widget with a name
+def store_widget(self, name, widget):
+    self.widgets[name] = widget
+    widget.set("id", name)  # Also set the id property
+    return widget
+
+# Get a stored widget
+def get_widget(self, widget_name):
+    return self.widgets.get(widget_name)
+```
+
+Alternatively, when using LoadJson/LoadXml, widgets can be found using the Container.findChild() method:
+```python
+# On a container (window, vbox, etc.)
+widget = container.findChild("myWidgetId")
 ```
 
 #### Reading Widget Properties
