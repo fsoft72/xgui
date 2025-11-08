@@ -10,8 +10,8 @@
 //
 //
 
-%typemap(python,out) xgui::Window * { $result = XGUIPyObjectCreate($1, false); }
-%typemap(python,out) xgui::Container * { $result = XGUIPyObjectCreate($1, false); }
+%typemap(out) xgui::Window * { $result = XGUIPyObjectCreate($1, false); }
+%typemap(out) xgui::Container * { $result = XGUIPyObjectCreate($1, false); }
 
 namespace xgui
 {
