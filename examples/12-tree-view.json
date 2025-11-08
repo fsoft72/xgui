@@ -1,0 +1,123 @@
+{
+  "type": "window",
+  "text": "File System Browser",
+  "size": "500 450",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "children": [
+        {
+          "type": "hbox",
+          "space": "5",
+          "expand": "0",
+          "children": [
+            {
+              "type": "button",
+              "text": "Refresh",
+              "id": "refreshBtn"
+            },
+            {
+              "type": "button",
+              "text": "Expand All",
+              "id": "expandBtn"
+            },
+            {
+              "type": "button",
+              "text": "Collapse All",
+              "id": "collapseBtn"
+            }
+          ]
+        },
+        {
+          "type": "hbox",
+          "expand": "1",
+          "children": [
+            {
+              "type": "tree",
+              "id": "fileTree",
+              "model": "fileModel",
+              "stylemanager": "fileStyle",
+              "has-icons": "1",
+              "has-checkboxes": "0",
+              "expand": "1"
+            },
+            {
+              "type": "vbox",
+              "expand": "1",
+              "space": "5",
+              "children": [
+                {
+                  "type": "label",
+                  "text": "File Properties",
+                  "alignment": "center"
+                },
+                {
+                  "type": "frame",
+                  "text": "Details",
+                  "expand": "1",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "space": "5",
+                      "children": [
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Name:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "label",
+                              "id": "fileName",
+                              "text": "-",
+                              "expand": "1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Type:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "label",
+                              "id": "fileType",
+                              "text": "-",
+                              "expand": "1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "hbox",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Size:",
+                              "expand": "0"
+                            },
+                            {
+                              "type": "label",
+                              "id": "fileSize",
+                              "text": "-",
+                              "expand": "1"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

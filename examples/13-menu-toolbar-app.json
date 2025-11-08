@@ -1,0 +1,196 @@
+{
+  "type": "window",
+  "text": "Text Editor",
+  "size": "700 500",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "children": [
+        {
+          "type": "menu",
+          "id": "mainMenu",
+          "expand": "0",
+          "children": [
+            {
+              "type": "menuitem",
+              "id": "file_menu",
+              "text": "File",
+              "children": [
+                {
+                  "type": "menuitem",
+                  "id": "new_item",
+                  "text": "New"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "open_item",
+                  "text": "Open..."
+                },
+                {
+                  "type": "menuitem",
+                  "id": "save_item",
+                  "text": "Save"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "saveas_item",
+                  "text": "Save As..."
+                },
+                {
+                  "type": "menuitem",
+                  "id": "sep1",
+                  "type": "separator"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "exit_item",
+                  "text": "Exit"
+                }
+              ]
+            },
+            {
+              "type": "menuitem",
+              "id": "edit_menu",
+              "text": "Edit",
+              "children": [
+                {
+                  "type": "menuitem",
+                  "id": "undo_item",
+                  "text": "Undo"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "redo_item",
+                  "text": "Redo"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "sep2",
+                  "type": "separator"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "cut_item",
+                  "text": "Cut"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "copy_item",
+                  "text": "Copy"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "paste_item",
+                  "text": "Paste"
+                }
+              ]
+            },
+            {
+              "type": "menuitem",
+              "id": "view_menu",
+              "text": "View",
+              "children": [
+                {
+                  "type": "menuitem",
+                  "id": "toolbar_check",
+                  "text": "Toolbar",
+                  "type": "check"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "statusbar_check",
+                  "text": "Status Bar",
+                  "type": "check"
+                }
+              ]
+            },
+            {
+              "type": "menuitem",
+              "id": "help_menu",
+              "text": "Help",
+              "children": [
+                {
+                  "type": "menuitem",
+                  "id": "about_item",
+                  "text": "About"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "toolbar",
+          "id": "mainToolbar",
+          "style": "both",
+          "expand": "0",
+          "children": [
+            {
+              "type": "toolbarbutton",
+              "id": "tb_new",
+              "text": "New"
+            },
+            {
+              "type": "toolbarbutton",
+              "id": "tb_open",
+              "text": "Open"
+            },
+            {
+              "type": "toolbarbutton",
+              "id": "tb_save",
+              "text": "Save"
+            },
+            {
+              "type": "toolbarseparator"
+            },
+            {
+              "type": "toolbarbutton",
+              "id": "tb_cut",
+              "text": "Cut"
+            },
+            {
+              "type": "toolbarbutton",
+              "id": "tb_copy",
+              "text": "Copy"
+            },
+            {
+              "type": "toolbarbutton",
+              "id": "tb_paste",
+              "text": "Paste"
+            },
+            {
+              "type": "toolbarseparator"
+            },
+            {
+              "type": "toolbarcheckbutton",
+              "id": "tb_bold",
+              "text": "Bold"
+            },
+            {
+              "type": "toolbarcheckbutton",
+              "id": "tb_italic",
+              "text": "Italic"
+            },
+            {
+              "type": "toolbarcheckbutton",
+              "id": "tb_underline",
+              "text": "Underline"
+            }
+          ]
+        },
+        {
+          "type": "entry",
+          "id": "textEditor",
+          "expand": "1"
+        },
+        {
+          "type": "label",
+          "id": "statusBar",
+          "text": "Ready",
+          "alignment": "left",
+          "expand": "0"
+        }
+      ]
+    }
+  ]
+}

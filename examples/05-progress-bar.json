@@ -1,0 +1,26 @@
+{
+  "type": "window",
+  "text": "Progress Bar Example",
+  "size": "400 100",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Download Progress",
+          "alignment": "center"
+        },
+        {
+          "type": "progressbar",
+          "id": "downloadProgress",
+          "min": "0",
+          "max": "100",
+          "pos": "35"
+        }
+      ]
+    }
+  ]
+}

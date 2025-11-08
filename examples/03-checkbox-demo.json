@@ -1,0 +1,37 @@
+{
+  "type": "window",
+  "text": "Checkbox Demo",
+  "size": "300 180",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Select your preferences:",
+          "alignment": "left"
+        },
+        {
+          "type": "checkbox",
+          "id": "option1",
+          "text": "Enable notifications",
+          "checked": "1"
+        },
+        {
+          "type": "checkbox",
+          "id": "option2",
+          "text": "Auto-save",
+          "checked": "0"
+        },
+        {
+          "type": "checkbox",
+          "id": "option3",
+          "text": "Dark mode",
+          "checked": "0"
+        }
+      ]
+    }
+  ]
+}

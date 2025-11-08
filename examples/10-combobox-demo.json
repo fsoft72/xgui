@@ -1,0 +1,66 @@
+{
+  "type": "window",
+  "text": "Combobox Demo",
+  "size": "350 200",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "frame",
+          "text": "Selection Options",
+          "children": [
+            {
+              "type": "vbox",
+              "space": "8",
+              "children": [
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "Country:",
+                      "expand": "0"
+                    },
+                    {
+                      "type": "combobox",
+                      "id": "countryCombo",
+                      "model": "countryModel",
+                      "editable": "0",
+                      "selected-item": "0",
+                      "expand": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "City:",
+                      "expand": "0"
+                    },
+                    {
+                      "type": "combobox",
+                      "id": "cityCombo",
+                      "model": "cityModel",
+                      "editable": "1",
+                      "expand": "1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "button",
+          "text": "Submit",
+          "id": "submitBtn"
+        }
+      ]
+    }
+  ]
+}

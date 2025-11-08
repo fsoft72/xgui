@@ -1,0 +1,100 @@
+{
+  "type": "window",
+  "text": "User Registration",
+  "size": "400 280",
+  "position": "center",
+  "resizable": "0",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "frame",
+          "text": "Personal Information",
+          "alignment": "left",
+          "children": [
+            {
+              "type": "vbox",
+              "space": "5",
+              "children": [
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "Username:",
+                      "expand": "0"
+                    },
+                    {
+                      "type": "entry",
+                      "id": "username",
+                      "expand": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "Email:",
+                      "expand": "0"
+                    },
+                    {
+                      "type": "entry",
+                      "id": "email",
+                      "expand": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "Password:",
+                      "expand": "0"
+                    },
+                    {
+                      "type": "entry",
+                      "id": "password",
+                      "password-mode": "1",
+                      "expand": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": "checkbox",
+                  "id": "termsCheck",
+                  "text": "I agree to terms and conditions"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "hbox",
+          "children": [
+            {
+              "type": "space",
+              "expand": "1"
+            },
+            {
+              "type": "button",
+              "text": "Cancel",
+              "id": "cancelBtn",
+              "expand": "0"
+            },
+            {
+              "type": "button",
+              "text": "Register",
+              "id": "registerBtn",
+              "expand": "0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

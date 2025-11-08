@@ -1,0 +1,34 @@
+{
+  "type": "window",
+  "text": "Simple Form",
+  "size": "350 120",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "8",
+      "children": [
+        {
+          "type": "hbox",
+          "children": [
+            {
+              "type": "label",
+              "text": "Name:",
+              "expand": "0"
+            },
+            {
+              "type": "entry",
+              "id": "nameEntry",
+              "expand": "1"
+            }
+          ]
+        },
+        {
+          "type": "button",
+          "text": "Submit",
+          "id": "submitBtn"
+        }
+      ]
+    }
+  ]
+}

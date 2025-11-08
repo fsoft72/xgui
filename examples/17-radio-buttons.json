@@ -1,0 +1,87 @@
+{
+  "type": "window",
+  "text": "Radio Button Groups",
+  "size": "400 300",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "frame",
+          "text": "Select Payment Method",
+          "alignment": "left",
+          "children": [
+            {
+              "type": "vbox",
+              "space": "5",
+              "children": [
+                {
+                  "type": "button",
+                  "id": "creditCard",
+                  "text": "Credit Card",
+                  "pressed": "1"
+                },
+                {
+                  "type": "button",
+                  "id": "debitCard",
+                  "text": "Debit Card",
+                  "pressed": "0"
+                },
+                {
+                  "type": "button",
+                  "id": "paypal",
+                  "text": "PayPal",
+                  "pressed": "0"
+                },
+                {
+                  "type": "button",
+                  "id": "bitcoin",
+                  "text": "Bitcoin",
+                  "pressed": "0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "text": "Select Shipping Speed",
+          "alignment": "left",
+          "children": [
+            {
+              "type": "vbox",
+              "space": "5",
+              "children": [
+                {
+                  "type": "button",
+                  "id": "standard",
+                  "text": "Standard (5-7 days) - Free",
+                  "pressed": "1"
+                },
+                {
+                  "type": "button",
+                  "id": "express",
+                  "text": "Express (2-3 days) - $9.99",
+                  "pressed": "0"
+                },
+                {
+                  "type": "button",
+                  "id": "overnight",
+                  "text": "Overnight - $24.99",
+                  "pressed": "0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "button",
+          "text": "Proceed to Checkout",
+          "id": "checkoutBtn"
+        }
+      ]
+    }
+  ]
+}

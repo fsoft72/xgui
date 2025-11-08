@@ -1,0 +1,131 @@
+{
+  "type": "window",
+  "text": "Layout Showcase",
+  "size": "600 400",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Demonstrating Various Layout Techniques",
+          "alignment": "center",
+          "expand": "0"
+        },
+        {
+          "type": "hbox",
+          "space": "10",
+          "expand": "1",
+          "children": [
+            {
+              "type": "frame",
+              "text": "Column 1 (expand=1)",
+              "expand": "1",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "5",
+                  "children": [
+                    {
+                      "type": "button",
+                      "text": "Button 1"
+                    },
+                    {
+                      "type": "button",
+                      "text": "Button 2"
+                    },
+                    {
+                      "type": "button",
+                      "text": "Button 3"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "text": "Column 2 (expand=2)",
+              "expand": "2",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "5",
+                  "children": [
+                    {
+                      "type": "label",
+                      "text": "This column is twice as wide"
+                    },
+                    {
+                      "type": "entry",
+                      "id": "input1"
+                    },
+                    {
+                      "type": "entry",
+                      "id": "input2"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "text": "Column 3 (expand=1)",
+              "expand": "1",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "5",
+                  "children": [
+                    {
+                      "type": "checkbox",
+                      "text": "Option A"
+                    },
+                    {
+                      "type": "checkbox",
+                      "text": "Option B"
+                    },
+                    {
+                      "type": "checkbox",
+                      "text": "Option C"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "hbox",
+          "expand": "0",
+          "children": [
+            {
+              "type": "button",
+              "text": "Left",
+              "expand": "0"
+            },
+            {
+              "type": "space",
+              "expand": "1"
+            },
+            {
+              "type": "button",
+              "text": "Center",
+              "expand": "0"
+            },
+            {
+              "type": "space",
+              "expand": "1"
+            },
+            {
+              "type": "button",
+              "text": "Right",
+              "expand": "0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

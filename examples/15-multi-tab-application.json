@@ -1,0 +1,489 @@
+{
+  "type": "window",
+  "text": "Project Management Suite",
+  "size": "900 650",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "children": [
+        {
+          "type": "menu",
+          "id": "appMenu",
+          "expand": "0",
+          "children": [
+            {
+              "type": "menuitem",
+              "id": "project_menu",
+              "text": "Project",
+              "children": [
+                {
+                  "type": "menuitem",
+                  "id": "new_project",
+                  "text": "New Project..."
+                },
+                {
+                  "type": "menuitem",
+                  "id": "open_project",
+                  "text": "Open Project..."
+                },
+                {
+                  "type": "menuitem",
+                  "id": "save_project",
+                  "text": "Save Project"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "sep1",
+                  "type": "separator"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "recent_menu",
+                  "text": "Recent Projects",
+                  "children": [
+                    {
+                      "type": "menuitem",
+                      "id": "recent1",
+                      "text": "Website Redesign"
+                    },
+                    {
+                      "type": "menuitem",
+                      "id": "recent2",
+                      "text": "Mobile App v2"
+                    }
+                  ]
+                },
+                {
+                  "type": "menuitem",
+                  "id": "sep2",
+                  "type": "separator"
+                },
+                {
+                  "type": "menuitem",
+                  "id": "quit",
+                  "text": "Quit"
+                }
+              ]
+            },
+            {
+              "type": "menuitem",
+              "id": "tools_menu",
+              "text": "Tools",
+              "children": [
+                {
+                  "type": "menuitem",
+                  "id": "preferences",
+                  "text": "Preferences"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "tab",
+          "id": "mainTabs",
+          "selected-index": "0",
+          "expand": "1",
+          "children": [
+            {
+              "type": "tabpage",
+              "tab-label": "Tasks",
+              "children": [
+                {
+                  "type": "vbox",
+                  "children": [
+                    {
+                      "type": "hbox",
+                      "space": "5",
+                      "expand": "0",
+                      "children": [
+                        {
+                          "type": "button",
+                          "text": "Add Task",
+                          "id": "addTaskBtn"
+                        },
+                        {
+                          "type": "button",
+                          "text": "Complete",
+                          "id": "completeTaskBtn"
+                        },
+                        {
+                          "type": "button",
+                          "text": "Delete",
+                          "id": "deleteTaskBtn"
+                        },
+                        {
+                          "type": "space",
+                          "expand": "1"
+                        },
+                        {
+                          "type": "combobox",
+                          "id": "filterCombo",
+                          "model": "filterModel",
+                          "editable": "0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "list",
+                      "id": "taskList",
+                      "model": "taskModel",
+                      "stylemanager": "taskStyle",
+                      "visible-headers": "1",
+                      "has-checkboxes": "1",
+                      "expand": "1",
+                      "children": [
+                        {
+                          "type": "listcolumn",
+                          "position": "0",
+                          "id": "taskCol",
+                          "name": "Task",
+                          "width": "300"
+                        },
+                        {
+                          "type": "listcolumn",
+                          "position": "1",
+                          "id": "priorityCol",
+                          "name": "Priority",
+                          "width": "100"
+                        },
+                        {
+                          "type": "listcolumn",
+                          "position": "2",
+                          "id": "dueDateCol",
+                          "name": "Due Date",
+                          "width": "120"
+                        },
+                        {
+                          "type": "listcolumn",
+                          "position": "3",
+                          "id": "assigneeCol",
+                          "name": "Assignee",
+                          "width": "150"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "tab-label": "Team",
+              "children": [
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "expand": "1",
+                      "children": [
+                        {
+                          "type": "label",
+                          "text": "Team Members",
+                          "alignment": "center"
+                        },
+                        {
+                          "type": "list",
+                          "id": "teamList",
+                          "model": "teamModel",
+                          "stylemanager": "teamStyle",
+                          "visible-headers": "1",
+                          "expand": "1",
+                          "children": [
+                            {
+                              "type": "listcolumn",
+                              "position": "0",
+                              "id": "memberCol",
+                              "name": "Name",
+                              "width": "150"
+                            },
+                            {
+                              "type": "listcolumn",
+                              "position": "1",
+                              "id": "roleCol",
+                              "name": "Role",
+                              "width": "120"
+                            },
+                            {
+                              "type": "listcolumn",
+                              "position": "2",
+                              "id": "statusCol",
+                              "name": "Status",
+                              "width": "100"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "vbox",
+                      "expand": "1",
+                      "space": "5",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "text": "Member Details",
+                          "expand": "0",
+                          "children": [
+                            {
+                              "type": "vbox",
+                              "space": "5",
+                              "children": [
+                                {
+                                  "type": "hbox",
+                                  "children": [
+                                    {
+                                      "type": "label",
+                                      "text": "Name:",
+                                      "expand": "0"
+                                    },
+                                    {
+                                      "type": "label",
+                                      "id": "memberName",
+                                      "text": "-",
+                                      "expand": "1"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "hbox",
+                                  "children": [
+                                    {
+                                      "type": "label",
+                                      "text": "Email:",
+                                      "expand": "0"
+                                    },
+                                    {
+                                      "type": "label",
+                                      "id": "memberEmail",
+                                      "text": "-",
+                                      "expand": "1"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "hbox",
+                                  "children": [
+                                    {
+                                      "type": "label",
+                                      "text": "Tasks:",
+                                      "expand": "0"
+                                    },
+                                    {
+                                      "type": "label",
+                                      "id": "memberTasks",
+                                      "text": "-",
+                                      "expand": "1"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "text": "Actions",
+                          "expand": "0",
+                          "children": [
+                            {
+                              "type": "vbox",
+                              "space": "5",
+                              "children": [
+                                {
+                                  "type": "button",
+                                  "text": "Add Member",
+                                  "id": "addMemberBtn"
+                                },
+                                {
+                                  "type": "button",
+                                  "text": "Edit Member",
+                                  "id": "editMemberBtn"
+                                },
+                                {
+                                  "type": "button",
+                                  "text": "Remove Member",
+                                  "id": "removeMemberBtn"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "tab-label": "Calendar",
+              "children": [
+                {
+                  "type": "hbox",
+                  "children": [
+                    {
+                      "type": "vbox",
+                      "expand": "1",
+                      "children": [
+                        {
+                          "type": "calendar",
+                          "id": "projectCalendar"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "vbox",
+                      "expand": "1",
+                      "space": "5",
+                      "children": [
+                        {
+                          "type": "label",
+                          "text": "Events for Selected Date",
+                          "alignment": "center"
+                        },
+                        {
+                          "type": "list",
+                          "id": "eventList",
+                          "model": "eventModel",
+                          "stylemanager": "eventStyle",
+                          "visible-headers": "1",
+                          "expand": "1",
+                          "children": [
+                            {
+                              "type": "listcolumn",
+                              "position": "0",
+                              "id": "timeCol",
+                              "name": "Time",
+                              "width": "80"
+                            },
+                            {
+                              "type": "listcolumn",
+                              "position": "1",
+                              "id": "eventCol",
+                              "name": "Event",
+                              "width": "200"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "hbox",
+                          "expand": "0",
+                          "children": [
+                            {
+                              "type": "button",
+                              "text": "Add Event",
+                              "id": "addEventBtn"
+                            },
+                            {
+                              "type": "button",
+                              "text": "Delete Event",
+                              "id": "deleteEventBtn"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "tab-label": "Reports",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "10",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Generate Report",
+                      "expand": "0",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "5",
+                          "children": [
+                            {
+                              "type": "hbox",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Report Type:",
+                                  "expand": "0"
+                                },
+                                {
+                                  "type": "combobox",
+                                  "id": "reportTypeCombo",
+                                  "model": "reportTypeModel",
+                                  "expand": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "hbox",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Date Range:",
+                                  "expand": "0"
+                                },
+                                {
+                                  "type": "entry",
+                                  "id": "startDate",
+                                  "expand": "1"
+                                },
+                                {
+                                  "type": "label",
+                                  "text": "to",
+                                  "expand": "0"
+                                },
+                                {
+                                  "type": "entry",
+                                  "id": "endDate",
+                                  "expand": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "button",
+                              "text": "Generate",
+                              "id": "generateBtn"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Report Preview",
+                      "expand": "1",
+                      "children": [
+                        {
+                          "type": "label",
+                          "id": "reportPreview",
+                          "text": "No report generated",
+                          "alignment": "center"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "label",
+          "id": "appStatusBar",
+          "text": "Ready",
+          "alignment": "left",
+          "expand": "0"
+        }
+      ]
+    }
+  ]
+}

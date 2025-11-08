@@ -1,0 +1,101 @@
+{
+  "type": "window",
+  "text": "Contact List Manager",
+  "size": "600 400",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "children": [
+        {
+          "type": "hbox",
+          "space": "5",
+          "expand": "0",
+          "children": [
+            {
+              "type": "button",
+              "text": "Add Contact",
+              "id": "addBtn"
+            },
+            {
+              "type": "button",
+              "text": "Edit",
+              "id": "editBtn"
+            },
+            {
+              "type": "button",
+              "text": "Delete",
+              "id": "deleteBtn"
+            },
+            {
+              "type": "space",
+              "expand": "1"
+            },
+            {
+              "type": "entry",
+              "id": "searchEntry",
+              "tooltip-text": "Search contacts",
+              "expand": "0"
+            },
+            {
+              "type": "button",
+              "text": "Search",
+              "id": "searchBtn"
+            }
+          ]
+        },
+        {
+          "type": "list",
+          "id": "contactList",
+          "model": "contactModel",
+          "stylemanager": "contactStyle",
+          "visible-headers": "1",
+          "has-icons": "0",
+          "has-checkboxes": "1",
+          "expand": "1",
+          "children": [
+            {
+              "type": "listcolumn",
+              "position": "0",
+              "id": "nameCol",
+              "name": "Name",
+              "width": "150",
+              "alignment": "left"
+            },
+            {
+              "type": "listcolumn",
+              "position": "1",
+              "id": "emailCol",
+              "name": "Email",
+              "width": "200",
+              "alignment": "left"
+            },
+            {
+              "type": "listcolumn",
+              "position": "2",
+              "id": "phoneCol",
+              "name": "Phone",
+              "width": "120",
+              "alignment": "left"
+            },
+            {
+              "type": "listcolumn",
+              "position": "3",
+              "id": "companyCol",
+              "name": "Company",
+              "width": "120",
+              "alignment": "left"
+            }
+          ]
+        },
+        {
+          "type": "label",
+          "id": "statusBar",
+          "text": "0 contacts selected",
+          "alignment": "left",
+          "expand": "0"
+        }
+      ]
+    }
+  ]
+}
