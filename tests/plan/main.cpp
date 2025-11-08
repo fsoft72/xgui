@@ -997,8 +997,8 @@ class PlanUi : public Window
 
 			menu = Master::CreateMenu(this);
 			menu->addItem("", "File_mnu", "&File");
-			menu->addItem("File_mnu", "LoadXml_mnu", "&Load Xml");
-			menu->addItem("File_mnu", "SaveXml_mnu", "&Save Xml");
+			menu->addItem("File_mnu", "LoadJson_mnu", "&Load Json");
+			menu->addItem("File_mnu", "SaveJson_mnu", "&Save Json");
 			menu->addItem("", "Master_mnu", "&Master");
 			menu->addItem("Master_mnu", "DTD_mnu", "&Generate Dtd");
 			menu->addItem("Master_mnu", "Plugin_mnu", "Load &Plugin");
@@ -1036,20 +1036,20 @@ class PlanUi : public Window
 
 		int onMenu(Widget * menu, std::string const &id, int state)
 		{
-			if(id == "LoadXml_mnu") {
+			if(id == "LoadJson_mnu") {
 				FileExtensionsVector filters;
-				filters.push_back(FileExtension("(.xml) Xml Gui Description", "*.xml"));
+				filters.push_back(FileExtension("(.json) Json Gui Description", "*.json"));
 				std::vector<std::string> files = Master::OpenFileDialog(this, filters, "Open");
 				if(!files.empty()) {
 					Object * current_parent = objects->getSelected();
-					Object * loaded_obj = Master::LoadXml(files[0], current_parent);
+					Object * loaded_obj = Master::LoadJson(files[0], current_parent);
 					if(loaded_obj)
 						objects->addObject(loaded_obj);
 				}
 			}
-			else if(id == "SaveXml_mnu") {
+			else if(id == "SaveJson_mnu") {
 				FileExtensionsVector filters;
-				filters.push_back(FileExtension("(.xml) Xml Gui Description", "*.xml"));
+				filters.push_back(FileExtension("(.json) Json Gui Description", "*.json"));
 				std::string file = Master::SaveFileDialog(this, filters, "Save");
 
 				Object * to_dump = objects->getSelected();

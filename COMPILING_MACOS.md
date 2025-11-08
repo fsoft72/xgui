@@ -17,22 +17,7 @@ Verify installation:
 clang --version
 ```
 
-### 2. libxml2
-
-macOS comes with libxml2 pre-installed. Verify it's available:
-
-```bash
-xml2-config --version
-xml2-config --cflags
-xml2-config --libs
-```
-
-If needed, you can also install via Homebrew:
-```bash
-brew install libxml2
-```
-
-### 3. Optional: Python Development (for Python bindings)
+### 2. Optional: Python Development (for Python bindings)
 
 If you want to build Python bindings:
 ```bash
@@ -126,18 +111,6 @@ If not installed or misconfigured:
 ```bash
 sudo xcode-select --reset
 xcode-select --install
-```
-
-### libxml2 Issues
-
-If xml2-config is not found, install via Homebrew:
-```bash
-brew install libxml2
-```
-
-Then update the PKG_CONFIG_PATH:
-```bash
-export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig:$PKG_CONFIG_PATH"
 ```
 
 ## Output Files
