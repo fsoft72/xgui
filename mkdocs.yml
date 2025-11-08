@@ -1,0 +1,100 @@
+site_name: XGUI Documentation
+site_description: Cross-platform GUI library for C++
+site_author: XGUI Team
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - API Reference:
+    - Overview: api/index.md
+    - Core Classes:
+      - Object: api/core/object.md
+      - Widget: api/core/widget.md
+      - Master: api/core/master.md
+      - StyleManager: api/core/stylemanager.md
+      - Image: api/core/image.md
+    - Widgets:
+      - Button: api/widgets/button.md
+      - Calendar: api/widgets/calendar.md
+      - Checkbox: api/widgets/checkbox.md
+      - Entry: api/widgets/entry.md
+      - ImageView: api/widgets/imageview.md
+      - Label: api/widgets/label.md
+      - Menu: api/widgets/menu.md
+      - Progressbar: api/widgets/progressbar.md
+      - Slider: api/widgets/slider.md
+      - Space: api/widgets/space.md
+      - Spin: api/widgets/spin.md
+      - Toolbar: api/widgets/toolbar.md
+    - Containers:
+      - Container: api/containers/container.md
+      - Frame: api/containers/frame.md
+      - HBox: api/containers/hbox.md
+      - VBox: api/containers/vbox.md
+      - Window: api/containers/window.md
+      - Tab: api/containers/tab.md
+    - Views:
+      - View: api/views/view.md
+      - Combobox: api/views/combobox.md
+      - List: api/views/list.md
+      - Tree: api/views/tree.md
+    - Data Structures:
+      - TreeNode: api/data/treenode.md
+      - Model: api/data/model.md
+      - LsColumnInfo: api/data/lscolumninfo.md
+      - TbButtonInfo: api/data/tbbuttoninfo.md
+      - FileExtension: api/data/fileextension.md
+    - Callbacks:
+      - Overview: api/callbacks/index.md
+      - Callback: api/callbacks/callback.md
+      - TextCallback: api/callbacks/textcallback.md
+      - TextStatusCallback: api/callbacks/textstatuscallback.md
+      - TextPairCallback: api/callbacks/textpaircallback.md
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/fsoft72/xgui
