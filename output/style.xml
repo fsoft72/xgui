@@ -1,4 +1,0 @@
-<stylemanager id="style1">
-	<style id="red-blue" fgcolor="#FF0000" bgcolor="#0000FF"/>
-	<style id="bold" bold="1" icon="icon.png" />
-</stylemanager>
