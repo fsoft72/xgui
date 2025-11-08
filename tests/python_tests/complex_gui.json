@@ -1,0 +1,360 @@
+{
+  "type": "window",
+  "text": "Complex GUI Test - Interactive Widgets",
+  "size": "800 600",
+  "position": "center",
+  "children": [
+    {
+      "type": "vbox",
+      "space": "10",
+      "children": [
+        {
+          "type": "label",
+          "text": "Interactive Widget Demo",
+          "id": "titleLabel"
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "tab",
+          "id": "mainTab",
+          "children": [
+            {
+              "type": "tabpage",
+              "text": "Sliders & Progress",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "15",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Volume Control",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "hbox",
+                              "space": "10",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Volume:"
+                                },
+                                {
+                                  "type": "label",
+                                  "text": "50%",
+                                  "id": "volumeLabel"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "slider",
+                              "id": "volumeSlider",
+                              "min": "0",
+                              "max": "100",
+                              "pos": "50"
+                            },
+                            {
+                              "type": "progressbar",
+                              "id": "volumeProgress",
+                              "min": "0",
+                              "max": "100",
+                              "pos": "50"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Brightness Control",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "hbox",
+                              "space": "10",
+                              "children": [
+                                {
+                                  "type": "label",
+                                  "text": "Brightness:"
+                                },
+                                {
+                                  "type": "label",
+                                  "text": "75",
+                                  "id": "brightnessLabel"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "slider",
+                              "id": "brightnessSlider",
+                              "min": "0",
+                              "max": "255",
+                              "pos": "75"
+                            },
+                            {
+                              "type": "spin",
+                              "id": "brightnessSpin",
+                              "min": "0",
+                              "max": "255",
+                              "pos": "75"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Download Progress Simulator",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Progress: 0%",
+                              "id": "downloadLabel"
+                            },
+                            {
+                              "type": "progressbar",
+                              "id": "downloadProgress",
+                              "min": "0",
+                              "max": "100",
+                              "pos": "0"
+                            },
+                            {
+                              "type": "hbox",
+                              "space": "10",
+                              "children": [
+                                {
+                                  "type": "button",
+                                  "text": "Start Download",
+                                  "id": "startButton"
+                                },
+                                {
+                                  "type": "button",
+                                  "text": "Reset",
+                                  "id": "resetButton"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "text": "Input Controls",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "15",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Text Input Mirror",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Type something:"
+                            },
+                            {
+                              "type": "entry",
+                              "id": "textEntry",
+                              "text": "Hello World"
+                            },
+                            {
+                              "type": "label",
+                              "text": "Mirror Output:"
+                            },
+                            {
+                              "type": "label",
+                              "text": "Hello World",
+                              "id": "mirrorLabel"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Character Counter",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "entry",
+                              "id": "counterEntry",
+                              "text": ""
+                            },
+                            {
+                              "type": "label",
+                              "text": "Characters: 0",
+                              "id": "charCountLabel"
+                            },
+                            {
+                              "type": "progressbar",
+                              "id": "charProgress",
+                              "min": "0",
+                              "max": "100",
+                              "pos": "0"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Widget Enable/Disable",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "checkbox",
+                              "text": "Enable Advanced Settings",
+                              "id": "enableCheckbox",
+                              "checked": "0"
+                            },
+                            {
+                              "type": "entry",
+                              "id": "advancedEntry",
+                              "text": "Advanced Option",
+                              "editable": "0"
+                            },
+                            {
+                              "type": "button",
+                              "text": "Apply Settings",
+                              "id": "applyButton"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "tabpage",
+              "text": "Selection Controls",
+              "children": [
+                {
+                  "type": "vbox",
+                  "space": "15",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "text": "Theme Selector",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "label",
+                              "text": "Select a theme:"
+                            },
+                            {
+                              "type": "combobox",
+                              "id": "themeCombo",
+                              "text": "Light|Dark|Blue|Green|Red"
+                            },
+                            {
+                              "type": "label",
+                              "text": "Selected: Light",
+                              "id": "themeLabel"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "text": "Status Indicators",
+                      "children": [
+                        {
+                          "type": "vbox",
+                          "space": "10",
+                          "children": [
+                            {
+                              "type": "hbox",
+                              "space": "10",
+                              "children": [
+                                {
+                                  "type": "checkbox",
+                                  "text": "WiFi",
+                                  "id": "wifiCheckbox",
+                                  "checked": "1"
+                                },
+                                {
+                                  "type": "checkbox",
+                                  "text": "Bluetooth",
+                                  "id": "bluetoothCheckbox",
+                                  "checked": "0"
+                                },
+                                {
+                                  "type": "checkbox",
+                                  "text": "GPS",
+                                  "id": "gpsCheckbox",
+                                  "checked": "0"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "label",
+                              "text": "Active Services: WiFi",
+                              "id": "servicesLabel"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "hbox",
+          "space": "10",
+          "children": [
+            {
+              "type": "label",
+              "text": "Status: Ready",
+              "id": "statusLabel"
+            },
+            {
+              "type": "button",
+              "text": "Quit",
+              "id": "quitButton"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

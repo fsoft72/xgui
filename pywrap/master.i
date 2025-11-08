@@ -65,7 +65,8 @@ namespace xgui
 			static xgui::Tree * CreateTree(xgui::Container * parent);
 			
 			static xgui::Object * LoadXml(const std::string & file_name);
-			
+			static xgui::Object * LoadJson(const std::string & file_name);
+
 			%clear xgui::Object *;
 			%clear xgui::Calendar *;
 			%clear xgui::Window *;
