@@ -85,10 +85,10 @@ class ComplexGUITest:
         try:
             value = int(text)  # Use text parameter
 
-            # Update spin widget
+            # Update spin widget (use "value" for Spin, not "pos")
             spin = self.get_widget("brightnessSpin")
             if spin:
-                spin.set("pos", str(value))
+                spin.set("value", str(value))
 
             # Update label
             label = self.get_widget("brightnessLabel")
@@ -105,16 +105,27 @@ class ComplexGUITest:
         """Callback when brightness spin changes - updates slider and label
 
         Note: Spin onchange uses TextCallback (widget, text)
+        Note: Spin widget uses "value" property, not "pos"
         """
         try:
-            print(f"DEBUG: Spin callback - text='{text}', widget.get('pos')='{widget.get('pos')}'")
+            print(f"DEBUG: Spin callback - text='{text}', widget.get('value')='{widget.get('value')}'")
 
-            # The text parameter might be empty, so fall back to widget.get("pos")
+            # Try to get value from text parameter or widget property
+            value = None
+
             if text and text.strip():
+                # Text parameter has a value (manual typing)
                 value = int(text)
             else:
-                # Fallback: read the value from the widget
-                value = int(widget.get("pos"))
+                # Fallback: try to read from widget (use "value" for Spin, not "pos")
+                value_str = widget.get("value")
+                if value_str is not None and value_str != "None":
+                    value = int(value_str)
+
+            # Skip update if we couldn't get a valid value (during init)
+            if value is None:
+                print(f"DEBUG: Skipping update - no valid value available")
+                return xgui.EVT_BLOCK
 
             print(f"DEBUG: Spin value={value}")
 
@@ -410,7 +421,7 @@ class ComplexGUITest:
         self.store_widget("brightnessSlider", brightness_slider)
 
         brightness_spin = xgui.Master.CreateSpin(brightness_vbox, 0, 255)
-        brightness_spin.set("pos", "75")
+        brightness_spin.set("value", "75")  # Spin uses "value", not "pos"
         self.store_widget("brightnessSpin", brightness_spin)
 
         # Download Progress Frame

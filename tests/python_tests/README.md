@@ -263,10 +263,17 @@ widget.linkEvent("onchange", callback)
 
 ### Common Properties
 - `text` - Text content or label
-- `pos` - Position/value for sliders, spins, progress bars
+- `pos` - Position/value for sliders and progress bars
+- `value` - **Important:** Spin widgets use `value`, not `pos`
 - `min` / `max` - Range for numeric widgets
 - `checked` - Checkbox state ("0" or "1")
 - `editable` - Entry field editable state ("0" or "1")
+
+### Widget-Specific Property Names
+- **Slider**: Use `pos` for position
+- **Progressbar**: Use `pos` for position
+- **Spin**: Use `value` for the numeric value (NOT `pos`)
+- **Entry**: Use `text` for the text content
 
 ### Common Events
 - `onclick` - Button clicks
