@@ -8,19 +8,30 @@ import sys
 import os
 
 # Add output directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../output'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../output"))
 
 try:
     import xgui
 except ImportError as e:
     print(f"Error: Could not import xgui module: {e}")
-    print("Make sure you've built the Python bindings with 'make -f Makefile.gtk python'")
+    print(
+        "Make sure you've built the Python bindings with 'make -f Makefile.gtk python'"
+    )
     sys.exit(1)
+
 
 def on_button_click(widget):
     """Callback when button is clicked"""
     print("Button clicked!")
     return xgui.EVT_BLOCK
+
+
+def on_entry_change(widget):
+    """Callback when entry text changes"""
+    text = widget.get("text")
+    print(f"Entry changed: {text}")
+    return xgui.EVT_BLOCK
+
 
 def on_window_close(widget):
     """Callback when window is closed"""
@@ -28,11 +39,13 @@ def on_window_close(widget):
     xgui.Master.Quit()
     return xgui.EVT_BLOCK
 
+
 def main():
     """Create a simple GUI window"""
     print("Creating xgui window...")
 
     # Create callbacks
+    entry_callback = xgui.PyCallback(on_entry_change)
     btn_callback = xgui.PyCallback(on_button_click)
     win_callback = xgui.PyCallback(on_window_close)
 
@@ -55,6 +68,7 @@ def main():
 
     # Create entry field
     entry = xgui.Master.CreateEntry(vbox, "Type something here...", 0, True, False)
+    entry.linkEvent("onchange", entry_callback)
 
     # Make entry expand
     vbox.setExpand(label, False)
@@ -74,9 +88,10 @@ def main():
 
     print("GUI closed successfully!")
 
+
 if __name__ == "__main__":
     # Check if we have a display
-    if not os.environ.get('DISPLAY'):
+    if not os.environ.get("DISPLAY"):
         print("Warning: DISPLAY environment variable not set.")
         print("This example requires X11. If you're in a headless environment,")
         print("use 'xvfb-run python3 gui_example_python3.py' instead.")
@@ -87,5 +102,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
