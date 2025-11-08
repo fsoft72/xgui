@@ -135,7 +135,34 @@ Object
 
 ## Examples
 
-Check the `tests/` directory for example applications demonstrating various XGUI features.
+### JSON Examples
+
+The `examples/` directory contains 18 ready-to-use JSON files demonstrating all XGUI capabilities, from simple 2-3 widget interfaces to complex multi-tab applications:
+
+- **Simple Examples** (01-05): Basic widgets and layouts
+- **Medium Complexity** (06-10): Forms, tabs, calendars, image viewers
+- **Complex Applications** (11-15): Data grids, tree views, menus, dashboards
+- **Specialized Demos** (16-18): Layout techniques, radio buttons, complete widget showcase
+
+See [examples/README.md](examples/README.md) for detailed documentation of each example.
+
+### XGUI Example Viewer
+
+Test and preview JSON GUI definitions instantly:
+
+```bash
+# Build the example viewer
+make -f Makefile.gtk xgui-example  # or Makefile.osx / Makefile.gnustep
+
+# Run with any JSON file
+./output/xgui-example examples/01-simple-button.json
+```
+
+See [tests/xgui-example/README.md](tests/xgui-example/README.md) for complete documentation.
+
+### C++ Examples
+
+Check the `tests/` directory for additional C++ example applications demonstrating various XGUI features.
 
 ## Contributing
 

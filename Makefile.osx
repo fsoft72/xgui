@@ -40,6 +40,9 @@ lib: $(XGUI_OBJS) $(NS_OBJS)
 test: $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o
 	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(NS_OBJS) tests/exe_test/nsmain.o -o output/main $(LIBS)
 
+xgui-example: $(XGUI_OBJS) $(NS_OBJS) tests/xgui-example/main.o
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) $(XGUI_OBJS) $(NS_OBJS) tests/xgui-example/main.o -o output/xgui-example $(LIBS)
+
 clean:
 	rm -f xgui_wrap.cpp
 	rm -rf *.o
