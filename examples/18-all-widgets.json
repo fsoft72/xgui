@@ -15,7 +15,7 @@
           "children": [
             {
               "type": "tabpage",
-              "tab-label": "Basic Controls",
+              "label": "Basic Controls",
               "children": [
                 {
                   "type": "vbox",
@@ -145,7 +145,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Value Controls",
+              "label": "Value Controls",
               "children": [
                 {
                   "type": "vbox",
@@ -268,7 +268,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Date & Time",
+              "label": "Date & Time",
               "children": [
                 {
                   "type": "vbox",
@@ -306,7 +306,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Alignment",
+              "label": "Alignment",
               "children": [
                 {
                   "type": "vbox",

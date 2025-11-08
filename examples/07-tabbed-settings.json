@@ -15,7 +15,7 @@
           "children": [
             {
               "type": "tabpage",
-              "tab-label": "General",
+              "label": "General",
               "children": [
                 {
                   "type": "vbox",
@@ -42,7 +42,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Display",
+              "label": "Display",
               "children": [
                 {
                   "type": "vbox",
@@ -86,7 +86,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Advanced",
+              "label": "Advanced",
               "children": [
                 {
                   "type": "vbox",

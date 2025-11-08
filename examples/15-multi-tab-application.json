@@ -88,7 +88,7 @@
           "children": [
             {
               "type": "tabpage",
-              "tab-label": "Tasks",
+              "label": "Tasks",
               "children": [
                 {
                   "type": "vbox",
@@ -170,7 +170,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Team",
+              "label": "Team",
               "children": [
                 {
                   "type": "hbox",
@@ -319,7 +319,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Calendar",
+              "label": "Calendar",
               "children": [
                 {
                   "type": "hbox",
@@ -392,7 +392,7 @@
             },
             {
               "type": "tabpage",
-              "tab-label": "Reports",
+              "label": "Reports",
               "children": [
                 {
                   "type": "vbox",
