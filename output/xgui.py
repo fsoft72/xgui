@@ -1947,6 +1947,10 @@ class Master(object):
         return _xgui.Master_LoadXml(file_name)
 
     @staticmethod
+    def LoadJson(file_name):
+        return _xgui.Master_LoadJson(file_name)
+
+    @staticmethod
     def DestroyWidget(w):
         return _xgui.Master_DestroyWidget(w)
 
