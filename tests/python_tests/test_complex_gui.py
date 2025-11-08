@@ -51,10 +51,13 @@ class ComplexGUITest:
 
     # ===== Volume Control Callbacks =====
 
-    def on_volume_change(self, widget):
-        """Callback when volume slider changes - updates progress bar and label"""
+    def on_volume_change(self, widget, text):
+        """Callback when volume slider changes - updates progress bar and label
+
+        Note: Slider onchange uses TextCallback (widget, text)
+        """
         try:
-            value = int(widget.get("pos"))
+            value = int(text)  # Use text parameter (slider position as string)
 
             # Update progress bar
             progress = self.get_widget("volumeProgress")
@@ -74,10 +77,13 @@ class ComplexGUITest:
 
     # ===== Brightness Control Callbacks =====
 
-    def on_brightness_slider_change(self, widget):
-        """Callback when brightness slider changes - updates spin and label"""
+    def on_brightness_slider_change(self, widget, text):
+        """Callback when brightness slider changes - updates spin and label
+
+        Note: Slider onchange uses TextCallback (widget, text)
+        """
         try:
-            value = int(widget.get("pos"))
+            value = int(text)  # Use text parameter
 
             # Update spin widget
             spin = self.get_widget("brightnessSpin")
@@ -95,10 +101,13 @@ class ComplexGUITest:
 
         return xgui.EVT_BLOCK
 
-    def on_brightness_spin_change(self, widget):
-        """Callback when brightness spin changes - updates slider and label"""
+    def on_brightness_spin_change(self, widget, text):
+        """Callback when brightness spin changes - updates slider and label
+
+        Note: Spin onchange uses TextCallback (widget, text)
+        """
         try:
-            value = int(widget.get("pos"))
+            value = int(text)  # Use text parameter
 
             # Update slider widget
             slider = self.get_widget("brightnessSlider")
@@ -205,6 +214,7 @@ class ComplexGUITest:
         """
         try:
             char_count = len(text)
+            print(f"DEBUG: Counter entry text='{text}', length={char_count}")
 
             # Update character count label
             label = self.get_widget("charCountLabel")
@@ -220,6 +230,8 @@ class ComplexGUITest:
             print(f"Character count: {char_count}")
         except Exception as e:
             print(f"Error in counter entry callback: {e}")
+            import traceback
+            traceback.print_exc()
 
         return xgui.EVT_BLOCK
 
@@ -265,11 +277,14 @@ class ComplexGUITest:
 
     # ===== Theme Callbacks =====
 
-    def on_theme_change(self, widget):
-        """Callback when theme combobox changes"""
+    def on_theme_change(self, widget, text):
+        """Callback when theme combobox changes
+
+        Note: Combobox onchange uses TextCallback (widget, text)
+        """
         try:
-            # Get selected index
-            index = int(widget.get("pos"))
+            # Get selected index from text parameter
+            index = int(text)
             themes = ["Light", "Dark", "Blue", "Green", "Red"]
 
             if 0 <= index < len(themes):
@@ -474,21 +489,27 @@ class ComplexGUITest:
         """Bind all event callbacks to widgets"""
         print("\nBinding events to widgets...")
 
-        # Volume control
+        # Volume control (use PyTextCallback for Slider)
         volume_slider = self.get_widget("volumeSlider")
         if volume_slider:
-            volume_slider.linkEvent("onchange", self.create_callback(self.on_volume_change))
+            volume_callback = xgui.PyTextCallback(self.on_volume_change)
+            self.callbacks['on_volume_change'] = volume_callback
+            volume_slider.linkEvent("onchange", volume_callback)
             print("  ✓ Bound volume slider")
 
-        # Brightness controls
+        # Brightness controls (use PyTextCallback for Slider and Spin)
         brightness_slider = self.get_widget("brightnessSlider")
         if brightness_slider:
-            brightness_slider.linkEvent("onchange", self.create_callback(self.on_brightness_slider_change))
+            brightness_slider_callback = xgui.PyTextCallback(self.on_brightness_slider_change)
+            self.callbacks['on_brightness_slider_change'] = brightness_slider_callback
+            brightness_slider.linkEvent("onchange", brightness_slider_callback)
             print("  ✓ Bound brightness slider")
 
         brightness_spin = self.get_widget("brightnessSpin")
         if brightness_spin:
-            brightness_spin.linkEvent("onchange", self.create_callback(self.on_brightness_spin_change))
+            brightness_spin_callback = xgui.PyTextCallback(self.on_brightness_spin_change)
+            self.callbacks['on_brightness_spin_change'] = brightness_spin_callback
+            brightness_spin.linkEvent("onchange", brightness_spin_callback)
             print("  ✓ Bound brightness spin")
 
         # Download buttons
@@ -528,10 +549,12 @@ class ComplexGUITest:
             apply_button.linkEvent("onclick", self.create_callback(self.on_apply_button_click))
             print("  ✓ Bound apply button")
 
-        # Theme selector
+        # Theme selector (use PyTextCallback for Combobox)
         theme_combo = self.get_widget("themeCombo")
         if theme_combo:
-            theme_combo.linkEvent("onchange", self.create_callback(self.on_theme_change))
+            theme_callback = xgui.PyTextCallback(self.on_theme_change)
+            self.callbacks['on_theme_change'] = theme_callback
+            theme_combo.linkEvent("onchange", theme_callback)
             print("  ✓ Bound theme combobox")
 
         # Quit button and window close

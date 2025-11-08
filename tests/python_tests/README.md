@@ -225,25 +225,34 @@ progress.set("pos", str(value))
 
 There are different callback types depending on the widget and event:
 
-**PyCallback** - For buttons, checkboxes, sliders, etc. (receives widget only):
+**PyCallback** - For buttons, checkboxes, windows (receives widget only):
 ```python
 def my_callback(widget):
     # Do something
     return xgui.EVT_BLOCK
 
 callback = xgui.PyCallback(my_callback)
-widget.linkEvent("onclick", callback)
+widget.linkEvent("onclick", callback)  # or "onchange", "onclose", etc.
 ```
 
-**PyTextCallback** - For Entry widgets (receives widget and text):
+**PyTextCallback** - For most value-changing widgets (receives widget and text):
+
+Widgets that need PyTextCallback for `onchange` events:
+- **Entry** - text parameter contains the entry text
+- **Slider** - text parameter contains the slider position (as string)
+- **Spin** - text parameter contains the spin value (as string)
+- **Combobox** - text parameter contains the selected index (as string)
+- **Progressbar** - text parameter contains the progress value
+
 ```python
-def entry_callback(widget, text):
-    # Handle text change
-    print(f"Text changed to: {text}")
+def value_callback(widget, text):
+    # Handle value change
+    value = int(text)  # Convert text to int for numeric widgets
+    print(f"Value changed to: {value}")
     return xgui.EVT_BLOCK
 
-callback = xgui.PyTextCallback(entry_callback)
-entry.linkEvent("onchange", callback)
+callback = xgui.PyTextCallback(value_callback)
+widget.linkEvent("onchange", callback)
 ```
 
 **Other callback types**:
