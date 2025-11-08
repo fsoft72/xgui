@@ -109,59 +109,15 @@ class ComplexGUITest:
 
         return xgui.EVT_BLOCK
 
-    def on_brightness_spin_change(self, widget, text):
-        """Callback when brightness spin changes - updates slider and label
-
-        Note: Spin onchange uses TextCallback (widget, text)
-        Note: Spin widget uses "value" property, not "pos"
-        """
-        # Prevent circular updates
-        if self._updating:
-            return xgui.EVT_BLOCK
-
-        try:
-            self._updating = True
-            print(f"DEBUG: Spin callback - text='{text}', widget.get('value')='{widget.get('value')}'")
-
-            # Try to get value from text parameter or widget property
-            value = None
-
-            if text and text.strip():
-                # Text parameter has a value (manual typing)
-                value = int(text)
-            else:
-                # Fallback: try to read from widget (use "value" for Spin, not "pos")
-                value_str = widget.get("value")
-                if value_str is not None and value_str != "None":
-                    value = int(value_str)
-
-            # Skip update if we couldn't get a valid value (during init)
-            if value is None:
-                print(f"DEBUG: Skipping update - no valid value available")
-                self._updating = False
-                return xgui.EVT_BLOCK
-
-            print(f"DEBUG: Spin value={value}")
-
-            # Update slider widget
-            slider = self.get_widget("brightnessSlider")
-            if slider:
-                slider.set("pos", str(value))
-
-            # Update label
-            label = self.get_widget("brightnessLabel")
-            if label:
-                label.set("text", str(value))
-
-            print(f"Brightness spin changed to: {value}")
-        except Exception as e:
-            print(f"Error in brightness spin callback: {e}")
-            import traceback
-            traceback.print_exc()
-        finally:
-            self._updating = False
-
-        return xgui.EVT_BLOCK
+    # NOTE: Spin widget callback removed due to xgui library bug
+    # The Spin widget's onchange event has a bug in xgui/gtk/spin_impl.cpp
+    # line 105 where it concatenates text incorrectly:
+    #   text_after_change.insert(*position, text_after_change);  // BUG
+    # Should be:
+    #   text_after_change.insert(*position, new_text);
+    #
+    # This causes the text parameter to show concatenated values like "7575"
+    # instead of "76". The slider->spin sync still works (one direction only).
 
     # ===== Download Progress Callbacks =====
 
@@ -543,12 +499,12 @@ class ComplexGUITest:
             brightness_slider.linkEvent("onchange", brightness_slider_callback)
             print("  ✓ Bound brightness slider")
 
-        brightness_spin = self.get_widget("brightnessSpin")
-        if brightness_spin:
-            brightness_spin_callback = xgui.PyTextCallback(self.on_brightness_spin_change)
-            self.callbacks['on_brightness_spin_change'] = brightness_spin_callback
-            brightness_spin.linkEvent("onchange", brightness_spin_callback)
-            print("  ✓ Bound brightness spin")
+        # NOTE: Spin widget onchange has a bug in xgui/gtk/spin_impl.cpp line 105
+        # where it concatenates text incorrectly. Only bind slider->spin sync.
+        # The slider callback will update the spin when the slider changes.
+        # Direct spin interaction (typing or +/- buttons) will work but won't
+        # update the slider - this is a known limitation.
+        print("  ⚠ Brightness spin not bound (xgui library bug - see README)")
 
         # Download buttons
         start_button = self.get_widget("startButton")

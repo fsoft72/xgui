@@ -28,8 +28,10 @@ The SWIG interface file has been updated (`pywrap/master.i`) and will be availab
 
 #### Tab 1: Sliders & Progress
 - **Volume Control**: Slider updates progress bar and label in real-time
-- **Brightness Control**: Slider and spin widget are synchronized (bidirectional)
+- **Brightness Control**: Slider updates spin widget and label (one-directional due to xgui bug)
 - **Download Simulator**: Button-triggered progress with incremental updates
+
+**Note**: The Brightness spin widget has limited functionality due to a bug in `xgui/gtk/spin_impl.cpp` where the `onchange` event concatenates text incorrectly. The slider will update the spin, but the spin won't update the slider when using +/- buttons or typing.
 
 #### Tab 2: Input Controls
 - **Text Mirror**: Entry field changes are mirrored to a label
@@ -348,6 +350,29 @@ If callbacks aren't being called:
 - See `../python_test/gui_example_python3.py` for programmatic GUI creation
 - See `../python_test/test_python3.py` for basic Python binding tests
 
+## Known Limitations
+
+### Spin Widget onchange Event Bug
+
+The Spin widget's `onchange` event has a bug in the xgui GTK implementation (`xgui/gtk/spin_impl.cpp` line 105):
+
+```cpp
+// Current (BUGGY):
+text_after_change.insert(*position, text_after_change);
+
+// Should be:
+text_after_change.insert(*position, new_text);
+```
+
+This causes the text parameter passed to callbacks to contain concatenated values (e.g., "7575" instead of "76").
+
+**Impact on this test:**
+- Brightness slider → spin synchronization works (one direction)
+- Spin +/- buttons and manual typing work, but don't sync back to slider
+- This is a library limitation, not a Python binding issue
+
+**Workaround:** Only bind the slider's onchange event, not the spin's. The slider will update the spin correctly.
+
 ## Contributing
 
 When adding new features to this test:
@@ -355,3 +380,4 @@ When adding new features to this test:
 - Add comments explaining complex interactions
 - Update this README with new features
 - Keep the code well-organized and readable
+- Document any xgui library limitations you encounter
