@@ -31,7 +31,7 @@ namespace xguimpl
 	typedef int ( * XGUIEventWin32CB  ) ( void * d, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 
-	Master::Master ( xgui::Master * master ) : 
+	Master::Master ( xgui::Master * master ) :
 		master_(master), gui_thread_id(0), mouse_down_widget(0), gdiplusToken(InitGDIPlus())
 	{
 		INITCOMMONCONTROLSEX ex;
@@ -39,40 +39,53 @@ namespace xguimpl
 
 		hInstance = GetModuleHandle(NULL);
 
+		// Enable DPI awareness for modern high-DPI displays (Windows 7+)
+		// This ensures proper scaling on high-DPI monitors
+		typedef BOOL (WINAPI *SetProcessDPIAwareFunc)(void);
+		HMODULE hUser32 = GetModuleHandleW(L"user32.dll");
+		if (hUser32) {
+			SetProcessDPIAwareFunc pSetProcessDPIAware =
+				reinterpret_cast<SetProcessDPIAwareFunc>(GetProcAddress(hUser32, "SetProcessDPIAware"));
+			if (pSetProcessDPIAware) {
+				pSetProcessDPIAware();
+			}
+		}
+
 		ex.dwSize = sizeof(ex);
 		ex.dwICC = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_DATE_CLASSES | ICC_LISTVIEW_CLASSES |
 			ICC_PROGRESS_CLASS | ICC_TAB_CLASSES | ICC_TREEVIEW_CLASSES | ICC_UPDOWN_CLASS;
 		InitCommonControlsEx(&ex);
+
+		// Register window classes using Unicode API for modern Windows
+		memset(&wc, 0, sizeof(wc));
+		wc.style = CS_DBLCLKS;
+		wc.hInstance = hInstance;
+		wc.lpfnWndProc = DefDlgProc;
+		wc.cbWndExtra = DLGWINDOWEXTRA;
+		wc.lpszClassName = L"XGUIWindowClass";
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = reinterpret_cast<HBRUSH>(static_cast<INT_PTR>(COLOR_BTNFACE + 1));
+		RegisterClassW(&wc);
 
 		memset(&wc, 0, sizeof(wc));
 		wc.style = CS_DBLCLKS;
 		wc.hInstance = hInstance;
 		wc.lpfnWndProc = DefDlgProc;
 		wc.cbWndExtra = DLGWINDOWEXTRA;
-		wc.lpszClassName = "XGUIWindowClass";
+		wc.lpszClassName = L"XGUIBox";
 		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
-		RegisterClassA(&wc);
-		
-		memset(&wc, 0, sizeof(wc));
-		wc.style = CS_DBLCLKS;
-		wc.hInstance = hInstance;
-		wc.lpfnWndProc = DefDlgProc;
-		wc.cbWndExtra = DLGWINDOWEXTRA;
-		wc.lpszClassName = "XGUIBox";
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
-		RegisterClassA(&wc);
+		wc.hbrBackground = reinterpret_cast<HBRUSH>(static_cast<INT_PTR>(COLOR_BTNFACE + 1));
+		RegisterClassW(&wc);
 
 		memset(&wc, 0, sizeof(wc));
 		wc.style = CS_DBLCLKS;
 		wc.hInstance = hInstance;
 		wc.lpfnWndProc = xguimpl::ImageView::wndProc;
 		wc.cbWndExtra = 0;
-		wc.lpszClassName = "XGUIImageView";
+		wc.lpszClassName = L"XGUIImageView";
 		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground = NULL;
-		RegisterClassA(&wc);
+		RegisterClassW(&wc);
 
 		tip_wnd = CreateWindowEx ( WS_EX_TOPMOST, TOOLTIPS_CLASS, "", WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
 			CW_USEDEFAULT, CW_USEDEFAULT,
@@ -526,11 +539,14 @@ namespace xguimpl
 
 	int Master::messageDialog ( xgui::Window * parent, const std::string & title, const std::string & text, const std::string & d_type, const std::string & d_buttons )
 	{
+		// Use proper locale-aware conversion instead of deprecated tolower
 		std::string type = d_type;
-		std::transform ( type.begin(), type.end(), type.begin(), tolower );
+		std::transform ( type.begin(), type.end(), type.begin(),
+			[](unsigned char c){ return static_cast<char>(std::tolower(c)); } );
 
 		std::string buttons = d_buttons;
-		std::transform ( buttons.begin(), buttons.end(), buttons.begin(), tolower );
+		std::transform ( buttons.begin(), buttons.end(), buttons.begin(),
+			[](unsigned char c){ return static_cast<char>(std::tolower(c)); } );
 
 		UINT t = 0;
 		if ( type.find ( "warn" ) == 0 ) t |= MB_ICONWARNING;

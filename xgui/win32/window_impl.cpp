@@ -18,8 +18,9 @@ namespace xguimpl
 	{
 		HWND hParent = parent ? parent->getImpl()->widget : NULL;
 
-		return CreateWindowEx ( WS_EX_CONTROLPARENT,
-			"XGUIWindowClass", "", WS_OVERLAPPEDWINDOW,
+		// Use Unicode API for modern Windows
+		return CreateWindowExW ( WS_EX_CONTROLPARENT,
+			L"XGUIWindowClass", L"", WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT,
 			CW_USEDEFAULT, CW_USEDEFAULT, hParent, NULL, xgui::Master::Instance()->getImpl()->hInstance, NULL );
 	}

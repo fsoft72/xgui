@@ -9,11 +9,15 @@
 #include <fstream>
 #include <map>
 #include <stack>
+#include <vector>
+#include <memory>
 #include <locale>
 
 #include "xgui.h"
 
-#define _WIN32_WINNT	0x0400
+// Target Windows 7 and later (0x0601) for modern API support
+#define _WIN32_WINNT	0x0601
+#define NTDDI_VERSION	0x06010000
 #include <windows.h>
 #include <commctrl.h>
 #include <gdiplus.h>
