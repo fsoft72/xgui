@@ -66,12 +66,11 @@ namespace xguimpl
 		}
 		else if ( name == "alignment" ) {
 			std::string  halign = "center";
-			float valign_v, halign_v;
+			// GTK3: Use gtk_widget_get_halign instead of deprecated gtk_button_get_alignment
+			GtkAlign align = gtk_widget_get_halign(GTK_WIDGET(widget));
 
-			gtk_button_get_alignment ( GTK_BUTTON(widget), &halign_v, &valign_v );
-
-			if (halign_v == 1.0f) halign = "right";
-			else if (halign_v == 0.0f) halign = "left";
+			if (align == GTK_ALIGN_END) halign = "right";
+			else if (align == GTK_ALIGN_START) halign = "left";
 
 			vals = halign;
 
@@ -97,16 +96,17 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "alignment" ) {
-			
-			float  halign_v = 0.5f;
-			
+
+			GtkAlign align = GTK_ALIGN_CENTER;
+
 			std::string halign = vals;
 
-			if (halign == "right") halign_v = 1.0f;
-			else if (halign == "left") halign_v = 0.0f;
+			if (halign == "right") align = GTK_ALIGN_END;
+			else if (halign == "left") align = GTK_ALIGN_START;
 
-			gtk_button_set_alignment ( GTK_BUTTON(widget), halign_v, 0.5f );
-			
+			// GTK3: Use gtk_widget_set_halign instead of deprecated gtk_button_set_alignment
+			gtk_widget_set_halign(GTK_WIDGET(widget), align);
+
 			return true;
 		}
 

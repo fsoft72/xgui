@@ -30,7 +30,7 @@ test: $(XGUI_OBJS) $(GTK_OBJS) tests/exe_test/main.o
 
 python: $(XGUI_OBJS) $(GTK_OBJS)
 	cd pywrap && swig -c++ -python -I../xgui/ -o ../xgui_wrap.cpp xgui.i
-	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -I`python3 -c "import sysconfig; print(sysconfig.get_path('include'))"` $(LIBS) $(XGUI_OBJS) $(GTK_OBJS) xgui_wrap.cpp -shared -o output/_xgui.so
+	$(CPP) $(CPPFLAGS) $(XGUI_INCLUDES) -I`python3 -c "import sysconfig; print(sysconfig.get_path('include'))"` $(XGUI_OBJS) $(GTK_OBJS) xgui_wrap.cpp -shared -o output/_xgui.so $(LIBS)
 	mv xgui.py output/xgui.py
 
 pexplorer: $(XGUI_OBJS) $(GTK_OBJS) tests/pexplorer/pexplorer.o
