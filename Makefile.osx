@@ -18,9 +18,9 @@ CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -DOPENSTEP $(SDK_FLAGS) -std=c++11
 # Note: ARC (-fobjc-arc) is disabled because the OpenStep implementation uses manual memory management
 OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString $(SDK_FLAGS)
 
-XGUI_INCLUDES= `xml2-config --cflags`  -I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
+XGUI_INCLUDES=-I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
 # Fixed: Cocoa framework name is case-sensitive
-LIBS= `xml2-config --libs` -lobjc -lstdc++ -framework Cocoa -framework Foundation
+LIBS=-lobjc -lstdc++ -framework Cocoa -framework Foundation
 
 XGUI_OBJS = $(XGUI_IMPL_PATH)/class_info.o $(XGUI_IMPL_PATH)/object.o $(XGUI_IMPL_PATH)/container.o $(XGUI_IMPL_PATH)/widget.o $(XGUI_IMPL_PATH)/master.o $(XGUI_IMPL_PATH)/callback.o $(XGUI_IMPL_PATH)/window.o $(XGUI_IMPL_PATH)/image.o $(XGUI_IMPL_PATH)/button.o $(XGUI_IMPL_PATH)/menu.o $(XGUI_IMPL_PATH)/hbox.o $(XGUI_IMPL_PATH)/vbox.o $(XGUI_IMPL_PATH)/model.o $(XGUI_IMPL_PATH)/view.o $(XGUI_IMPL_PATH)/style.o $(XGUI_IMPL_PATH)/label.o $(XGUI_IMPL_PATH)/entry.o $(XGUI_IMPL_PATH)/list.o $(XGUI_IMPL_PATH)/calendar.o $(XGUI_IMPL_PATH)/slider.o $(XGUI_IMPL_PATH)/imageview.o $(XGUI_IMPL_PATH)/progressbar.o $(XGUI_IMPL_PATH)/tab.o $(XGUI_IMPL_PATH)/spin.o $(XGUI_IMPL_PATH)/checkbox.o $(XGUI_IMPL_PATH)/combobox.o $(XGUI_IMPL_PATH)/frame.o $(XGUI_IMPL_PATH)/toolbar.o $(XGUI_IMPL_PATH)/space.o $(XGUI_IMPL_PATH)/tree.o $(XGUI_IMPL_PATH)/dmaster.o
 

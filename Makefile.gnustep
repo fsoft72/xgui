@@ -9,8 +9,8 @@ CPPFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -DOPENSTEP
 OBJC=gcc
 OBJCFLAGS=-g -Wall -fPIC -D_DEBUG -O0 -fconstant-string-class=NSConstantString -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNUSTEP
 
-XGUI_INCLUDES= `xml2-config --cflags`  -I/usr/include/GNUstep/Headers/ -I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
-LIBS= -L/usr/lib/GNUstep/System/Library/Libraries -L/usr/lib/GNUstep/System/Library/Libraries/gnu-gnu-gnu -L/usr/lib/GNUstep/System/Library/Libraries  -lxslt -lcallback -lavcall -ldl  -lz `xml2-config --libs` -lobjc -lstdc++ -lgnustep-base -lgnustep-gui
+XGUI_INCLUDES=-I/usr/include/GNUstep/Headers/ -I$(XGUI_IMPL_PATH) -I$(NS_IMPL_PATH)
+LIBS=-L/usr/lib/GNUstep/System/Library/Libraries -L/usr/lib/GNUstep/System/Library/Libraries/gnu-gnu-gnu -L/usr/lib/GNUstep/System/Library/Libraries -lcallback -lavcall -ldl -lz -lobjc -lstdc++ -lgnustep-base -lgnustep-gui
 
 XGUI_OBJS = $(XGUI_IMPL_PATH)/class_info.o $(XGUI_IMPL_PATH)/object.o $(XGUI_IMPL_PATH)/container.o $(XGUI_IMPL_PATH)/widget.o $(XGUI_IMPL_PATH)/master.o $(XGUI_IMPL_PATH)/callback.o $(XGUI_IMPL_PATH)/window.o $(XGUI_IMPL_PATH)/image.o $(XGUI_IMPL_PATH)/button.o $(XGUI_IMPL_PATH)/menu.o $(XGUI_IMPL_PATH)/hbox.o $(XGUI_IMPL_PATH)/vbox.o $(XGUI_IMPL_PATH)/model.o $(XGUI_IMPL_PATH)/view.o $(XGUI_IMPL_PATH)/style.o $(XGUI_IMPL_PATH)/label.o $(XGUI_IMPL_PATH)/entry.o $(XGUI_IMPL_PATH)/list.o $(XGUI_IMPL_PATH)/calendar.o $(XGUI_IMPL_PATH)/slider.o $(XGUI_IMPL_PATH)/imageview.o $(XGUI_IMPL_PATH)/progressbar.o $(XGUI_IMPL_PATH)/tab.o $(XGUI_IMPL_PATH)/spin.o $(XGUI_IMPL_PATH)/checkbox.o $(XGUI_IMPL_PATH)/combobox.o $(XGUI_IMPL_PATH)/frame.o $(XGUI_IMPL_PATH)/toolbar.o $(XGUI_IMPL_PATH)/space.o $(XGUI_IMPL_PATH)/tree.o $(XGUI_IMPL_PATH)/dmaster.o
 

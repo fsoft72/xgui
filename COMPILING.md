@@ -11,12 +11,11 @@ For detailed macOS compilation instructions, see [COMPILING_MACOS.md](COMPILING_
 
 ### Linux/GTK+
 	1 - libgtk+-2.0-dev
-	2 - libxml2-dev
-	3 - swig (optional for Python bindings)
-	4 - python-dev (optional for Python bindings)
+	2 - swig (optional for Python bindings)
+	3 - python-dev (optional for Python bindings)
 
 ### macOS
-	1 - Xcode Command Line Tools (includes clang, libxml2)
+	1 - Xcode Command Line Tools (includes clang)
 	2 - swig (optional for Python bindings, via Homebrew)
 	3 - python3 (optional for Python bindings, via Homebrew)
 
