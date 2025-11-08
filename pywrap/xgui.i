@@ -92,14 +92,14 @@ DWORD PythonThreadsManager::tls_index = 0;
 %{
 void XGUIPyObjectDestructionNotify(PyObject * pyobj, xgui::Object * w)
 {
-        PyObject *n = PyInt_FromLong(0);
+        PyObject *n = PyLong_FromLong(0);
 
 	int ptrlen = sizeof(void*)*2;
 	std::string ptr = "_";
 	for(int i=0; i <ptrlen; ++i)
 		ptr += '0';
 	ptr+="DestroyedObject";
-	PyObject *this_ptr = PyString_FromString(ptr.c_str());
+	PyObject *this_ptr = PyUnicode_FromString(ptr.c_str());
 
         PyObject_SetAttrString(pyobj,(char*)"thisown",n);
 	PyObject_SetAttrString(pyobj, (char*)"this", this_ptr);
@@ -127,7 +127,7 @@ PyObject * XGUIPyObjectCreate(xgui::Object * w, bool constructing)
 	}
 
 	PyObject *pyobj = SWIG_NewPointerObj(w, swig_class, 0);
-	PyObject *n = PyInt_FromLong(1);
+	PyObject *n = PyLong_FromLong(1);
 	PyObject_SetAttrString(pyobj, (char*)"valid", n);
         Py_DECREF(n);
 

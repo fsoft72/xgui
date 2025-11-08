@@ -10,16 +10,16 @@
 //
 //
 
-%typemap(python, in, numinputs=0) std::string &dest (std::string temp) {
+%typemap( in, numinputs=0) std::string &dest (std::string temp) {
 	$1 = &temp;
 }
 
-%typemap(python, argout) std::string &dest {
+%typemap( argout) std::string &dest {
 	Py_XDECREF($result);
 	if (result) {
 		char const * cstrdata = $1->c_str();
 		unsigned long int cstrlen = $1->size();
-		$result = PyString_FromStringAndSize(cstrdata, cstrlen);
+		$result = PyUnicode_FromStringAndSize(cstrdata, cstrlen);
 	}
 	else {
 		Py_INCREF(Py_None);
@@ -27,7 +27,7 @@
 	}
 }
 
-%typemap(python,out) xgui::Object * { $result = XGUIPyObjectCreate($1, false); }
+%typemap(out) xgui::Object * { $result = XGUIPyObjectCreate($1, false); }
 
 namespace xgui
 {

@@ -16,27 +16,27 @@ namespace xgui
 			static xgui::StyleManager * CreateStyleManager();
 			static void DestroyStyleManager(xgui::StyleManager * sm);
 			
-			%typemap(python,out) xgui::Object * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Window * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Button * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Label * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Entry * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::VBox * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::HBox * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::ImageView * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::List * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Toolbar * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Combobox * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Space * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Checkbox * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Progressbar * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Slider * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Menu * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Tab * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Spin * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Frame * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Calendar * { $result = XGUIPyObjectCreate($1, true); }
-			%typemap(python,out) xgui::Tree * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Object * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Window * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Button * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Label * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Entry * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::VBox * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::HBox * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::ImageView * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::List * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Toolbar * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Combobox * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Space * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Checkbox * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Progressbar * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Slider * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Menu * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Tab * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Spin * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Frame * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Calendar * { $result = XGUIPyObjectCreate($1, true); }
+			%typemap(out) xgui::Tree * { $result = XGUIPyObjectCreate($1, true); }
 			
 			static xgui::Image * LoadImage(std::string const &path);
 			static xgui::Image * GetImage(std::string const &path);

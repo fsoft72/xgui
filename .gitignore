@@ -13,3 +13,4 @@ tests/_xguimodule.so
 tests/xgui.py
 Makefile
 xgui-example
+output/__pycache__/

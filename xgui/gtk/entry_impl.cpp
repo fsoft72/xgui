@@ -85,8 +85,9 @@ namespace xguimpl
 			float align = 0.5f;
 			if (vals == "left") align = 0.0f;
 			else if (vals == "right") align = 1.0f;
-	
-			gtk_entry_set_alignment( GTK_ENTRY(widget), align );
+
+			// GTK3: Use xalign property instead of deprecated gtk_entry_set_alignment
+			g_object_set(G_OBJECT(widget), "xalign", align, NULL);
 			return true;
 		}
 		else if ( name == "maxlength" ) {
@@ -116,12 +117,14 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "alignment" ) {
-			float align = gtk_entry_get_alignment( GTK_ENTRY(widget) );
-	
+			float align;
+			// GTK3: Use xalign property instead of deprecated gtk_entry_get_alignment
+			g_object_get(G_OBJECT(widget), "xalign", &align, NULL);
+
 			if (align == 1.0f) vals = "right";
 			else if (align == 0.0f) vals = "left";
 			else vals = "center";
-	
+
 			return true;
 		}
 		else if ( name == "maxlength" ) {
