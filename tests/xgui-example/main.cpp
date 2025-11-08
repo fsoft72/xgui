@@ -1,5 +1,6 @@
 #include "../../xgui/xgui.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using namespace xgui;
