@@ -11,3 +11,5 @@ tests/xml_test/xml.o
 xgui_wrap.cpp
 tests/_xguimodule.so
 tests/xgui.py
+Makefile
+xgui-example
