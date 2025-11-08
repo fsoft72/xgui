@@ -38,6 +38,7 @@ class ComplexGUITest:
         self.widgets = {}
         self.callbacks = {}
         self.download_progress = 0
+        self._updating = False  # Flag to prevent circular updates
 
     def store_widget(self, name, widget):
         """Store a widget reference by name"""
@@ -82,7 +83,12 @@ class ComplexGUITest:
 
         Note: Slider onchange uses TextCallback (widget, text)
         """
+        # Prevent circular updates
+        if self._updating:
+            return xgui.EVT_BLOCK
+
         try:
+            self._updating = True
             value = int(text)  # Use text parameter
 
             # Update spin widget (use "value" for Spin, not "pos")
@@ -98,6 +104,8 @@ class ComplexGUITest:
             print(f"Brightness slider changed to: {value}")
         except Exception as e:
             print(f"Error in brightness slider callback: {e}")
+        finally:
+            self._updating = False
 
         return xgui.EVT_BLOCK
 
@@ -107,7 +115,12 @@ class ComplexGUITest:
         Note: Spin onchange uses TextCallback (widget, text)
         Note: Spin widget uses "value" property, not "pos"
         """
+        # Prevent circular updates
+        if self._updating:
+            return xgui.EVT_BLOCK
+
         try:
+            self._updating = True
             print(f"DEBUG: Spin callback - text='{text}', widget.get('value')='{widget.get('value')}'")
 
             # Try to get value from text parameter or widget property
@@ -125,6 +138,7 @@ class ComplexGUITest:
             # Skip update if we couldn't get a valid value (during init)
             if value is None:
                 print(f"DEBUG: Skipping update - no valid value available")
+                self._updating = False
                 return xgui.EVT_BLOCK
 
             print(f"DEBUG: Spin value={value}")
@@ -144,6 +158,8 @@ class ComplexGUITest:
             print(f"Error in brightness spin callback: {e}")
             import traceback
             traceback.print_exc()
+        finally:
+            self._updating = False
 
         return xgui.EVT_BLOCK
 
