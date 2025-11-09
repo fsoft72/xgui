@@ -84,8 +84,8 @@ private:
 	TextCallback * cb_checkbox;
 	TextCallback * cb_name_entry;
 	TextCallback * cb_password_entry;
-	Callback * cb_slider_change;
-	Callback * cb_spin_change;
+	TextCallback * cb_slider_change;
+	TextCallback * cb_spin_change;
 	TextStatusCallback * cb_combo_select;
 	TextStatusCallback * cb_list_select;
 	TextStatusCallback * cb_tree_select;
@@ -93,7 +93,7 @@ private:
 	TextStatusCallback * cb_menu_select;
 	TextStatusCallback * cb_tab_select;
 	TextStatusCallback * cb_toolbar_click;
-	Callback * cb_opacity_change;
+	TextCallback * cb_opacity_change;
 
 public:
 	ComplexWidgetDemo() : Window(0), click_count(0)
@@ -109,8 +109,8 @@ public:
 		cb_checkbox = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCheckbox);
 		cb_name_entry = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onNameEntry);
 		cb_password_entry = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onPasswordEntry);
-		cb_slider_change = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSliderChange);
-		cb_spin_change = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSpinChange);
+		cb_slider_change = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSliderChange);
+		cb_spin_change = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSpinChange);
 		cb_combo_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onComboSelect);
 		cb_list_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onListSelect);
 		cb_tree_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onTreeSelect);
@@ -118,7 +118,7 @@ public:
 		cb_menu_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onMenuSelect);
 		cb_tab_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onTabSelect);
 		cb_toolbar_click = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onToolbarClick);
-		cb_opacity_change = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onOpacityChange);
+		cb_opacity_change = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onOpacityChange);
 
 		// Create UI
 		createMenu();
@@ -501,11 +501,8 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onSliderChange(Widget * w)
+	int onSliderChange(Widget * w, std::string const &value)
 	{
-		std::string value;
-		slider_widget->get("value", value);
-
 		std::cout << "[EVENT] Slider changed: " << value << std::endl;
 
 		// Update label
@@ -518,11 +515,8 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onSpinChange(Widget * w)
+	int onSpinChange(Widget * w, std::string const &value)
 	{
-		std::string value;
-		spin_widget->get("value", value);
-
 		std::cout << "[EVENT] Spinner changed: " << value << std::endl;
 
 		// Update label showing current spinner value
@@ -643,11 +637,8 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onOpacityChange(Widget * w)
+	int onOpacityChange(Widget * w, std::string const &value)
 	{
-		std::string value;
-		opacity_slider->get("value", value);
-
 		std::cout << "[EVENT] Opacity changed: " << value << "%" << std::endl;
 
 		std::string label_text = "Opacity: " + value + "%";
