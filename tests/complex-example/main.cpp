@@ -122,13 +122,17 @@ public:
 
 		// Create UI
 		createMenu();
+
+		// Create main tab container first
+		main_tab = Master::CreateTab(this, "top");
+
+		// Create tab pages with main_tab as parent
 		createBasicTab();
 		createInputTab();
 		createDataTab();
 		createAdvancedTab();
 
-		// Setup main tab container
-		main_tab = Master::CreateTab(this, "top");
+		// Set page labels
 		main_tab->setPageLabel(basic_tab, "Basic Controls");
 		main_tab->setPageLabel(input_tab, "Input Widgets");
 		main_tab->setPageLabel(data_tab, "Data Views");
@@ -188,7 +192,7 @@ public:
 
 	void createBasicTab()
 	{
-		basic_tab = Master::CreateVBox(0, 10, true);
+		basic_tab = Master::CreateVBox(main_tab, 10, true);
 
 		// Title
 		Label * title = Master::CreateLabel(basic_tab, "Basic Controls Demo");
@@ -223,7 +227,7 @@ public:
 
 	void createInputTab()
 	{
-		input_tab = Master::CreateVBox(0, 10, true);
+		input_tab = Master::CreateVBox(main_tab, 10, true);
 
 		// Title
 		Label * title = Master::CreateLabel(input_tab, "Input Widgets Demo");
@@ -293,7 +297,7 @@ public:
 
 	void createDataTab()
 	{
-		data_tab = Master::CreateVBox(0, 10, true);
+		data_tab = Master::CreateVBox(main_tab, 10, true);
 
 		// Title
 		Label * title = Master::CreateLabel(data_tab, "Data View Widgets");
@@ -370,7 +374,7 @@ public:
 
 	void createAdvancedTab()
 	{
-		advanced_tab = Master::CreateVBox(0, 10, true);
+		advanced_tab = Master::CreateVBox(main_tab, 10, true);
 
 		// Title
 		Label * title = Master::CreateLabel(advanced_tab, "Advanced Widgets");
