@@ -5,6 +5,21 @@
 
 using namespace xgui;
 
+// Template for member function text callbacks (not in callback.h)
+template <typename ObjectType>
+class CppMTextCallback : public TextCallback
+{
+	private:
+		ObjectType * obj;
+		int (ObjectType::*func)(Widget*, std::string const &text);
+
+	public:
+		CppMTextCallback(ObjectType * const o, int(ObjectType::*fptr)(Widget*, std::string const &))
+		: TextCallback(), obj(o), func(fptr) {}
+		virtual ~CppMTextCallback() {}
+		virtual int call(Widget * w, std::string const &text) { return (obj->*func)(w, text); }
+};
+
 /**
  * Complex Widget Example - Showcasing All XGUI Widgets
  *
@@ -36,7 +51,7 @@ private:
 	Entry * name_entry;
 	Entry * password_entry;
 	Slider * slider_widget;
-	ProgressBar * progress_bar;
+	Progressbar * progress_bar;
 	Spin * spin_widget;
 	Label * slider_value_label;
 	Label * spin_value_label;
@@ -114,10 +129,10 @@ public:
 
 		// Setup main tab container
 		main_tab = Master::CreateTab(this, "top");
-		main_tab->addPage(basic_tab, "Basic Controls");
-		main_tab->addPage(input_tab, "Input Widgets");
-		main_tab->addPage(data_tab, "Data Views");
-		main_tab->addPage(advanced_tab, "Advanced");
+		main_tab->setPageLabel(basic_tab, "Basic Controls");
+		main_tab->setPageLabel(input_tab, "Input Widgets");
+		main_tab->setPageLabel(data_tab, "Data Views");
+		main_tab->setPageLabel(advanced_tab, "Advanced");
 		main_tab->linkEvent("onselect", cb_tab_select);
 
 		// Window setup
@@ -265,11 +280,11 @@ public:
 
 		combo_label = Master::CreateLabel(combo_box, "Selected: (none)");
 		combo_widget = Master::CreateCombobox(combo_box, false);
-		combo_widget->addItem("Option 1");
-		combo_widget->addItem("Option 2");
-		combo_widget->addItem("Option 3");
-		combo_widget->addItem("Option 4");
-		combo_widget->addItem("Option 5");
+		combo_widget->appendText("Option 1");
+		combo_widget->appendText("Option 2");
+		combo_widget->appendText("Option 3");
+		combo_widget->appendText("Option 4");
+		combo_widget->appendText("Option 5");
 		combo_widget->linkEvent("onselect", cb_combo_select);
 
 		// Space filler
@@ -291,7 +306,7 @@ public:
 		// List widget
 		VBox * list_vbox = Master::CreateVBox(data_hbox, 5, false);
 		list_vbox->set("expand", "1.0");
-		Label * list_label = Master::CreateLabel(list_vbox, "List Widget:");
+		Master::CreateLabel(list_vbox, "List Widget:");
 
 		data_list = Master::CreateList(list_vbox, 0);
 		data_list->set("expand", "1.0");
@@ -320,7 +335,7 @@ public:
 		// Tree widget
 		VBox * tree_vbox = Master::CreateVBox(data_hbox, 5, false);
 		tree_vbox->set("expand", "1.0");
-		Label * tree_label = Master::CreateLabel(tree_vbox, "Tree Widget:");
+		Master::CreateLabel(tree_vbox, "Tree Widget:");
 
 		tree_widget = Master::CreateTree(tree_vbox, 0);
 		tree_widget->set("expand", "1.0");
@@ -364,13 +379,13 @@ public:
 
 		// Toolbar
 		toolbar_widget = Master::CreateToolbar(advanced_tab);
-		toolbar_widget->addButton("btn_new", "New", "");
-		toolbar_widget->addButton("btn_open", "Open", "");
-		toolbar_widget->addButton("btn_save", "Save", "");
-		toolbar_widget->addSeparator();
-		toolbar_widget->addButton("btn_cut", "Cut", "");
-		toolbar_widget->addButton("btn_copy", "Copy", "");
-		toolbar_widget->addButton("btn_paste", "Paste", "");
+		toolbar_widget->addItem("btn_new", "New", 0, "New document");
+		toolbar_widget->addItem("btn_open", "Open", 0, "Open file");
+		toolbar_widget->addItem("btn_save", "Save", 0, "Save file");
+		toolbar_widget->addItem("sep1", "", 0, "", "separator");
+		toolbar_widget->addItem("btn_cut", "Cut", 0, "Cut selection");
+		toolbar_widget->addItem("btn_copy", "Copy", 0, "Copy selection");
+		toolbar_widget->addItem("btn_paste", "Paste", 0, "Paste from clipboard");
 		toolbar_widget->linkEvent("onclick", cb_toolbar_click);
 
 		// Settings Frame
