@@ -221,6 +221,19 @@ public:
 		enable_checkbox->set("checked", "0");      // Start unchecked
 		enable_checkbox->linkEvent("onclick", cb_checkbox);
 
+		// Settings Frame (controlled by checkbox)
+		settings_frame = Master::CreateFrame(basic_tab, "Advanced Settings");
+		VBox * settings_vbox = Master::CreateVBox(settings_frame, 10, false);
+
+		// Opacity control
+		opacity_label = Master::CreateLabel(settings_vbox, "Opacity: 100%");
+		opacity_slider = Master::CreateSlider(settings_vbox, 0, 100);
+		opacity_slider->set("value", "100");
+		opacity_slider->linkEvent("onchange", cb_opacity_change);
+
+		// Start with settings disabled (checkbox unchecked)
+		settings_frame->set("enabled", "0");
+
 		// Space filler
 		Master::CreateSpace(basic_tab, 0, 0)->set("expand", "1.0");
 	}
@@ -391,16 +404,6 @@ public:
 		toolbar_widget->addItem("btn_copy", "Copy", 0, "Copy selection");
 		toolbar_widget->addItem("btn_paste", "Paste", 0, "Paste from clipboard");
 		toolbar_widget->linkEvent("onclick", cb_toolbar_click);
-
-		// Settings Frame
-		settings_frame = Master::CreateFrame(advanced_tab, "Settings");
-		VBox * settings_vbox = Master::CreateVBox(settings_frame, 10, false);
-
-		// Opacity control
-		opacity_label = Master::CreateLabel(settings_vbox, "Opacity: 100%");
-		opacity_slider = Master::CreateSlider(settings_vbox, 0, 100);
-		opacity_slider->set("value", "100");
-		opacity_slider->linkEvent("onchange", cb_opacity_change);
 
 		// Status label
 		status_label = Master::CreateLabel(advanced_tab, "Status: Ready");
