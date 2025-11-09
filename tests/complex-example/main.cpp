@@ -56,6 +56,7 @@ private:
 	Label * slider_value_label;
 	Label * spin_value_label;
 	Combobox * combo_widget;
+	Model * combo_model;
 	Label * combo_label;
 
 	// Data View Widgets (Tab 3)
@@ -297,11 +298,16 @@ public:
 
 		combo_label = Master::CreateLabel(combo_box, "Selected: (none)");
 		combo_widget = Master::CreateCombobox(combo_box, false);
-		combo_widget->appendText("Option 1");
-		combo_widget->appendText("Option 2");
-		combo_widget->appendText("Option 3");
-		combo_widget->appendText("Option 4");
-		combo_widget->appendText("Option 5");
+
+		// Non-editable comboboxes need a Model
+		combo_model = Master::CreateModel();
+		combo_model->appendChild("Option 1");
+		combo_model->appendChild("Option 2");
+		combo_model->appendChild("Option 3");
+		combo_model->appendChild("Option 4");
+		combo_model->appendChild("Option 5");
+		combo_widget->setModel(combo_model);
+
 		combo_widget->linkEvent("onselect", cb_combo_select);
 
 		// Space filler
