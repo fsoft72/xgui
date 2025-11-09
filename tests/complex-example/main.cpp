@@ -218,6 +218,7 @@ public:
 		HBox * checkbox_box = Master::CreateHBox(basic_tab, 5, false);
 		enable_checkbox = Master::CreateCheckbox(checkbox_box, "Enable Advanced Features");
 		enable_checkbox->set("value", "enabled");  // Value string to pass when checked
+		enable_checkbox->set("checked", "0");      // Start unchecked
 		enable_checkbox->linkEvent("onclick", cb_checkbox);
 
 		// Space filler
