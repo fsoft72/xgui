@@ -128,11 +128,14 @@ namespace xguimpl
 		}
 
 		bool is_active = gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(w) );
-		std::string value = (is_active ? cbox->value : "");
+
+		// Read value from the high-level Checkbox class, not the impl
+		std::string checkbox_value = cbox->this_checkbox->getValue();
+		std::string value = (is_active ? checkbox_value : "");
 
 		std::cout << "[XGUI DEBUG] Checkbox::OnClick:" << std::endl;
 		std::cout << "  - gtk_toggle_button_get_active: " << is_active << std::endl;
-		std::cout << "  - cbox->value: '" << cbox->value << "'" << std::endl;
+		std::cout << "  - this_checkbox->getValue(): '" << checkbox_value << "'" << std::endl;
 		std::cout << "  - Passing to callback: '" << value << "'" << std::endl;
 
 		cb->call( cbox->this_widget, value );
