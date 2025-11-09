@@ -452,11 +452,20 @@ public:
 
 	int onCheckbox(Widget * w, std::string const &value)
 	{
+		// Debug: Check actual checkbox state
+		std::string checked_prop, value_prop;
+		enable_checkbox->get("checked", checked_prop);
+		enable_checkbox->get("value", value_prop);
+
+		std::cout << "[EVENT] Checkbox onclick callback:" << std::endl;
+		std::cout << "  - Received value parameter: '" << value << "'" << std::endl;
+		std::cout << "  - 'checked' property: '" << checked_prop << "'" << std::endl;
+		std::cout << "  - 'value' property: '" << value_prop << "'" << std::endl;
+
 		// Checkbox passes its value string if checked, empty string if unchecked
 		bool is_checked = !value.empty();
 
-		std::cout << "[EVENT] Checkbox changed! Enabled: " << (is_checked ? "Yes" : "No")
-		          << " (value: '" << value << "')" << std::endl;
+		std::cout << "  - Determined state: " << (is_checked ? "CHECKED" : "UNCHECKED") << std::endl;
 
 		if (is_checked) {
 			info_label->set("text", "Advanced features ENABLED");

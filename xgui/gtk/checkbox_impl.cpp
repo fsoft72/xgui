@@ -13,6 +13,7 @@
 #include "checkbox_impl.h"
 #include "checkbox.h"
 #include "callback.h"
+#include <iostream>
 
 static GtkWidget * MkCheckboxWidget(std::string const &text)
 {
@@ -89,6 +90,7 @@ namespace xguimpl
 		else if ( name == "value" ) {
 			value = vals;
 			if ( value.empty() ) value = "on";
+			std::cout << "[XGUI DEBUG] Checkbox::set_checkbox_prop - setting value to: '" << value << "'" << std::endl;
 			return true;
 		}
 		else if ( name == "checked" ) {
@@ -125,7 +127,14 @@ namespace xguimpl
 			return;
 		}
 
-		std::string value = (gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(w) ) ? cbox->value : "");
+		bool is_active = gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(w) );
+		std::string value = (is_active ? cbox->value : "");
+
+		std::cout << "[XGUI DEBUG] Checkbox::OnClick:" << std::endl;
+		std::cout << "  - gtk_toggle_button_get_active: " << is_active << std::endl;
+		std::cout << "  - cbox->value: '" << cbox->value << "'" << std::endl;
+		std::cout << "  - Passing to callback: '" << value << "'" << std::endl;
+
 		cb->call( cbox->this_widget, value );
 	}
 }
