@@ -81,7 +81,7 @@ private:
 	Callback * cb_window_close;
 	Callback * cb_action_btn;
 	Callback * cb_toggle_btn;
-	Callback * cb_checkbox;
+	TextCallback * cb_checkbox;
 	TextCallback * cb_name_entry;
 	TextCallback * cb_password_entry;
 	Callback * cb_slider_change;
@@ -106,7 +106,7 @@ public:
 		cb_window_close = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onWindowClose);
 		cb_action_btn = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onActionButton);
 		cb_toggle_btn = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onToggleButton);
-		cb_checkbox = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCheckbox);
+		cb_checkbox = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCheckbox);
 		cb_name_entry = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onNameEntry);
 		cb_password_entry = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onPasswordEntry);
 		cb_slider_change = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSliderChange);
@@ -449,14 +449,15 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onCheckbox(Widget * w)
+	int onCheckbox(Widget * w, std::string const &value)
 	{
-		std::string value;
-		enable_checkbox->get("value", value);
+		// Checkbox passes its value string if checked, empty string if unchecked
+		bool is_checked = !value.empty();
 
-		std::cout << "[EVENT] Checkbox changed! Enabled: " << (value == "1" ? "Yes" : "No") << std::endl;
+		std::cout << "[EVENT] Checkbox changed! Enabled: " << (is_checked ? "Yes" : "No")
+		          << " (value: '" << value << "')" << std::endl;
 
-		if (value == "1") {
+		if (is_checked) {
 			info_label->set("text", "Advanced features ENABLED");
 			settings_frame->set("enabled", "1");
 		} else {
