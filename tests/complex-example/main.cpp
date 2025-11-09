@@ -211,8 +211,7 @@ public:
 		action_btn->linkEvent("onclick", cb_action_btn);
 
 		// Toggle button
-		toggle_btn = Master::CreateButton(basic_tab, "Toggle: OFF");
-		toggle_btn->set("toggle", "1");
+		toggle_btn = Master::CreateButton(basic_tab, "Toggle: OFF", 0, true);
 		toggle_btn->linkEvent("onclick", cb_toggle_btn);
 
 		// Checkbox
@@ -434,12 +433,12 @@ public:
 
 	int onToggleButton(Widget * w)
 	{
-		std::string value;
-		toggle_btn->get("value", value);
+		std::string pressed;
+		toggle_btn->get("pressed", pressed);
 
-		std::cout << "[EVENT] Toggle button changed! New state: " << value << std::endl;
+		std::cout << "[EVENT] Toggle button changed! New state: " << pressed << std::endl;
 
-		if (value == "1") {
+		if (pressed == "1") {
 			toggle_btn->set("text", "Toggle: ON");
 			info_label->set("text", "Toggle is now ON");
 		} else {
