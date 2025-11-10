@@ -227,39 +227,72 @@ progress.set("value", str(value))
 
 There are different callback types depending on the widget and event:
 
-**PyCallback** - For buttons, checkboxes, windows (receives widget only):
+**PyCallback** - For buttons, windows (receives widget only):
 ```python
 def my_callback(widget):
     # Do something
     return xgui.EVT_BLOCK
 
 callback = xgui.PyCallback(my_callback)
-widget.linkEvent("onclick", callback)  # or "onchange", "onclose", etc.
+widget.linkEvent("onclick", callback)  # or "onclose", etc.
 ```
 
-**PyTextCallback** - For most value-changing widgets (receives widget and text):
+**PyTextCallback** - For text-based widgets (receives widget and text):
 
-Widgets that need PyTextCallback for `onchange` events:
-- **Entry** - text parameter contains the entry text
-- **Slider** - text parameter contains the slider position (as string)
-- **Spin** - text parameter contains the spin value (as string)
-- **Combobox** - text parameter contains the selected index (as string)
-- **Progressbar** - text parameter contains the progress value
+Widgets that use PyTextCallback:
+- **Entry** - `onchange` event, text parameter contains the entry text
+- **Spin** - `onchange` event, text parameter contains the spin value (as string)
+- **Combobox** - `onchange` event, text parameter contains the selected item text
+- **Calendar** - `onchange` event, text parameter contains the selected date
 
 ```python
-def value_callback(widget, text):
-    # Handle value change
-    value = int(text)  # Convert text to int for numeric widgets
-    print(f"Value changed to: {value}")
+def text_callback(widget, text):
+    # Handle text change
+    print(f"Text changed to: {text}")
     return xgui.EVT_BLOCK
 
-callback = xgui.PyTextCallback(value_callback)
+callback = xgui.PyTextCallback(text_callback)
 widget.linkEvent("onchange", callback)
 ```
 
+**PyIntCallback** - For numeric value widgets (receives widget and integer):
+
+Widgets that use PyIntCallback:
+- **Slider** - `oninput` event, value parameter contains the slider position (as int)
+- **Tab** - `onchange` event, value parameter contains the selected page index (as int)
+
+```python
+def int_callback(widget, value):
+    # Handle integer value change
+    print(f"Value changed to: {value}")
+    return xgui.EVT_BLOCK
+
+callback = xgui.PyIntCallback(int_callback)
+slider.linkEvent("oninput", callback)  # For slider
+tab.linkEvent("onchange", callback)    # For tab
+```
+
+**PyBoolCallback** - For boolean state widgets (receives widget and boolean):
+
+Widgets that use PyBoolCallback:
+- **Checkbox** - `onchange` event, checked parameter indicates if checkbox is checked (True/False)
+
+```python
+def bool_callback(widget, checked):
+    # Handle boolean state change
+    if checked:
+        print("Checkbox is checked")
+    else:
+        print("Checkbox is unchecked")
+    return xgui.EVT_BLOCK
+
+callback = xgui.PyBoolCallback(bool_callback)
+checkbox.linkEvent("onchange", callback)
+```
+
 **Other callback types**:
-- `PyTextStatusCallback(func)` - receives (widget, text, status)
-- `PyTextPairCallback(func)` - receives (widget, text1, text2)
+- `PyTextStatusCallback(func)` - receives (widget, text, status) - primarily for mouse events
+- `PyTextPairCallback(func)` - receives (widget, text1, text2) - for comparison operations
 
 ## Widget Properties Reference
 

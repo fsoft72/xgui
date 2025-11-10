@@ -52,13 +52,12 @@ class ComplexGUITest:
 
     # ===== Volume Control Callbacks =====
 
-    def on_volume_change(self, widget, text):
+    def on_volume_change(self, widget, value):
         """Callback when volume slider changes - updates progress bar and label
 
-        Note: Slider onchange uses TextCallback (widget, text)
+        Note: Slider oninput uses IntCallback (widget, value)
         """
         try:
-            value = int(text)  # Use text parameter (slider position as string)
 
             # Update progress bar
             progress = self.get_widget("volumeProgress")
@@ -78,10 +77,10 @@ class ComplexGUITest:
 
     # ===== Brightness Control Callbacks =====
 
-    def on_brightness_slider_change(self, widget, text):
+    def on_brightness_slider_change(self, widget, value):
         """Callback when brightness slider changes - updates spin and label
 
-        Note: Slider onchange uses TextCallback (widget, text)
+        Note: Slider oninput uses IntCallback (widget, value)
         """
         # Prevent circular updates
         if self._updating:
@@ -89,7 +88,6 @@ class ComplexGUITest:
 
         try:
             self._updating = True
-            value = int(text)  # Use text parameter
 
             # Update spin widget (use "value" for Spin, not "pos")
             spin = self.get_widget("brightnessSpin")
@@ -231,10 +229,12 @@ class ComplexGUITest:
 
     # ===== Enable/Disable Callbacks =====
 
-    def on_enable_checkbox_change(self, widget):
-        """Callback when enable checkbox changes - enables/disables widgets"""
+    def on_enable_checkbox_change(self, widget, checked):
+        """Callback when enable checkbox changes - enables/disables widgets
+
+        Note: Checkbox onchange uses BoolCallback (widget, checked)
+        """
         try:
-            checked = widget.get("checked") == "1"
 
             # Enable or disable advanced entry
             entry = self.get_widget("advancedEntry")
@@ -483,20 +483,20 @@ class ComplexGUITest:
         """Bind all event callbacks to widgets"""
         print("\nBinding events to widgets...")
 
-        # Volume control (use PyTextCallback for Slider)
+        # Volume control (use PyIntCallback for Slider)
         volume_slider = self.get_widget("volumeSlider")
         if volume_slider:
-            volume_callback = xgui.PyTextCallback(self.on_volume_change)
+            volume_callback = xgui.PyIntCallback(self.on_volume_change)
             self.callbacks['on_volume_change'] = volume_callback
-            volume_slider.linkEvent("onchange", volume_callback)
+            volume_slider.linkEvent("oninput", volume_callback)
             print("  ✓ Bound volume slider")
 
-        # Brightness controls (use PyTextCallback for Slider and Spin)
+        # Brightness controls (use PyIntCallback for Slider and Spin)
         brightness_slider = self.get_widget("brightnessSlider")
         if brightness_slider:
-            brightness_slider_callback = xgui.PyTextCallback(self.on_brightness_slider_change)
+            brightness_slider_callback = xgui.PyIntCallback(self.on_brightness_slider_change)
             self.callbacks['on_brightness_slider_change'] = brightness_slider_callback
-            brightness_slider.linkEvent("onchange", brightness_slider_callback)
+            brightness_slider.linkEvent("oninput", brightness_slider_callback)
             print("  ✓ Bound brightness slider")
 
         # NOTE: Spin widget onchange has a bug in xgui/gtk/spin_impl.cpp line 105
@@ -532,10 +532,12 @@ class ComplexGUITest:
             counter_entry.linkEvent("onchange", counter_callback)
             print("  ✓ Bound counter entry")
 
-        # Enable checkbox and apply button
+        # Enable checkbox (use PyBoolCallback for Checkbox)
         enable_checkbox = self.get_widget("enableCheckbox")
         if enable_checkbox:
-            enable_checkbox.linkEvent("onchange", self.create_callback(self.on_enable_checkbox_change))
+            checkbox_callback = xgui.PyBoolCallback(self.on_enable_checkbox_change)
+            self.callbacks['on_enable_checkbox_change'] = checkbox_callback
+            enable_checkbox.linkEvent("onchange", checkbox_callback)
             print("  ✓ Bound enable checkbox")
 
         apply_button = self.get_widget("applyButton")
