@@ -77,7 +77,7 @@ namespace xguimpl
 			gtk_editable_set_editable( GTK_EDITABLE(widget), (vals == "1" ? TRUE : FALSE) );
 			return true;
 		}
-		else if ( name == "password-mode" ) {
+		else if ( name == "password-mode" || name == "password" ) {
 			gtk_entry_set_visibility ( GTK_ENTRY(widget), (vals == "1" ? false : true) );
 			return true;
 		}
@@ -112,7 +112,7 @@ namespace xguimpl
 			vals = xgui::semantic_cast<std::string>(edit);
 			return true;
 		}
-		else if ( name == "password-mode" ) {
+		else if ( name == "password-mode" || name == "password" ) {
 			vals = ( gtk_entry_get_visibility( GTK_ENTRY(widget) ) ? "0" : "1" );
 			return true;
 		}

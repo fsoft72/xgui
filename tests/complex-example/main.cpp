@@ -264,7 +264,7 @@ public:
 		pass_label->set("size", "100 -1");
 		password_entry = Master::CreateEntry(pass_box, "");
 		password_entry->set("expand", "1.0");
-		password_entry->set("password", "1");
+		password_entry->set("password-mode", "1");
 		password_entry->linkEvent("onchange", cb_password_entry);
 
 		// Slider and Progress Bar (linked)
