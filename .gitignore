@@ -7,6 +7,8 @@ pexplorer
 tests/debug
 output/xml
 output/main
+output/complex-example
+output/xgui.py
 tests/xml_test/xml.o
 xgui_wrap.cpp
 tests/_xguimodule.so
