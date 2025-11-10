@@ -82,19 +82,19 @@ private:
 	Callback * cb_window_close;
 	Callback * cb_action_btn;
 	Callback * cb_toggle_btn;
-	TextCallback * cb_checkbox;
+	BoolCallback * cb_checkbox;
 	TextCallback * cb_name_entry;
 	TextCallback * cb_password_entry;
-	TextCallback * cb_slider_change;
+	IntCallback * cb_slider_change;
 	TextCallback * cb_spin_change;
-	TextStatusCallback * cb_combo_select;
+	TextCallback * cb_combo_select;
 	TextStatusCallback * cb_list_select;
 	TextStatusCallback * cb_tree_select;
-	TextStatusCallback * cb_calendar_select;
+	TextCallback * cb_calendar_select;
 	TextStatusCallback * cb_menu_select;
-	TextStatusCallback * cb_tab_select;
+	IntCallback * cb_tab_select;
 	TextStatusCallback * cb_toolbar_click;
-	TextCallback * cb_opacity_change;
+	IntCallback * cb_opacity_change;
 
 public:
 	ComplexWidgetDemo() : Window(0), click_count(0)
