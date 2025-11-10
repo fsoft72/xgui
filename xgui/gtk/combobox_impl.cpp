@@ -47,21 +47,26 @@ namespace xguimpl
 	
 
 	bool Combobox::linkEvent( std::string const &name )
-	{	
-		if ( name == "onselect" )
+	{
+		if ( name == "onchange" ) {
+			// For non-editable combobox: trigger on selection change
+			if (!entry) {
+				g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+			}
+			// For editable combobox: trigger on text change
+			else {
+				g_signal_connect(G_OBJECT(entry), "insert-text", G_CALLBACK ( OnTextInsert ), this);
+				g_signal_connect(G_OBJECT(entry), "delete-text", G_CALLBACK ( OnTextDelete ), this);
+			}
 			return true;
+		}
 		else if ( name == "onrefresh" )
 			return true;
 		else if ( name == "onsubmit" ) {
 			g_signal_connect ( G_OBJECT ( real_widget ), "activate", G_CALLBACK ( OnSubmit ), this );
 			return true;
 		}
-		else if ( (name == "onchange") && (entry) ) {
-			g_signal_connect(G_OBJECT(entry), "insert-text", G_CALLBACK ( OnTextInsert ), this);
-			g_signal_connect(G_OBJECT(entry), "delete-text", G_CALLBACK ( OnTextDelete ), this);
-			return true;
-		}
-		
+
 		return Widget::linkEvent(name);
 	}
 
@@ -98,8 +103,10 @@ namespace xguimpl
 	
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
-	
-		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+
+		// Reconnect onchange handler if it was registered for non-editable combobox
+		if (!entry && this_cbox->hasEvent("onchange"))
+			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 	
 	void Combobox::insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
@@ -114,9 +121,11 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 
-		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		// Reconnect onchange handler if it was registered for non-editable combobox
+		if (!entry && this_cbox->hasEvent("onchange"))
+			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
-	
+
 	void Combobox::removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
 	{
 		xgui::Model * model = this_cbox->getModel();
@@ -129,7 +138,9 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 
-		g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		// Reconnect onchange handler if it was registered for non-editable combobox
+		if (!entry && this_cbox->hasEvent("onchange"))
+			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
 	}
 
 	void Combobox::appendText(std::string const &text)
@@ -215,21 +226,20 @@ namespace xguimpl
 
 	int Combobox::OnSelect ( GtkComboBox * w, Combobox *cbox )
 	{
-		xgui::Callback * base_cb = cbox->this_widget->getEvent("onselect");
+		xgui::Callback * base_cb = cbox->this_widget->getEvent("onchange");
 		if (!base_cb) return 0;
 
-		int selection = gtk_combo_box_get_active ( GTK_COMBO_BOX( w ) );
-		xgui::TextStatusCallback * cb = dynamic_cast<xgui::TextStatusCallback*>(base_cb);
+		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback*>(base_cb);
+		if (!cb) {
+			DMESSAGE("onchange event of xgui::Combobox expected a TextCallback");
+			return 0;
+		}
+
 		gchar * text = gtk_combo_box_text_get_active_text ( GTK_COMBO_BOX_TEXT( w ) );
 		std::string txt(text ? text : "");
 		g_free(text);
 
-		if (!cb) {
-			DMESSAGE("onselect event of xgui::Combobox expected a TextStatusCallback");
-			return 0;
-		}
-
-		cb->call( cbox->this_cbox, txt, selection );
+		cb->call( cbox->this_cbox, txt );
 
 		return 0;
 	}

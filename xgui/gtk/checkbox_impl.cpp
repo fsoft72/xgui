@@ -42,11 +42,11 @@ namespace xguimpl
 
 	bool Checkbox::linkEvent( std::string const &name )
 	{
-		if ( name == "onclick" ) {
-			g_signal_connect ( G_OBJECT ( widget ), "clicked", G_CALLBACK ( OnClick ), this );
+		if ( name == "onchange" ) {
+			g_signal_connect ( G_OBJECT ( widget ), "toggled", G_CALLBACK ( OnClick ), this );
 			return true;
 		}
-	
+
 		return Widget::linkEvent(name);
 	}
 
@@ -118,27 +118,18 @@ namespace xguimpl
 
 	void Checkbox::OnClick ( GtkWidget * w, Checkbox * cbox )
 	{
-		xgui::Callback * base_cb = cbox->this_widget->getEvent("onclick");
+		xgui::Callback * base_cb = cbox->this_widget->getEvent("onchange");
 		if (!base_cb) return;
 
-		xgui::TextCallback  * cb =  dynamic_cast<xgui::TextCallback*>(base_cb);
+		xgui::BoolCallback  * cb =  dynamic_cast<xgui::BoolCallback*>(base_cb);
 		if (!cb) {
-			DMESSAGE ( "onclick event of xgui::Checkbox expected a TextCallback" );
+			DMESSAGE ( "onchange event of xgui::Checkbox expected a BoolCallback" );
 			return;
 		}
 
 		bool is_active = gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(w) );
 
-		// Read value from the high-level Checkbox class, not the impl
-		std::string checkbox_value = cbox->this_checkbox->getValue();
-		std::string value = (is_active ? checkbox_value : "");
-
-		std::cout << "[XGUI DEBUG] Checkbox::OnClick:" << std::endl;
-		std::cout << "  - gtk_toggle_button_get_active: " << is_active << std::endl;
-		std::cout << "  - this_checkbox->getValue(): '" << checkbox_value << "'" << std::endl;
-		std::cout << "  - Passing to callback: '" << value << "'" << std::endl;
-
-		cb->call( cbox->this_widget, value );
+		cb->call( cbox->this_widget, is_active );
 	}
 }
 

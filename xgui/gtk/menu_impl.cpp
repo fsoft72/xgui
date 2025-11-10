@@ -42,11 +42,11 @@ namespace xguimpl
 
 	Menu::~Menu() {}
 
-	bool Menu::linkEvent(std::string const & name) 
+	bool Menu::linkEvent(std::string const & name)
 	{
-		if (name == "onselect")
+		if (name == "onclick")
 			return true;
-		
+
 		return Widget::linkEvent(name);
 	}
 

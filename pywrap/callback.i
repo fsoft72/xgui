@@ -27,10 +27,30 @@ namespace xgui
 	{
 		protected:
 			 TextCallback();
-	
+
 		public:
 			 virtual int call(Widget *, std::string const &text);
 			 virtual ~TextCallback();
+	};
+
+	class IntCallback : public Callback
+	{
+		protected:
+			 IntCallback();
+
+		public:
+			 virtual int call(Widget *, int value);
+			 virtual ~IntCallback();
+	};
+
+	class BoolCallback : public Callback
+	{
+		protected:
+			 BoolCallback();
+
+		public:
+			 virtual int call(Widget *, bool value);
+			 virtual ~BoolCallback();
 	};
 
 
@@ -72,7 +92,23 @@ namespace xgui
 			virtual ~PyTextCallback();
 			virtual int call(xgui::Widget *w, std::string const &str);
 	};
-	
+
+	class PyIntCallback : public xgui::IntCallback
+	{
+		public:
+			PyIntCallback(PyObject * cb);
+			virtual ~PyIntCallback();
+			virtual int call(xgui::Widget *w, int value);
+	};
+
+	class PyBoolCallback : public xgui::BoolCallback
+	{
+		public:
+			PyBoolCallback(PyObject * cb);
+			virtual ~PyBoolCallback();
+			virtual int call(xgui::Widget *w, bool value);
+	};
+
 	class PyTextStatusCallback : public xgui::TextStatusCallback
 	{
 		public:
@@ -213,11 +249,137 @@ namespace xgui
 				}
 	
 				if ( should_allow ) PythonThreadsManager::AllowThreads();
-				
+
 				return rv;
 			}
 	};
-	
+
+	class PyIntCallback : public xgui::IntCallback
+	{
+		private:
+			PyObject * callback;
+
+		public:
+			PyIntCallback(PyObject * cb)
+			: xgui::IntCallback(), callback(cb)
+			{
+				if (!PyCallable_Check(cb)) {
+					PyErr_SetString(PyExc_TypeError, "Non callable object to PyIntCallback");
+					PyErr_Print();
+				}
+
+				Py_INCREF(cb);
+			}
+
+			virtual ~PyIntCallback()
+			{
+				Py_DECREF(callback);
+			}
+
+
+			virtual int call(xgui::Widget *w, int value)
+			{
+				int rv = 0;
+
+				bool should_allow = PythonThreadsManager::DenyThreads();
+
+				if (PyCallable_Check(callback)) {
+					PyObject *pw =  XGUIPyObjectCreate(w, false);
+					PyObject *args = Py_BuildValue("(Oi)", pw, value);
+					PyObject *result = PyObject_CallObject(callback, args);
+					Py_XDECREF(args);
+					Py_XDECREF(pw);
+
+					if (result == 0) {
+						PyErr_Print();
+					}
+					else if (result == Py_None) {
+						Py_XDECREF(result);
+					}
+					else if (PyLong_Check(result)) {
+						rv = PyLong_AsLong(result);
+						Py_XDECREF(result);
+					}
+					else {
+						Py_XDECREF(result);
+						PyErr_SetString(PyExc_TypeError, "Expected Integer or None as return value of callback");
+						PyErr_Print();
+					}
+				}
+				else {
+					PyErr_SetString(PyExc_TypeError, "Non callable object to PyIntCallback");
+					PyErr_Print();
+				}
+
+				if ( should_allow ) PythonThreadsManager::AllowThreads();
+
+				return rv;
+			}
+	};
+
+	class PyBoolCallback : public xgui::BoolCallback
+	{
+		private:
+			PyObject * callback;
+
+		public:
+			PyBoolCallback(PyObject * cb)
+			: xgui::BoolCallback(), callback(cb)
+			{
+				if (!PyCallable_Check(cb)) {
+					PyErr_SetString(PyExc_TypeError, "Non callable object to PyBoolCallback");
+					PyErr_Print();
+				}
+
+				Py_INCREF(cb);
+			}
+
+			virtual ~PyBoolCallback()
+			{
+				Py_DECREF(callback);
+			}
+
+
+			virtual int call(xgui::Widget *w, bool value)
+			{
+				int rv = 0;
+
+				bool should_allow = PythonThreadsManager::DenyThreads();
+
+				if (PyCallable_Check(callback)) {
+					PyObject *pw =  XGUIPyObjectCreate(w, false);
+					PyObject *args = Py_BuildValue("(Oi)", pw, value ? 1 : 0);
+					PyObject *result = PyObject_CallObject(callback, args);
+					Py_XDECREF(args);
+					Py_XDECREF(pw);
+
+					if (result == 0) {
+						PyErr_Print();
+					}
+					else if (result == Py_None) {
+						Py_XDECREF(result);
+					}
+					else if (PyLong_Check(result)) {
+						rv = PyLong_AsLong(result);
+						Py_XDECREF(result);
+					}
+					else {
+						Py_XDECREF(result);
+						PyErr_SetString(PyExc_TypeError, "Expected Integer or None as return value of callback");
+						PyErr_Print();
+					}
+				}
+				else {
+					PyErr_SetString(PyExc_TypeError, "Non callable object to PyBoolCallback");
+					PyErr_Print();
+				}
+
+				if ( should_allow ) PythonThreadsManager::AllowThreads();
+
+				return rv;
+			}
+	};
+
 	class PyTextStatusCallback : public xgui::TextStatusCallback
 	{
 		private:

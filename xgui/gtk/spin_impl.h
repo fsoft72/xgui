@@ -35,6 +35,7 @@ namespace xguimpl
 		std::string getAlignment();
 		void setAlignment(std::string const &align);
 
+		static void OnValueChanged ( GtkSpinButton * w, Spin * e );
 		static int OnSubmit ( GtkWidget * w, Spin * e );
 		static void OnTextInsert ( GtkWidget * editable, gchar * new_text, gint new_text_length, gint * position, Spin * e );
 		static void OnTextDelete ( GtkEditable *editable, gint start_pos, gint end_pos, Spin * e );

@@ -30,6 +30,9 @@ namespace xguimpl
 			return true;
 		}
 		else if (name == "onchange") {
+			// Connect to value-changed for arrow button clicks
+			g_signal_connect ( G_OBJECT ( widget ), "value-changed", G_CALLBACK ( OnValueChanged ), this );
+			// Also connect to text changes for manual input
 			g_signal_connect ( G_OBJECT ( widget ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
 			g_signal_connect ( G_OBJECT ( widget ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
 			return true;
@@ -77,17 +80,33 @@ namespace xguimpl
 		g_object_set(G_OBJECT(widget), "xalign", align, NULL);
 	}
 
+	void Spin::OnValueChanged ( GtkSpinButton * w, Spin * e )
+	{
+		xgui::Callback * base_cb = e->this_widget->getEvent("onchange");
+		if (!base_cb) return;
+
+		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(base_cb);
+		if (!cb) {
+			DMESSAGE("onchange event of xgui::Spin expected a TextCallback");
+			return;
+		}
+
+		int value = gtk_spin_button_get_value_as_int ( GTK_SPIN_BUTTON ( w ) );
+		std::string buf = std::to_string(value);
+		cb->call( e->this_widget, buf);
+	}
+
 	int Spin::OnSubmit ( GtkWidget * w, Spin * e )
 	{
 		xgui::Callback * base_cb = e->this_widget->getEvent("onsubmit");
 		if (!base_cb) return 0;
-		
+
 		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(base_cb);
 		if (!cb) {
 			DMESSAGE("onsubmit event of xgui::Spin expected a TextCallback");
 			return 0;
 		}
-	
+
 		std::string buf = gtk_entry_get_text ( GTK_ENTRY ( e->widget ) );
 		return cb->call( e->this_widget, buf);
 	}

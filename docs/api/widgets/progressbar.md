@@ -33,7 +33,7 @@ Sets the current position of the progress counter.
 
 ## Properties
 
-### `pos` (Read/Write)
+### `value` (Read/Write)
 
 Sets or retrieves the current position of the progress counter.
 
@@ -58,16 +58,5 @@ Sets or retrieves the maximum position of the progress counter.
 **Type:** Integer (as string)
 
 **Default:** `"100"`
-
----
-
-## Events
-
-### `onchange` (xgui::TextCallback)
-
-Fired when the position of the progress counter changes.
-
-**Parameters:**
-- `text` - The current progress counter position
 
 ---

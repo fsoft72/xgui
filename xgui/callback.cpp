@@ -52,6 +52,22 @@ namespace xgui
 		return 0;
 	}
 	TextPairCallback::~TextPairCallback() {}
+
+	IntCallback::IntCallback() : Callback() {}
+	int IntCallback::call(Widget *w, int value)
+	{
+		std::cerr << "XGUI Warning: DEFAULT CALLBACK CALLED ON " << w->className() << ":" << w << " with int parameter: " << value << std::endl;
+		return 0;
+	}
+	IntCallback::~IntCallback() {}
+
+	BoolCallback::BoolCallback() : Callback() {}
+	int BoolCallback::call(Widget *w, bool value)
+	{
+		std::cerr << "XGUI Warning: DEFAULT CALLBACK CALLED ON " << w->className() << ":" << w << " with bool parameter: " << (value ? "true" : "false") << std::endl;
+		return 0;
+	}
+	BoolCallback::~BoolCallback() {}
 	
 	
 	CppFCallback::CppFCallback(int(*fptr)(Widget*)) : Callback(), func(fptr) {}
@@ -81,4 +97,18 @@ namespace xgui
 		return func(w, text1, text2);
 	}
 	CppFTextPairCallback::~CppFTextPairCallback() {}
+
+	CppFIntCallback::CppFIntCallback(int(*fptr)(Widget*, int)) : IntCallback(), func(fptr) {}
+	int CppFIntCallback::call(Widget *w, int value)
+	{
+		return func(w, value);
+	}
+	CppFIntCallback::~CppFIntCallback() {}
+
+	CppFBoolCallback::CppFBoolCallback(int(*fptr)(Widget*, bool)) : BoolCallback(), func(fptr) {}
+	int CppFBoolCallback::call(Widget *w, bool value)
+	{
+		return func(w, value);
+	}
+	CppFBoolCallback::~CppFBoolCallback() {}
 }

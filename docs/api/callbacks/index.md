@@ -8,7 +8,9 @@ XGUI provides several callback types, each designed for different event scenario
 
 - **[Callback](callback.md)** - Basic callback interface for simple events
 - **[TextCallback](textcallback.md)** - Callback with a text parameter
-- **[TextStatusCallback](textstatuscallback.md)** - Callback with text and integer status parameters
+- **[IntCallback](intcallback.md)** - Callback with an integer parameter
+- **[BoolCallback](boolcallback.md)** - Callback with a boolean parameter
+- **[TextStatusCallback](textstatuscallback.md)** - Callback with text and integer status parameters (primarily for mouse events)
 - **[TextPairCallback](textpaircallback.md)** - Callback with two text parameters
 
 ## Callback Types
@@ -28,18 +30,31 @@ The base callback type accepts only a widget reference. It's used for simple eve
 This callback type accepts a widget reference and a text parameter. It's used when events need to provide string data.
 
 **Common Events:**
-- `onchange` - Text has changed (Entry, Spin)
+- `onchange` - Text has changed (Entry, Spin, Combobox, Calendar)
 - `onsubmit` - Enter key pressed (Entry, Spin, Combobox)
 - `onkeypress` - Key pressed and released
 - `onmousemove` - Mouse moved (provides position)
 
-### TextStatusCallback
+### IntCallback
 
-This callback type accepts a widget reference, a text parameter, and an integer status parameter. It's used when events provide both text and state information.
+This callback type accepts a widget reference and an integer parameter. It's used when events need to provide numeric data.
 
 **Common Events:**
-- `onselect` - Item selected (Menu, List, Tree, Combobox)
-- `oncheck` - Item checked/unchecked (List, Tree)
+- `oninput` - Value has changed (Slider)
+- `onchange` - Selection changed (Tab - provides page number)
+
+### BoolCallback
+
+This callback type accepts a widget reference and a boolean parameter. It's used when events need to provide boolean state.
+
+**Common Events:**
+- `onchange` - State has changed (Checkbox - provides checked state)
+
+### TextStatusCallback
+
+This callback type accepts a widget reference, a text parameter, and an integer status parameter. It's primarily used for mouse events.
+
+**Common Events:**
 - `onmousedown` - Mouse button pressed
 - `onmouseup` - Mouse button released
 - `onmouseclick` - Mouse clicked

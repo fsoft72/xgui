@@ -22,11 +22,11 @@ namespace xguimpl
 
 	bool Calendar::linkEvent( std::string const &name )
 	{
-		if ( name == "onselect" ) {
+		if ( name == "onchange" ) {
 			g_signal_connect ( G_OBJECT ( widget ), "day-selected", G_CALLBACK ( OnSelect ), this );
 			return true;
 		}
-	
+
 		return Widget::linkEvent(name);
 	}
 
@@ -127,12 +127,12 @@ namespace xguimpl
 
 	void Calendar::OnSelect ( GtkWidget * w, Calendar * cal )
 	{
-		xgui::Callback * base_cb = cal->this_widget->getEvent("onselect");
+		xgui::Callback * base_cb = cal->this_widget->getEvent("onchange");
 		if (!base_cb) return;
 
-		xgui::TextStatusCallback * cb = dynamic_cast<xgui::TextStatusCallback*>(base_cb);
+		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback*>(base_cb);
 		if (!cb) {
-			DMESSAGE("onselect event of xgui::Calendar expected a TextStatusCallback");
+			DMESSAGE("onchange event of xgui::Calendar expected a TextCallback");
 			return;
 		}
 
@@ -144,6 +144,6 @@ namespace xguimpl
 		char date_str[32];
 		snprintf(date_str, sizeof(date_str), "%04d-%02d-%02d", year, month, day);
 
-		cb->call(cal->this_widget, std::string(date_str), 1);
+		cb->call(cal->this_widget, std::string(date_str));
 	}
 }

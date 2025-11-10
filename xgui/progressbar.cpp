@@ -28,11 +28,11 @@ namespace xgui
 {
 	xgui::ProgressbarClass pbar_class_info;
 
-	ProgressbarClass::ProgressbarClass() : WidgetClass() 
+	ProgressbarClass::ProgressbarClass() : WidgetClass()
 	{
 		registerProperty("min", Progressbar::Progressbar_set, Progressbar::Progressbar_get, true);
 		registerProperty("max", Progressbar::Progressbar_set, Progressbar::Progressbar_get, true);
-		registerProperty("pos", Progressbar::Progressbar_set, Progressbar::Progressbar_get, true);
+		registerProperty("value", Progressbar::Progressbar_set, Progressbar::Progressbar_get, true);
 
 		registerInitProperty("min", false);
 		registerInitProperty("max", false);
@@ -109,8 +109,8 @@ namespace xgui
 	{
 		xgui::Progressbar * self = dynamic_cast<xgui::Progressbar*>(o);
 		xguimpl::Progressbar * impl = dynamic_cast<xguimpl::Progressbar*>(self->getImpl());
-	
-		if ( name == "pos" ) {
+
+		if ( name == "value" ) {
 			self->pos_ = xgui::semantic_cast<int>(val);
 			impl->setState(self->min_, self->max_, self->pos_);
 		}
@@ -127,14 +127,14 @@ namespace xgui
 	void Progressbar::Progressbar_get ( xgui::Object * o, std::string const &name, std::string &dest )
 	{
 		xgui::Progressbar * self = dynamic_cast<xgui::Progressbar*>(o);
-	
+
 		if ( name == "min" ) {
 			dest = xgui::semantic_cast<std::string>(self->min_);
 		}
 		else if ( name == "max" ) {
 			dest = xgui::semantic_cast<std::string>(self->max_);
 		}
-		else if (name == "pos" ) {
+		else if (name == "value" ) {
 			dest = xgui::semantic_cast<std::string>(self->pos_);
 		}
 	}

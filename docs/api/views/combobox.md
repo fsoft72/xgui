@@ -133,21 +133,15 @@ Fired when the Enter key is pressed while the combobox widget has keyboard focus
 
 ### `onchange` (xgui::TextCallback)
 
-Fired when the user has taken an action that may have altered text in the entry part of the combobox.
+Fired when the combobox value changes.
+
+**Behavior:**
+- For **editable comboboxes**: Fires when text is inserted or deleted in the entry part
+- For **non-editable comboboxes**: Fires when the user selects a different item from the list
 
 **Parameters:**
-- `text` - The altered entry text
+- `text` - For editable comboboxes: the altered entry text; for non-editable comboboxes: the text of the selected item
 
-**Note:** Returning `xgui::EVT_BLOCK` from the callback function prevents the text from changing.
-
----
-
-### `onselect` (xgui::TextStatusCallback)
-
-Fired when the user changes the selected item of the list part of the combobox.
-
-**Parameters:**
-- `text` - The text of the newly selected item
-- `status` - The zero-based index of the selected item
+**Note:** For editable comboboxes, returning `xgui::EVT_BLOCK` from the callback function prevents the text from changing.
 
 ---

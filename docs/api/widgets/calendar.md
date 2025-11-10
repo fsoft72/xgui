@@ -56,7 +56,7 @@ Sets or retrieves the full date currently selected in the calendar.
 
 ## Events
 
-### `onselect` (xgui::TextCallback)
+### `onchange` (xgui::TextCallback)
 
 Fired when the user selects a date.
 

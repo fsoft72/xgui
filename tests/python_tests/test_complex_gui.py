@@ -52,18 +52,17 @@ class ComplexGUITest:
 
     # ===== Volume Control Callbacks =====
 
-    def on_volume_change(self, widget, text):
+    def on_volume_change(self, widget, value):
         """Callback when volume slider changes - updates progress bar and label
 
-        Note: Slider onchange uses TextCallback (widget, text)
+        Note: Slider oninput uses IntCallback (widget, value)
         """
         try:
-            value = int(text)  # Use text parameter (slider position as string)
 
             # Update progress bar
             progress = self.get_widget("volumeProgress")
             if progress:
-                progress.set("pos", str(value))
+                progress.set("value", str(value))
 
             # Update label
             label = self.get_widget("volumeLabel")
@@ -78,10 +77,10 @@ class ComplexGUITest:
 
     # ===== Brightness Control Callbacks =====
 
-    def on_brightness_slider_change(self, widget, text):
+    def on_brightness_slider_change(self, widget, value):
         """Callback when brightness slider changes - updates spin and label
 
-        Note: Slider onchange uses TextCallback (widget, text)
+        Note: Slider oninput uses IntCallback (widget, value)
         """
         # Prevent circular updates
         if self._updating:
@@ -89,7 +88,6 @@ class ComplexGUITest:
 
         try:
             self._updating = True
-            value = int(text)  # Use text parameter
 
             # Update spin widget (use "value" for Spin, not "pos")
             spin = self.get_widget("brightnessSpin")
@@ -137,7 +135,7 @@ class ComplexGUITest:
                     self.download_progress = 100
 
                 if progress:
-                    progress.set("pos", str(self.download_progress))
+                    progress.set("value", str(self.download_progress))
 
                 if label:
                     label.set("text", f"Progress: {self.download_progress}%")
@@ -169,7 +167,7 @@ class ComplexGUITest:
             status = self.get_widget("statusLabel")
 
             if progress:
-                progress.set("pos", "0")
+                progress.set("value", "0")
 
             if label:
                 label.set("text", "Progress: 0%")
@@ -219,7 +217,7 @@ class ComplexGUITest:
             progress = self.get_widget("charProgress")
             if progress:
                 progress_value = min(char_count, 100)
-                progress.set("pos", str(progress_value))
+                progress.set("value", str(progress_value))
 
             print(f"Character count: {char_count}")
         except Exception as e:
@@ -231,10 +229,12 @@ class ComplexGUITest:
 
     # ===== Enable/Disable Callbacks =====
 
-    def on_enable_checkbox_change(self, widget):
-        """Callback when enable checkbox changes - enables/disables widgets"""
+    def on_enable_checkbox_change(self, widget, checked):
+        """Callback when enable checkbox changes - enables/disables widgets
+
+        Note: Checkbox onchange uses BoolCallback (widget, checked)
+        """
         try:
-            checked = widget.get("checked") == "1"
 
             # Enable or disable advanced entry
             entry = self.get_widget("advancedEntry")
@@ -372,11 +372,11 @@ class ComplexGUITest:
         self.store_widget("volumeLabel", volume_label)
 
         volume_slider = xgui.Master.CreateSlider(volume_vbox, 0, 100, False)
-        volume_slider.set("pos", "50")
+        volume_slider.set("value", "50")
         self.store_widget("volumeSlider", volume_slider)
 
         volume_progress = xgui.Master.CreateProgressbar(volume_vbox, 0, 100)
-        volume_progress.set("pos", "50")
+        volume_progress.set("value", "50")
         self.store_widget("volumeProgress", volume_progress)
 
         # Brightness Control Frame
@@ -389,7 +389,7 @@ class ComplexGUITest:
         self.store_widget("brightnessLabel", brightness_label)
 
         brightness_slider = xgui.Master.CreateSlider(brightness_vbox, 0, 255, False)
-        brightness_slider.set("pos", "75")
+        brightness_slider.set("value", "75")
         self.store_widget("brightnessSlider", brightness_slider)
 
         brightness_spin = xgui.Master.CreateSpin(brightness_vbox, 0, 255)
@@ -404,7 +404,7 @@ class ComplexGUITest:
         self.store_widget("downloadLabel", download_label)
 
         download_progress = xgui.Master.CreateProgressbar(download_vbox, 0, 100)
-        download_progress.set("pos", "0")
+        download_progress.set("value", "0")
         self.store_widget("downloadProgress", download_progress)
 
         download_hbox = xgui.Master.CreateHBox(download_vbox, 10)
@@ -443,7 +443,7 @@ class ComplexGUITest:
         self.store_widget("charCountLabel", char_count_label)
 
         char_progress = xgui.Master.CreateProgressbar(counter_vbox, 0, 100)
-        char_progress.set("pos", "0")
+        char_progress.set("value", "0")
         self.store_widget("charProgress", char_progress)
 
         # Enable/Disable Frame
@@ -473,7 +473,7 @@ class ComplexGUITest:
         xgui.Master.CreateLabel(theme_vbox, "Select a theme:")
         theme_combo = xgui.Master.CreateCombobox(theme_vbox, False)
         theme_combo.set("text", "Light|Dark|Blue|Green|Red")
-        theme_combo.set("pos", "0")
+        theme_combo.set("value", "0")
         self.store_widget("themeCombo", theme_combo)
 
         theme_label = xgui.Master.CreateLabel(theme_vbox, "Selected: Light")
@@ -483,20 +483,20 @@ class ComplexGUITest:
         """Bind all event callbacks to widgets"""
         print("\nBinding events to widgets...")
 
-        # Volume control (use PyTextCallback for Slider)
+        # Volume control (use PyIntCallback for Slider)
         volume_slider = self.get_widget("volumeSlider")
         if volume_slider:
-            volume_callback = xgui.PyTextCallback(self.on_volume_change)
+            volume_callback = xgui.PyIntCallback(self.on_volume_change)
             self.callbacks['on_volume_change'] = volume_callback
-            volume_slider.linkEvent("onchange", volume_callback)
+            volume_slider.linkEvent("oninput", volume_callback)
             print("  ✓ Bound volume slider")
 
-        # Brightness controls (use PyTextCallback for Slider and Spin)
+        # Brightness controls (use PyIntCallback for Slider and Spin)
         brightness_slider = self.get_widget("brightnessSlider")
         if brightness_slider:
-            brightness_slider_callback = xgui.PyTextCallback(self.on_brightness_slider_change)
+            brightness_slider_callback = xgui.PyIntCallback(self.on_brightness_slider_change)
             self.callbacks['on_brightness_slider_change'] = brightness_slider_callback
-            brightness_slider.linkEvent("onchange", brightness_slider_callback)
+            brightness_slider.linkEvent("oninput", brightness_slider_callback)
             print("  ✓ Bound brightness slider")
 
         # NOTE: Spin widget onchange has a bug in xgui/gtk/spin_impl.cpp line 105
@@ -532,10 +532,12 @@ class ComplexGUITest:
             counter_entry.linkEvent("onchange", counter_callback)
             print("  ✓ Bound counter entry")
 
-        # Enable checkbox and apply button
+        # Enable checkbox (use PyBoolCallback for Checkbox)
         enable_checkbox = self.get_widget("enableCheckbox")
         if enable_checkbox:
-            enable_checkbox.linkEvent("onchange", self.create_callback(self.on_enable_checkbox_change))
+            checkbox_callback = xgui.PyBoolCallback(self.on_enable_checkbox_change)
+            self.callbacks['on_enable_checkbox_change'] = checkbox_callback
+            enable_checkbox.linkEvent("onchange", checkbox_callback)
             print("  ✓ Bound enable checkbox")
 
         apply_button = self.get_widget("applyButton")

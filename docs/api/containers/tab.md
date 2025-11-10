@@ -85,13 +85,12 @@ Sets or retrieves the zero-based index of the currently selected page of the tab
 
 ## Events
 
-### `onselect` (xgui::TextStatusCallback)
+### `onchange` (xgui::IntCallback)
 
 Fired when the currently selected tab page changes.
 
 **Parameters:**
-- `text` - ID of the new selected page
-- `status` - Index of the new selected page
+- `page_num` - Zero-based index of the new selected page
 
 ---
 

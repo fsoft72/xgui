@@ -82,19 +82,19 @@ private:
 	Callback * cb_window_close;
 	Callback * cb_action_btn;
 	Callback * cb_toggle_btn;
-	TextCallback * cb_checkbox;
+	BoolCallback * cb_checkbox;
 	TextCallback * cb_name_entry;
 	TextCallback * cb_password_entry;
-	TextCallback * cb_slider_change;
+	IntCallback * cb_slider_change;
 	TextCallback * cb_spin_change;
-	TextStatusCallback * cb_combo_select;
+	TextCallback * cb_combo_select;
 	TextStatusCallback * cb_list_select;
 	TextStatusCallback * cb_tree_select;
-	TextStatusCallback * cb_calendar_select;
+	TextCallback * cb_calendar_select;
 	TextStatusCallback * cb_menu_select;
-	TextStatusCallback * cb_tab_select;
+	IntCallback * cb_tab_select;
 	TextStatusCallback * cb_toolbar_click;
-	TextCallback * cb_opacity_change;
+	IntCallback * cb_opacity_change;
 
 public:
 	ComplexWidgetDemo() : Window(0), click_count(0)
@@ -107,19 +107,19 @@ public:
 		cb_window_close = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onWindowClose);
 		cb_action_btn = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onActionButton);
 		cb_toggle_btn = new CppMCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onToggleButton);
-		cb_checkbox = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCheckbox);
+		cb_checkbox = new CppMBoolCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCheckbox);
 		cb_name_entry = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onNameEntry);
 		cb_password_entry = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onPasswordEntry);
-		cb_slider_change = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSliderChange);
+		cb_slider_change = new CppMIntCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSliderChange);
 		cb_spin_change = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onSpinChange);
-		cb_combo_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onComboSelect);
+		cb_combo_select = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onComboSelect);
 		cb_list_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onListSelect);
 		cb_tree_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onTreeSelect);
-		cb_calendar_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCalendarSelect);
+		cb_calendar_select = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onCalendarSelect);
 		cb_menu_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onMenuSelect);
-		cb_tab_select = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onTabSelect);
+		cb_tab_select = new CppMIntCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onTabSelect);
 		cb_toolbar_click = new CppMTextStatusCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onToolbarClick);
-		cb_opacity_change = new CppMTextCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onOpacityChange);
+		cb_opacity_change = new CppMIntCallback<ComplexWidgetDemo>(this, &ComplexWidgetDemo::onOpacityChange);
 
 		// Create UI
 		createMenu();
@@ -138,7 +138,7 @@ public:
 		main_tab->setPageLabel(input_tab, "Input Widgets");
 		main_tab->setPageLabel(data_tab, "Data Views");
 		main_tab->setPageLabel(advanced_tab, "Advanced");
-		main_tab->linkEvent("onselect", cb_tab_select);
+		main_tab->linkEvent("onchange", cb_tab_select);
 
 		// Window setup
 		linkEvent("onclose", cb_window_close);
@@ -188,7 +188,7 @@ public:
 		menu_bar->addItem("", "help_menu", "&Help");
 		menu_bar->addItem("help_menu", "about_item", "&About");
 
-		menu_bar->linkEvent("onselect", cb_menu_select);
+		menu_bar->linkEvent("onclick", cb_menu_select);
 	}
 
 	void createBasicTab()
@@ -220,7 +220,7 @@ public:
 		enable_checkbox = Master::CreateCheckbox(checkbox_box, "Enable Advanced Features");
 		enable_checkbox->set("value", "enabled");  // Value string to pass when checked
 		enable_checkbox->set("checked", "0");      // Start unchecked
-		enable_checkbox->linkEvent("onclick", cb_checkbox);
+		enable_checkbox->linkEvent("onchange", cb_checkbox);
 
 		// Settings Frame (controlled by checkbox)
 		settings_frame = Master::CreateFrame(basic_tab, "Advanced Settings");
@@ -230,7 +230,7 @@ public:
 		opacity_label = Master::CreateLabel(settings_vbox, "Opacity: 100%");
 		opacity_slider = Master::CreateSlider(settings_vbox, 0, 100);
 		opacity_slider->set("value", "100");
-		opacity_slider->linkEvent("onchange", cb_opacity_change);
+		opacity_slider->linkEvent("oninput", cb_opacity_change);
 
 		// Start with settings disabled (checkbox unchecked)
 		settings_frame->set("enabled", "0");
@@ -264,7 +264,7 @@ public:
 		pass_label->set("size", "100 -1");
 		password_entry = Master::CreateEntry(pass_box, "");
 		password_entry->set("expand", "1.0");
-		password_entry->set("password", "1");
+		password_entry->set("password-mode", "1");
 		password_entry->linkEvent("onchange", cb_password_entry);
 
 		// Slider and Progress Bar (linked)
@@ -274,7 +274,7 @@ public:
 		slider_value_label = Master::CreateLabel(slider_box, "Slider Value: 50");
 		slider_widget = Master::CreateSlider(slider_box, 0, 100);
 		slider_widget->set("value", "50");
-		slider_widget->linkEvent("onchange", cb_slider_change);
+		slider_widget->linkEvent("oninput", cb_slider_change);
 
 		progress_bar = Master::CreateProgressbar(slider_box, 0, 100);
 		progress_bar->set("value", "50");
@@ -308,7 +308,7 @@ public:
 		combo_model->appendChild("Option 5");
 		combo_widget->setModel(combo_model);
 
-		combo_widget->linkEvent("onselect", cb_combo_select);
+		combo_widget->linkEvent("onchange", cb_combo_select);
 
 		// Space filler
 		Master::CreateSpace(input_tab, 0, 0)->set("expand", "1.0");
@@ -353,7 +353,7 @@ public:
 		list_model->appendChild(row3);
 
 		data_list->setModel(list_model);
-		data_list->linkEvent("onselect", cb_list_select);
+		data_list->linkEvent("onchange", cb_list_select);
 
 		// Tree widget
 		VBox * tree_vbox = Master::CreateVBox(data_hbox, 5, false);
@@ -382,13 +382,13 @@ public:
 		tree_model->appendChild(root2);
 
 		tree_widget->setModel(tree_model);
-		tree_widget->linkEvent("onselect", cb_tree_select);
+		tree_widget->linkEvent("onchange", cb_tree_select);
 
 		// Calendar widget
 		VBox * calendar_vbox = Master::CreateVBox(data_tab, 5, false);
 		calendar_label = Master::CreateLabel(calendar_vbox, "Selected Date: (none)");
 		calendar_widget = Master::CreateCalendar(calendar_vbox);
-		calendar_widget->linkEvent("onselect", cb_calendar_select);
+		calendar_widget->linkEvent("onchange", cb_calendar_select);
 	}
 
 	void createAdvancedTab()
@@ -459,24 +459,12 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onCheckbox(Widget * w, std::string const &value)
+	int onCheckbox(Widget * w, bool checked)
 	{
-		// Debug: Check actual checkbox state
-		std::string checked_prop, value_prop;
-		enable_checkbox->get("checked", checked_prop);
-		enable_checkbox->get("value", value_prop);
+		std::cout << "[EVENT] Checkbox onchange callback:" << std::endl;
+		std::cout << "  - Checked state: " << (checked ? "true" : "false") << std::endl;
 
-		std::cout << "[EVENT] Checkbox onclick callback:" << std::endl;
-		std::cout << "  - Received value parameter: '" << value << "'" << std::endl;
-		std::cout << "  - 'checked' property: '" << checked_prop << "'" << std::endl;
-		std::cout << "  - 'value' property: '" << value_prop << "'" << std::endl;
-
-		// Checkbox passes its value string if checked, empty string if unchecked
-		bool is_checked = !value.empty();
-
-		std::cout << "  - Determined state: " << (is_checked ? "CHECKED" : "UNCHECKED") << std::endl;
-
-		if (is_checked) {
+		if (checked) {
 			info_label->set("text", "Advanced features ENABLED");
 			settings_frame->set("enabled", "1");
 		} else {
@@ -507,16 +495,16 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onSliderChange(Widget * w, std::string const &value)
+	int onSliderChange(Widget * w, int value)
 	{
 		std::cout << "[EVENT] Slider changed: " << value << std::endl;
 
 		// Update label
-		std::string label_text = "Slider Value: " + value;
+		std::string label_text = "Slider Value: " + std::to_string(value);
 		slider_value_label->set("text", label_text);
 
 		// Update linked progress bar
-		progress_bar->set("value", value);
+		progress_bar->set("value", std::to_string(value));
 
 		return EVT_PROPAGATE;
 	}
@@ -532,11 +520,8 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onComboSelect(Widget * w, std::string const &id, int state)
+	int onComboSelect(Widget * w, std::string const &text)
 	{
-		std::string text;
-		combo_widget->get("text", text);
-
 		std::cout << "[EVENT] Combobox selection: '" << text << "'" << std::endl;
 
 		std::string label_text = "Selected: " + text;
@@ -586,7 +571,7 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onCalendarSelect(Widget * w, std::string const &date, int state)
+	int onCalendarSelect(Widget * w, std::string const &date)
 	{
 		std::cout << "[EVENT] Calendar date selected: " << date << std::endl;
 
@@ -613,11 +598,11 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onTabSelect(Widget * w, std::string const &id, int state)
+	int onTabSelect(Widget * w, int page_num)
 	{
-		std::cout << "[EVENT] Tab changed to page: " << id << std::endl;
+		std::cout << "[EVENT] Tab changed to page: " << page_num << std::endl;
 
-		std::string msg = "Switched to tab: " + id;
+		std::string msg = "Switched to tab: " + std::to_string(page_num);
 		if (info_label) {
 			info_label->set("text", msg);
 		}
@@ -643,11 +628,11 @@ public:
 		return EVT_PROPAGATE;
 	}
 
-	int onOpacityChange(Widget * w, std::string const &value)
+	int onOpacityChange(Widget * w, int value)
 	{
 		std::cout << "[EVENT] Opacity changed: " << value << "%" << std::endl;
 
-		std::string label_text = "Opacity: " + value + "%";
+		std::string label_text = "Opacity: " + std::to_string(value) + "%";
 		opacity_label->set("text", label_text);
 
 		return EVT_PROPAGATE;
