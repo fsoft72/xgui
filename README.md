@@ -4,11 +4,20 @@ A lightweight, cross-platform GUI library for C++ with Python bindings support.
 
 ## Overview
 
+XGUI is an open-source GUI toolkit designed for building desktop applications with ease. It provides a simple and consistent API for creating user interfaces that work seamlessly across Linux, macOS, Windows and GNUstep environments.
+The main design goals is to use the _native wigets_ available on each platform, to provide a true native look and feel, while keeping the API as consistent as possible across different backends.
+So, on Linux it uses GTK+, on macOS the native Cocoa framework, on GNUstep the GNUstep GUI libraries and on Windows the Win32 API directly.
+It is one of its kind, being a C++ library that supports multiple native backends with a single API.
+
+There is also an optional Python binding, generated with SWIG, that allows rapid prototyping and scripting of GUI applications using the same XGUI API.
+
+Original started as a support GUI library for internal project by [OS3 srl](https://www.os3.it), and mainly written by [Alessandro Molina](https://github.com/amol-), Gabriele Buscone and [Fabio Rotondo](https://www.github.com/fsoft72) as project manager, it has been almost forgotten since 2005.
+
 XGUI is a modern GUI toolkit that enables developers to build desktop applications with native look and feel across multiple platforms. With its event-driven architecture and comprehensive widget library, XGUI provides everything you need to create sophisticated user interfaces.
 
 ## Key Features
 
-- **Cross-Platform** - Native support for Linux (GTK+), macOS, and GNUstep
+- **Cross-Platform** - Native support for Linux (GTK+), macOS, Windows and GNUstep
 - **Rich Widget Library** - Comprehensive set of UI components including buttons, labels, entries, trees, lists, and more
 - **Event-Driven Architecture** - Flexible callback system for handling user interactions
 - **Dynamic Properties** - Runtime property configuration for all widgets using a simple `set()`/`get()` API
@@ -51,11 +60,13 @@ int main() {
 ### Prerequisites
 
 #### Linux/GTK+
+
 - `libgtk+-2.0-dev`
 - `swig` (optional, for Python bindings)
 - `python-dev` (optional, for Python bindings)
 
 #### macOS
+
 - Xcode Command Line Tools
 - `swig` (optional, via Homebrew)
 - `python3` (optional, via Homebrew)
@@ -63,12 +74,14 @@ int main() {
 ### Compilation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/fsoft72/xgui.git
 cd xgui
 ```
 
 2. Choose and link the appropriate Makefile for your platform:
+
 ```bash
 # For GTK+ (Linux)
 ln -s Makefile.gtk Makefile
@@ -81,16 +94,19 @@ ln -s Makefile.gnustep Makefile
 ```
 
 3. Build the library:
+
 ```bash
 make
 ```
 
 4. (Optional) Build Python bindings:
+
 ```bash
 make python
 ```
 
 For detailed compilation instructions, see:
+
 - [COMPILING.md](COMPILING.md) - General compilation guide
 - [COMPILING_MACOS.md](COMPILING_MACOS.md) - macOS-specific instructions
 
@@ -127,11 +143,11 @@ Object
 
 ## Platform Support
 
-| Platform | Backend | Status |
-|----------|---------|--------|
-| Linux | GTK+ 2.0 | Supported |
-| macOS | Native (Cocoa) | Supported |
-| GNUstep | GNUstep | Supported |
+| Platform | Backend        | Status    |
+| -------- | -------------- | --------- |
+| Linux    | GTK+ 2.0       | Supported |
+| macOS    | Native (Cocoa) | Supported |
+| GNUstep  | GNUstep        | Supported |
 
 ## Examples
 
