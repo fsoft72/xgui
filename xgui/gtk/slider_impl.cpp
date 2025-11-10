@@ -45,7 +45,7 @@ namespace xguimpl
 
 	bool Slider::get_slider_prop ( std::string const &name, std::string &vals )
 	{
-		if ( name == "pos" ) {
+		if ( name == "value" ) {
 			vals = xgui::semantic_cast<std::string> (getPos());
 			return true;
 		}
@@ -63,7 +63,7 @@ namespace xguimpl
 
 	bool Slider::set_slider_prop ( std::string const &name, const std::string &vals )
 	{
-		if ( name == "pos" ) {
+		if ( name == "value" ) {
 			setPos ( xgui::semantic_cast<int> ( vals ) );
 			return true;
 		}

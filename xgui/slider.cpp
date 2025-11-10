@@ -44,11 +44,11 @@ namespace xgui
 {
 	xgui::SliderClass slider_class_info;
 
-	SliderClass::SliderClass() : WidgetClass() 
+	SliderClass::SliderClass() : WidgetClass()
 	{
 		registerProperty("min", Slider_set, Slider_get, true);
 		registerProperty("max", Slider_set, Slider_get, true);
-		registerProperty("pos", Slider_set, Slider_get, true);
+		registerProperty("value", Slider_set, Slider_get, true);
 
 		registerInitProperty("min", false);
 		registerInitProperty("max", false);

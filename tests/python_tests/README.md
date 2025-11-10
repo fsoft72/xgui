@@ -219,8 +219,8 @@ checked = checkbox.get("checked")
 widget.set("property_name", "value")
 # Examples:
 label.set("text", "New Text")
-slider.set("pos", "50")
-progress.set("pos", str(value))
+slider.set("value", "50")
+progress.set("value", str(value))
 ```
 
 #### Creating and Binding Callbacks

@@ -33,7 +33,7 @@ Sets the current position of the slider.
 
 ## Properties
 
-### `pos` (Read/Write)
+### `value` (Read/Write)
 
 Sets or retrieves the current position of the slider.
 
@@ -63,11 +63,11 @@ Sets or retrieves the maximum position of the slider.
 
 ## Events
 
-### `onchange` (xgui::TextCallback)
+### `oninput` (xgui::IntCallback)
 
 Fired when the position of the slider changes.
 
 **Parameters:**
-- `text` - The current slider position
+- `value` - The current slider position (integer)
 
 ---

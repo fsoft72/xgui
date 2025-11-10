@@ -63,7 +63,7 @@ class ComplexGUITest:
             # Update progress bar
             progress = self.get_widget("volumeProgress")
             if progress:
-                progress.set("pos", str(value))
+                progress.set("value", str(value))
 
             # Update label
             label = self.get_widget("volumeLabel")
@@ -137,7 +137,7 @@ class ComplexGUITest:
                     self.download_progress = 100
 
                 if progress:
-                    progress.set("pos", str(self.download_progress))
+                    progress.set("value", str(self.download_progress))
 
                 if label:
                     label.set("text", f"Progress: {self.download_progress}%")
@@ -169,7 +169,7 @@ class ComplexGUITest:
             status = self.get_widget("statusLabel")
 
             if progress:
-                progress.set("pos", "0")
+                progress.set("value", "0")
 
             if label:
                 label.set("text", "Progress: 0%")
@@ -219,7 +219,7 @@ class ComplexGUITest:
             progress = self.get_widget("charProgress")
             if progress:
                 progress_value = min(char_count, 100)
-                progress.set("pos", str(progress_value))
+                progress.set("value", str(progress_value))
 
             print(f"Character count: {char_count}")
         except Exception as e:
@@ -372,11 +372,11 @@ class ComplexGUITest:
         self.store_widget("volumeLabel", volume_label)
 
         volume_slider = xgui.Master.CreateSlider(volume_vbox, 0, 100, False)
-        volume_slider.set("pos", "50")
+        volume_slider.set("value", "50")
         self.store_widget("volumeSlider", volume_slider)
 
         volume_progress = xgui.Master.CreateProgressbar(volume_vbox, 0, 100)
-        volume_progress.set("pos", "50")
+        volume_progress.set("value", "50")
         self.store_widget("volumeProgress", volume_progress)
 
         # Brightness Control Frame
@@ -389,7 +389,7 @@ class ComplexGUITest:
         self.store_widget("brightnessLabel", brightness_label)
 
         brightness_slider = xgui.Master.CreateSlider(brightness_vbox, 0, 255, False)
-        brightness_slider.set("pos", "75")
+        brightness_slider.set("value", "75")
         self.store_widget("brightnessSlider", brightness_slider)
 
         brightness_spin = xgui.Master.CreateSpin(brightness_vbox, 0, 255)
@@ -404,7 +404,7 @@ class ComplexGUITest:
         self.store_widget("downloadLabel", download_label)
 
         download_progress = xgui.Master.CreateProgressbar(download_vbox, 0, 100)
-        download_progress.set("pos", "0")
+        download_progress.set("value", "0")
         self.store_widget("downloadProgress", download_progress)
 
         download_hbox = xgui.Master.CreateHBox(download_vbox, 10)
@@ -443,7 +443,7 @@ class ComplexGUITest:
         self.store_widget("charCountLabel", char_count_label)
 
         char_progress = xgui.Master.CreateProgressbar(counter_vbox, 0, 100)
-        char_progress.set("pos", "0")
+        char_progress.set("value", "0")
         self.store_widget("charProgress", char_progress)
 
         # Enable/Disable Frame
@@ -473,7 +473,7 @@ class ComplexGUITest:
         xgui.Master.CreateLabel(theme_vbox, "Select a theme:")
         theme_combo = xgui.Master.CreateCombobox(theme_vbox, False)
         theme_combo.set("text", "Light|Dark|Blue|Green|Red")
-        theme_combo.set("pos", "0")
+        theme_combo.set("value", "0")
         self.store_widget("themeCombo", theme_combo)
 
         theme_label = xgui.Master.CreateLabel(theme_vbox, "Selected: Light")

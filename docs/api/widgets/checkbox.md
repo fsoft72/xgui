@@ -16,7 +16,7 @@ Object
 
 #### `void setValue(std::string const &value)`
 
-Assigns a value to the checkbox. This value will be passed as a parameter to the `onclick` event callback when the checkbox is checked.
+Assigns a value to the checkbox for identification purposes.
 
 **Parameters:**
 - `value` - The value to assign to the checkbox
@@ -57,7 +57,7 @@ Sets or retrieves the alignment of the checkbox text relative to the checkbox it
 
 ### `value` (Read/Write)
 
-Sets or retrieves the value assigned to the checkbox. This value will be passed as a parameter to the `onclick` event callback when the checkbox is checked.
+Sets or retrieves the value assigned to the checkbox for identification purposes.
 
 **Type:** String
 
@@ -79,11 +79,11 @@ Controls the checked state of the checkbox.
 
 ## Events
 
-### `onclick` (xgui::TextCallback)
+### `onchange` (xgui::BoolCallback)
 
-Fired when the checkbox is clicked.
+Fired when the checkbox state changes.
 
 **Parameters:**
-- `text` - Equal to the value assigned to the checkbox (see `value` property or `setValue()` method) if the click changes the state to checked; otherwise the string parameter is empty
+- `checked` - Boolean indicating if the checkbox is now checked (true) or unchecked (false)
 
 ---

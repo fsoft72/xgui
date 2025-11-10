@@ -229,7 +229,7 @@ public:
 		// Opacity control
 		opacity_label = Master::CreateLabel(settings_vbox, "Opacity: 100%");
 		opacity_slider = Master::CreateSlider(settings_vbox, 0, 100);
-		opacity_slider->set("pos", "100");
+		opacity_slider->set("value", "100");
 		opacity_slider->linkEvent("oninput", cb_opacity_change);
 
 		// Start with settings disabled (checkbox unchecked)
@@ -273,11 +273,11 @@ public:
 
 		slider_value_label = Master::CreateLabel(slider_box, "Slider Value: 50");
 		slider_widget = Master::CreateSlider(slider_box, 0, 100);
-		slider_widget->set("pos", "50");
+		slider_widget->set("value", "50");
 		slider_widget->linkEvent("oninput", cb_slider_change);
 
 		progress_bar = Master::CreateProgressbar(slider_box, 0, 100);
-		progress_bar->set("pos", "50");
+		progress_bar->set("value", "50");
 
 		// Spinner
 		Frame * spin_frame = Master::CreateFrame(input_tab, "Spinner Control");
@@ -504,7 +504,7 @@ public:
 		slider_value_label->set("text", label_text);
 
 		// Update linked progress bar
-		progress_bar->set("pos", std::to_string(value));
+		progress_bar->set("value", std::to_string(value));
 
 		return EVT_PROPAGATE;
 	}
