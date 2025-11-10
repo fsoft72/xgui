@@ -116,7 +116,7 @@ namespace xguimpl
 
 	bool List::linkEvent( std::string const &name )
 	{
-		if ( (name == "onselect") )
+		if ( (name == "onchange") )
 			return true;
 		else if ( name == "onheaderclick" )
 			return true;
@@ -124,7 +124,7 @@ namespace xguimpl
 			return true;
 		else if ( name == "oncheck" )
 			return true;
-	
+
 		return Widget::linkEvent(name);
 	}
 

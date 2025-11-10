@@ -66,6 +66,32 @@ namespace xgui
 	};
 
 
+	class IntCallback : public virtual Callback
+	{
+		protected:
+			DLLEXPORT IntCallback();
+
+		public:
+			using Callback::call;
+			DLLEXPORT virtual int call(Widget *, int value);
+			DLLEXPORT virtual ~IntCallback();
+
+	};
+
+
+	class BoolCallback : public virtual Callback
+	{
+		protected:
+			DLLEXPORT BoolCallback();
+
+		public:
+			using Callback::call;
+			DLLEXPORT virtual int call(Widget *, bool value);
+			DLLEXPORT virtual ~BoolCallback();
+
+	};
+
+
 	//Cpp Callbacks Implementation
 	class CppFCallback : public Callback
 	{
@@ -112,6 +138,28 @@ namespace xgui
 			DLLEXPORT virtual int call(Widget *, std::string const &text1, std::string const &text2);
 	};
 
+	class CppFIntCallback : public IntCallback
+	{
+		private:
+			int (*func)(Widget*, int value);
+
+		public:
+			DLLEXPORT CppFIntCallback(int(*fptr)(Widget*, int));
+			DLLEXPORT virtual ~CppFIntCallback();
+			DLLEXPORT virtual int call(Widget *, int value);
+	};
+
+	class CppFBoolCallback : public BoolCallback
+	{
+		private:
+			int (*func)(Widget*, bool value);
+
+		public:
+			DLLEXPORT CppFBoolCallback(int(*fptr)(Widget*, bool));
+			DLLEXPORT virtual ~CppFBoolCallback();
+			DLLEXPORT virtual int call(Widget *, bool value);
+	};
+
 	template <typename ObjectType>
 	class CppMCallback : public Callback
 	{
@@ -133,10 +181,38 @@ namespace xgui
 			int (ObjectType::*func)(Widget*, std::string const &text, int state);
 
 		public:
-			CppMTextStatusCallback(ObjectType * const o, int(ObjectType::*fptr)(Widget*, std::string const &, int)) 
+			CppMTextStatusCallback(ObjectType * const o, int(ObjectType::*fptr)(Widget*, std::string const &, int))
 			: TextStatusCallback(), obj(o), func(fptr) {}
 			virtual ~CppMTextStatusCallback() {}
 			virtual int call(Widget * w, std::string const &text, int state) { return (obj->*func)(w, text, state); }
+	};
+
+	template <typename ObjectType>
+	class CppMIntCallback : public IntCallback
+	{
+		private:
+			ObjectType * obj;
+			int (ObjectType::*method)(Widget*, int value);
+
+		public:
+			CppMIntCallback(ObjectType * const o, int(ObjectType::*mptr)(Widget*, int))
+			: IntCallback(), obj(o), method(mptr) {}
+			virtual ~CppMIntCallback() {}
+			virtual int call(Widget * w, int value) { return (obj->*method)(w, value); }
+	};
+
+	template <typename ObjectType>
+	class CppMBoolCallback : public BoolCallback
+	{
+		private:
+			ObjectType * obj;
+			int (ObjectType::*method)(Widget*, bool value);
+
+		public:
+			CppMBoolCallback(ObjectType * const o, int(ObjectType::*mptr)(Widget*, bool))
+			: BoolCallback(), obj(o), method(mptr) {}
+			virtual ~CppMBoolCallback() {}
+			virtual int call(Widget * w, bool value) { return (obj->*method)(w, value); }
 	};
 
 

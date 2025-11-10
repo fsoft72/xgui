@@ -35,11 +35,11 @@ namespace xguimpl
 
 	bool Slider::linkEvent( std::string const &name )
 	{
-		if ( name == "onchange" ) {
+		if ( name == "oninput" ) {
 			g_signal_connect ( G_OBJECT ( widget ), "value-changed", G_CALLBACK ( OnChange ), this );
 			return true;
 		}
-	
+
 		return Widget::linkEvent(name);
 	}
 
@@ -83,16 +83,16 @@ namespace xguimpl
 
 	void Slider::OnChange ( GtkWidget * w, Slider * pbar )
 	{
-		xgui::Callback * base_cb = pbar->this_widget->getEvent("onchange");
+		xgui::Callback * base_cb = pbar->this_widget->getEvent("oninput");
 		if (!base_cb) return;
-		
-		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(base_cb);
+
+		xgui::IntCallback * cb = dynamic_cast<xgui::IntCallback *>(base_cb);
 		if (!cb) {
-			DMESSAGE("onchange event of xgui::Slider expected a TextCallback");
+			DMESSAGE("oninput event of xgui::Slider expected an IntCallback");
 			return;
 		}
-	
-		cb->call( pbar->this_widget, xgui::semantic_cast<std::string> (pbar->getPos()) );
+
+		cb->call( pbar->this_widget, pbar->getPos() );
 	}
 
 	void Slider::setPos (int pos)

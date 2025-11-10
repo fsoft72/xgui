@@ -65,7 +65,7 @@ namespace xguimpl
 
 	bool Tree::linkEvent( std::string const &name )
 	{
-		if ( (name == "onselect") )
+		if ( (name == "onchange") )
 			return true;
 		else if ( name == "onrefresh" )
 			return true;
@@ -76,7 +76,7 @@ namespace xguimpl
 			g_signal_connect ( G_OBJECT(tree_view), "test-collapse-row", G_CALLBACK( OnCollapse ), this );
 			return true;
 		}
-	
+
 		return Widget::linkEvent(name);
 	}
 
