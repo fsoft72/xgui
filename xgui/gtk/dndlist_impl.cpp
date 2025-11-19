@@ -70,7 +70,7 @@ namespace xguimpl
 	DndList::DndList ( xgui::Container * parent ) : List ( parent )
 	{
  		GtkTargetEntry target_entry[1];
-                target_entry[0].target = "text/plain";
+                target_entry[0].target = const_cast<gchar*>("text/plain");
                 target_entry[0].flags = 0;
                 target_entry[0].info =  0;
 

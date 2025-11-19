@@ -93,14 +93,14 @@ namespace xguimpl
 		gtk_tree_selection_set_mode ( gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) ), GTK_SELECTION_MULTIPLE );
 	
 		left_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( left_align_text_renderer ), "xalign", 0.0f, 0 );
+		g_object_set ( G_OBJECT ( left_align_text_renderer ), "xalign", 0.0f, NULL );
 		center_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( center_align_text_renderer ), "xalign", 0.5f, 0 );
+		g_object_set ( G_OBJECT ( center_align_text_renderer ), "xalign", 0.5f, NULL );
 		right_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( right_align_text_renderer ), "xalign", 1.0f, 0 );
+		g_object_set ( G_OBJECT ( right_align_text_renderer ), "xalign", 1.0f, NULL );
 	
 		check_renderer = gtk_cell_renderer_toggle_new();
-		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, 0 );
+		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, NULL );
 		icon_renderer = gtk_cell_renderer_pixbuf_new();
 	
 		g_signal_connect (G_OBJECT (check_renderer), "toggled", G_CALLBACK ( OnCheck ), this);

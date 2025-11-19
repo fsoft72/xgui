@@ -120,7 +120,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib gdiplus.lib msimg32.lib libxml2.lib"
+				AdditionalDependencies="comctl32.lib gdiplus.lib msimg32.lib"
 				OutputFile="$(OutDir)/xgui.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -170,7 +170,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib gdiplus.lib msimg32.lib libxml2.lib"
+				AdditionalDependencies="comctl32.lib gdiplus.lib msimg32.lib"
 				OutputFile="$(OutDir)/_xgui.pyd"
 				AdditionalLibraryDirectories="C:\Python23\libs"
 				GenerateDebugInformation="TRUE"

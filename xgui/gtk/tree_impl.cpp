@@ -40,14 +40,14 @@ namespace xguimpl
 		gtk_tree_selection_set_mode ( gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) ), GTK_SELECTION_SINGLE );
 	
 		left_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( left_align_text_renderer ), "xalign", 0.0f, 0 );
+		g_object_set ( G_OBJECT ( left_align_text_renderer ), "xalign", 0.0f, NULL );
 		center_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( center_align_text_renderer ), "xalign", 0.5f, 0 );
+		g_object_set ( G_OBJECT ( center_align_text_renderer ), "xalign", 0.5f, NULL );
 		right_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( right_align_text_renderer ), "xalign", 1.0f, 0 );
+		g_object_set ( G_OBJECT ( right_align_text_renderer ), "xalign", 1.0f, NULL );
 		
 		check_renderer = gtk_cell_renderer_toggle_new();
-		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, 0 );
+		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, NULL );
 		icon_renderer = gtk_cell_renderer_pixbuf_new();
 	
 		gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( tree_view ) );

@@ -106,7 +106,7 @@ int on_ok_click(Widget *w)
 
 	xgui::Window * dialog = xgui::Master::CreateWindow(w->getContext());
 	xgui::VBox * box = xgui::Master::CreateVBox(dialog, 0, 0);
-	xgui::Calendar * cal = xgui::Master::CreateCalendar(box);
+	(void)xgui::Master::CreateCalendar(box);
 	xgui::Button * btn = xgui::Master::CreateButton(box, "APPLICA");
 
 	btn->linkEvent("onclick", &cb_on_dialog_quit);
@@ -311,14 +311,14 @@ int main()
 				ImageView * imv = Master::CreateImageView(hbi, Master::LoadImage("big.jpg"));
 				Space * sp2 = Master::CreateSpace(hbi);
 			Button * b = Master::CreateButton(vb, "ciao mondo", Master::NullImage());
-			Checkbox * chk = Master::CreateCheckbox(vb, "test checkbox");
+			(void)Master::CreateCheckbox(vb, "test checkbox");
 			Frame * frm = Master::CreateFrame ( vb, "Frame di prova" );
 				HBox * hb3 = Master::CreateHBox(frm, 10);
 					Progressbar * pbar = Master::CreateProgressbar(hb3);
 					Button * btn_pbar = Master::CreateButton(hb3, "Step!");
 					Slider * sld = Master::CreateSlider(hb3);
 					VBox * vb3 = Master::CreateVBox(hb3);
-						Spin * spin = Master::CreateSpin(vb3);
+						(void)Master::CreateSpin(vb3);
 			Combobox * cbox = Master::CreateCombobox(vb);	
 			HBox * hbt = Master::CreateHBox(vb);
 				Tree * ts = Master::CreateTree(hbt, sm);
@@ -330,7 +330,7 @@ int main()
 				VBox * frm2_vb = Master::CreateVBox(frm2, 0, 0);
 				Button * tab_btn = Master::CreateButton ( frm2_vb, "prova" );
 					tab_btn->linkEvent("onclick", &cb_on_rm_click);
-				ImageView * imv2 = Master::CreateImageView(frm2_vb, Master::LoadImage("image.jpg"));
+				(void)Master::CreateImageView(frm2_vb, Master::LoadImage("image.jpg"));
 			Entry * tab_entry = Master::CreateEntry ( tab, "ciao" );
 				tab_entry->set("id", "TabPage2");
 
