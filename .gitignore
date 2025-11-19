@@ -16,3 +16,4 @@ tests/xgui.py
 Makefile
 xgui-example
 output/__pycache__/
+layout_debugger
