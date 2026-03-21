@@ -70,6 +70,12 @@ namespace xguimpl
 		return Widget::linkEvent(name);
 	}
 
+	void Combobox::_reconnectOnChangeSignal()
+	{
+		if (!entry && this_cbox->hasEvent("onchange"))
+			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+	}
+
 	void Combobox::refresh()
 	{
 		xgui::Model * model = this_cbox->getModel();
@@ -104,9 +110,7 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 
-		// Reconnect onchange handler if it was registered for non-editable combobox
-		if (!entry && this_cbox->hasEvent("onchange"))
-			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		_reconnectOnChangeSignal();
 	}
 	
 	void Combobox::insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
@@ -121,9 +125,7 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 
-		// Reconnect onchange handler if it was registered for non-editable combobox
-		if (!entry && this_cbox->hasEvent("onchange"))
-			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		_reconnectOnChangeSignal();
 	}
 
 	void Combobox::removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
@@ -138,9 +140,7 @@ namespace xguimpl
 		xgui::Callback * refresh_cb = this_cbox->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_cbox );
 
-		// Reconnect onchange handler if it was registered for non-editable combobox
-		if (!entry && this_cbox->hasEvent("onchange"))
-			g_signal_connect ( G_OBJECT ( real_widget ), "changed", G_CALLBACK ( OnSelect ), this );
+		_reconnectOnChangeSignal();
 	}
 
 	void Combobox::appendText(std::string const &text)

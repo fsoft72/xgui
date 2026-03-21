@@ -62,6 +62,8 @@ namespace xguimpl
 		void select(xgui::Model * parent, int pos, bool state);
 		void selectAll(xgui::Model * parent, bool state);
 
+		void _reconnectOnChangeSignal();
+
 		static int OnSelect ( GtkComboBox * w, Combobox *cbox );
 		static int OnSubmit ( GtkWidget * w, Combobox * e );
 		static void OnTextInsert ( GtkWidget * editable, gchar * new_text, gint new_text_length, gint * position, Combobox * e );

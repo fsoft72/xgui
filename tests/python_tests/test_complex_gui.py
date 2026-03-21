@@ -53,10 +53,7 @@ class ComplexGUITest:
     # ===== Volume Control Callbacks =====
 
     def on_volume_change(self, widget, value):
-        """Callback when volume slider changes - updates progress bar and label
-
-        Note: Slider oninput uses IntCallback (widget, value)
-        """
+        """Callback when volume slider changes - updates progress bar and label"""
         try:
 
             # Update progress bar
@@ -78,10 +75,7 @@ class ComplexGUITest:
     # ===== Brightness Control Callbacks =====
 
     def on_brightness_slider_change(self, widget, value):
-        """Callback when brightness slider changes - updates spin and label
-
-        Note: Slider oninput uses IntCallback (widget, value)
-        """
+        """Callback when brightness slider changes - updates spin and label"""
         # Prevent circular updates
         if self._updating:
             return xgui.EVT_BLOCK
@@ -183,10 +177,7 @@ class ComplexGUITest:
     # ===== Text Input Callbacks =====
 
     def on_text_entry_change(self, widget, text):
-        """Callback when text entry changes - mirrors to label
-
-        Note: Entry callbacks receive (widget, text) - this is a TextCallback
-        """
+        """Callback when text entry changes - mirrors to label"""
         try:
             # Update mirror label
             label = self.get_widget("mirrorLabel")
@@ -200,10 +191,7 @@ class ComplexGUITest:
         return xgui.EVT_BLOCK
 
     def on_counter_entry_change(self, widget, text):
-        """Callback when counter entry changes - updates character count
-
-        Note: Entry callbacks receive (widget, text) - this is a TextCallback
-        """
+        """Callback when counter entry changes - updates character count"""
         try:
             char_count = len(text)
             print(f"DEBUG: Counter entry text='{text}', length={char_count}")
@@ -230,10 +218,7 @@ class ComplexGUITest:
     # ===== Enable/Disable Callbacks =====
 
     def on_enable_checkbox_change(self, widget, checked):
-        """Callback when enable checkbox changes - enables/disables widgets
-
-        Note: Checkbox onchange uses BoolCallback (widget, checked)
-        """
+        """Callback when enable checkbox changes - enables/disables widgets"""
         try:
 
             # Enable or disable advanced entry
@@ -272,10 +257,7 @@ class ComplexGUITest:
     # ===== Theme Callbacks =====
 
     def on_theme_change(self, widget, text):
-        """Callback when theme combobox changes
-
-        Note: Combobox onchange uses TextCallback (widget, text)
-        """
+        """Callback when theme combobox changes"""
         try:
             # Get selected index from text parameter
             index = int(text)
@@ -483,7 +465,6 @@ class ComplexGUITest:
         """Bind all event callbacks to widgets"""
         print("\nBinding events to widgets...")
 
-        # Volume control (use PyIntCallback for Slider)
         volume_slider = self.get_widget("volumeSlider")
         if volume_slider:
             volume_callback = xgui.PyIntCallback(self.on_volume_change)
@@ -491,7 +472,6 @@ class ComplexGUITest:
             volume_slider.linkEvent("oninput", volume_callback)
             print("  ✓ Bound volume slider")
 
-        # Brightness controls (use PyIntCallback for Slider and Spin)
         brightness_slider = self.get_widget("brightnessSlider")
         if brightness_slider:
             brightness_slider_callback = xgui.PyIntCallback(self.on_brightness_slider_change)
@@ -517,7 +497,6 @@ class ComplexGUITest:
             reset_button.linkEvent("onclick", self.create_callback(self.on_reset_download))
             print("  ✓ Bound reset button")
 
-        # Text inputs (use PyTextCallback for Entry widgets)
         text_entry = self.get_widget("textEntry")
         if text_entry:
             text_callback = xgui.PyTextCallback(self.on_text_entry_change)
@@ -532,7 +511,6 @@ class ComplexGUITest:
             counter_entry.linkEvent("onchange", counter_callback)
             print("  ✓ Bound counter entry")
 
-        # Enable checkbox (use PyBoolCallback for Checkbox)
         enable_checkbox = self.get_widget("enableCheckbox")
         if enable_checkbox:
             checkbox_callback = xgui.PyBoolCallback(self.on_enable_checkbox_change)

@@ -283,31 +283,25 @@ namespace xgui
 
 				bool should_allow = PythonThreadsManager::DenyThreads();
 
-				if (PyCallable_Check(callback)) {
-					PyObject *pw =  XGUIPyObjectCreate(w, false);
-					PyObject *args = Py_BuildValue("(Oi)", pw, value);
-					PyObject *result = PyObject_CallObject(callback, args);
-					Py_XDECREF(args);
-					Py_XDECREF(pw);
+				PyObject *pw =  XGUIPyObjectCreate(w, false);
+				PyObject *args = Py_BuildValue("(Oi)", pw, value);
+				PyObject *result = PyObject_CallObject(callback, args);
+				Py_XDECREF(args);
+				Py_XDECREF(pw);
 
-					if (result == 0) {
-						PyErr_Print();
-					}
-					else if (result == Py_None) {
-						Py_XDECREF(result);
-					}
-					else if (PyLong_Check(result)) {
-						rv = PyLong_AsLong(result);
-						Py_XDECREF(result);
-					}
-					else {
-						Py_XDECREF(result);
-						PyErr_SetString(PyExc_TypeError, "Expected Integer or None as return value of callback");
-						PyErr_Print();
-					}
+				if (result == 0) {
+					PyErr_Print();
+				}
+				else if (result == Py_None) {
+					Py_XDECREF(result);
+				}
+				else if (PyLong_Check(result)) {
+					rv = PyLong_AsLong(result);
+					Py_XDECREF(result);
 				}
 				else {
-					PyErr_SetString(PyExc_TypeError, "Non callable object to PyIntCallback");
+					Py_XDECREF(result);
+					PyErr_SetString(PyExc_TypeError, "Expected Integer or None as return value of callback");
 					PyErr_Print();
 				}
 
@@ -346,31 +340,25 @@ namespace xgui
 
 				bool should_allow = PythonThreadsManager::DenyThreads();
 
-				if (PyCallable_Check(callback)) {
-					PyObject *pw =  XGUIPyObjectCreate(w, false);
-					PyObject *args = Py_BuildValue("(Oi)", pw, value ? 1 : 0);
-					PyObject *result = PyObject_CallObject(callback, args);
-					Py_XDECREF(args);
-					Py_XDECREF(pw);
+				PyObject *pw =  XGUIPyObjectCreate(w, false);
+				PyObject *args = Py_BuildValue("(Oi)", pw, value ? 1 : 0);
+				PyObject *result = PyObject_CallObject(callback, args);
+				Py_XDECREF(args);
+				Py_XDECREF(pw);
 
-					if (result == 0) {
-						PyErr_Print();
-					}
-					else if (result == Py_None) {
-						Py_XDECREF(result);
-					}
-					else if (PyLong_Check(result)) {
-						rv = PyLong_AsLong(result);
-						Py_XDECREF(result);
-					}
-					else {
-						Py_XDECREF(result);
-						PyErr_SetString(PyExc_TypeError, "Expected Integer or None as return value of callback");
-						PyErr_Print();
-					}
+				if (result == 0) {
+					PyErr_Print();
+				}
+				else if (result == Py_None) {
+					Py_XDECREF(result);
+				}
+				else if (PyLong_Check(result)) {
+					rv = PyLong_AsLong(result);
+					Py_XDECREF(result);
 				}
 				else {
-					PyErr_SetString(PyExc_TypeError, "Non callable object to PyBoolCallback");
+					Py_XDECREF(result);
+					PyErr_SetString(PyExc_TypeError, "Expected Integer or None as return value of callback");
 					PyErr_Print();
 				}
 
