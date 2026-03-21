@@ -74,7 +74,7 @@ namespace xgui
 namespace xgui
 {	
 	Toolbar::Toolbar(xgui::Container * parent, xgui::ClassInfo * cinfo, xguimpl::Toolbar * widget)
-	: Widget ( parent, cinfo, widget ), nelements_(0), tb_impl_(0)
+	: Widget ( parent, cinfo, widget ), nelements_(0), tb_impl_(0), is_in_radio_group_(false)
 	{
 		tb_impl_ = dynamic_cast<xguimpl::Toolbar *>(impl_);
 		ASSERT(tb_impl_);
@@ -82,7 +82,7 @@ namespace xgui
 	}
 
 	Toolbar::Toolbar(xgui::Container * parent)
-	: Widget ( parent, &toolbar_class_info, new xguimpl::Toolbar(parent) ), nelements_(0), tb_impl_(0)
+	: Widget ( parent, &toolbar_class_info, new xguimpl::Toolbar(parent) ), nelements_(0), tb_impl_(0), is_in_radio_group_(false)
 	{
 		tb_impl_ = dynamic_cast<xguimpl::Toolbar *>(impl_);
 		ASSERT(tb_impl_);
@@ -103,37 +103,36 @@ namespace xgui
 
 	int Toolbar::addItem( std::string const &id, std::string const &text, xgui::Image * icon, std::string const &tooltip, std::string const & type )
 	{
-		static std::vector<xgui::TbButtonInfo> cur_radio_group;
-		static bool is_in_group = false;
 		TbButtonInfo * btn = 0;
 
 		if ( (type != "radio_begin") && (type != "radio_end") )
 			btn = new TbButtonInfo(id, text, icon, tooltip, type);	
 	
+		// nullptr sentinels mark radio group boundaries in items_ (used by dump())
 		items_.push_back(btn);
 
 		if (type == "check") {
-			if (!is_in_group) {
+			if (!is_in_radio_group_) {
 				tb_impl_->addToggleButton( *btn );
 				++nelements_;
 			}
 			else
-				cur_radio_group.push_back( *btn );
+				cur_radio_group_.push_back( *btn );
 		}
 		else if (type == "separator") {
 			tb_impl_->addSeparator();
 			++nelements_;
 		}
 		else if (type == "radio_begin") {
-			cur_radio_group.clear();
-			is_in_group = true;
+			cur_radio_group_.clear();
+			is_in_radio_group_ = true;
 		}
 		else if (type == "radio_end") {
-			if (is_in_group) {
-				tb_impl_->addRadioButtons(cur_radio_group);
-				is_in_group = false;
-				nelements_+=cur_radio_group.size();
-				cur_radio_group.clear();
+			if (is_in_radio_group_) {
+				tb_impl_->addRadioButtons(cur_radio_group_);
+				is_in_radio_group_ = false;
+				nelements_+=cur_radio_group_.size();
+				cur_radio_group_.clear();
 				return nelements_;
 			}
 		}
@@ -151,7 +150,8 @@ namespace xgui
 			--nelements_;
 
 		for(std::vector<TbButtonInfo*>::iterator i = items_.begin(); i != items_.end(); ++i) {
-			if ((*i)->name == name) {
+			if (*i && (*i)->name == name) {
+				delete *i;
 				items_.erase(i);
 				break;
 			}

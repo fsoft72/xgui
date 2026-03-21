@@ -38,13 +38,13 @@ namespace xguimpl
 			DLLEXPORT void swap(Style &other);
 			DLLEXPORT Style &operator=(xguimpl::Style const &other);
 
-			DLLEXPORT bool isTextBold();
-			DLLEXPORT bool isTextItalic();
-			DLLEXPORT bool isTextUnderlined();
-			DLLEXPORT bool isTextStriked();
-			DLLEXPORT xgui::Image * getIcon();
-			DLLEXPORT std::string const &getFgColor();
-			DLLEXPORT std::string const &getBgColor();
+			DLLEXPORT bool isTextBold() const;
+			DLLEXPORT bool isTextItalic() const;
+			DLLEXPORT bool isTextUnderlined() const;
+			DLLEXPORT bool isTextStriked() const;
+			DLLEXPORT xgui::Image * getIcon() const;
+			DLLEXPORT std::string const &getFgColor() const;
+			DLLEXPORT std::string const &getBgColor() const;
 
 		friend struct StyleManager;
 	};
@@ -84,7 +84,7 @@ namespace xgui
 				TxtStrikeOut =	0x00000008,
 			};
 
-			DLLEXPORT xguimpl::StyleManager * getImpl();
+			DLLEXPORT xguimpl::StyleManager * getImpl() const;
 			DLLEXPORT int ref();
 			DLLEXPORT int unref();
 
@@ -99,7 +99,7 @@ namespace xgui
 			DLLEXPORT std::string const &getFgColor(std::string const &style);
 			DLLEXPORT std::string const &getBgColor(std::string const &style);
 
-			DLLEXPORT unsigned int parseColorString(const std::string & color);
+			DLLEXPORT unsigned int parseColorString(const std::string & color) const;
 
 			virtual std::string dump();
 

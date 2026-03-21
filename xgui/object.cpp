@@ -123,21 +123,21 @@ namespace xgui
 		properties_[prop] = PropertyInfo(setter, getter, dumpable);
 	}
 
-	std::vector<std::string> Object::properties()
+	std::vector<std::string> Object::properties() const
 	{
 		std::vector<std::string> props = cinfo_->properties();
 
-		for (PropertiesMap::iterator i = properties_.begin(); i != properties_.end(); ++i)
+		for (PropertiesMap::const_iterator i = properties_.begin(); i != properties_.end(); ++i)
 			props.push_back(i->first);
 
 		return props;
 	}
 
-	xgui::PropertyType Object::hasProperty(std::string const &property)
+	xgui::PropertyType Object::hasProperty(std::string const &property) const
 	{
 		PropertyType p_type;
 
-		PropertiesMap::iterator i = properties_.find(property);
+		PropertiesMap::const_iterator i = properties_.find(property);
 
 		if (i == properties_.end())
 			p_type = xgui::PROPERTY_NOT_FOUND;
@@ -152,11 +152,11 @@ namespace xgui
 		return p_type;
 	}
 
-	bool Object::isPropertyDumpable(std::string const &property)
+	bool Object::isPropertyDumpable(std::string const &property) const
 	{
 		bool dumpable = false;
 
-		PropertiesMap::iterator i = properties_.find(property);
+		PropertiesMap::const_iterator i = properties_.find(property);
 
 		if (i == properties_.end())
 			dumpable = cinfo_->isPropertyDumpable(property);
@@ -166,11 +166,11 @@ namespace xgui
 		return dumpable;
 	}
 
-	std::string const &Object::className() { return cinfo_->className(); }
-	xgui::ClassInfo *Object::getClass() { return cinfo_; }
+	std::string const &Object::className() const { return cinfo_->className(); }
+	xgui::ClassInfo *Object::getClass() const { return cinfo_; }
 
-	bool Object::isIdentifiedAs(std::string const &id) { return id_ == id; }
-	std::string const &Object::id() { return id_; }
+	bool Object::isIdentifiedAs(std::string const &id) const { return id_ == id; }
+	std::string const &Object::id() const { return id_; }
 	void Object::setId(std::string const &id) { id_ = id; }
 
 	void Object::store(std::string const &name, xgui::Object *o, bool destroy)
@@ -205,7 +205,7 @@ namespace xgui
 	{
 		PropertySetter setter = 0;
 
-		PropertiesMap::iterator i = properties_.find(name);
+		PropertiesMap::const_iterator i = properties_.find(name);
 		if (i != properties_.end())
 			setter = i->second.setter;
 
@@ -225,7 +225,7 @@ namespace xgui
 	{
 		PropertyGetter getter = 0;
 
-		PropertiesMap::iterator i = properties_.find(name);
+		PropertiesMap::const_iterator i = properties_.find(name);
 		if (i != properties_.end())
 			getter = i->second.getter;
 
@@ -298,11 +298,11 @@ namespace xgui
 		return xml;
 	}
 
-	DMethod *Object::findMethod(std::string const &name)
+	DMethod *Object::findMethod(std::string const &name) const
 	{
 		DMethod *m = 0;
 
-		MethodsMap::iterator mi = mmap_.find(name);
+		MethodsMap::const_iterator mi = mmap_.find(name);
 		if (mi != mmap_.end())
 			m = mi->second;
 		else
@@ -316,11 +316,11 @@ namespace xgui
 		mmap_[name] = m;
 	}
 
-	std::vector<std::string> Object::methods()
+	std::vector<std::string> Object::methods() const
 	{
 		std::vector<std::string> mv = cinfo_->methods();
 
-		for (MethodsMap::iterator mi = mmap_.begin(); mi != mmap_.end(); ++mi)
+		for (MethodsMap::const_iterator mi = mmap_.begin(); mi != mmap_.end(); ++mi)
 			mv.push_back(mi->first);
 
 		return mv;

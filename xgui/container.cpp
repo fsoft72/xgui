@@ -91,7 +91,6 @@ namespace xgui
 					if (found_child) return found_child;
 				}
 				else {
-					std::string child_id;
 					if ((*i)->isIdentifiedAs(child_name))
 						return static_cast<xgui::Widget*>(*i);
 				}

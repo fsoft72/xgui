@@ -40,13 +40,13 @@ namespace xgui
 			DLLEXPORT VBox(xgui::Container * parent, int space, bool border);
 			DLLEXPORT virtual ~VBox();
 
-			DLLEXPORT virtual void addChild(xgui::Widget * w);
+			DLLEXPORT virtual void addChild(xgui::Widget * w) override;
 	
 		public:
 			DLLEXPORT int setExpand(xgui::Widget * w, float expand);
 			DLLEXPORT float getExpand(xgui::Widget * w);
 
-			DLLEXPORT std::string dump();
+			DLLEXPORT virtual std::string dump() override;
 
 
 		friend class Master;

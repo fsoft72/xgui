@@ -41,6 +41,8 @@ namespace xgui
 			int nelements_;
 			xguimpl::Toolbar * tb_impl_;
 			std::vector<TbButtonInfo*> items_;
+			std::vector<xgui::TbButtonInfo> cur_radio_group_;
+			bool is_in_radio_group_;
 
 			DLLEXPORT Toolbar(xgui::Container * parent, xgui::ClassInfo * cinfo, xguimpl::Toolbar * widget);
 			DLLEXPORT Toolbar(xgui::Container * parent);
@@ -57,7 +59,7 @@ namespace xgui
 			DLLEXPORT int uncheckButton ( const std::string & name );
 			DLLEXPORT bool isButtonChecked ( const std::string & name );
 
-			DLLEXPORT virtual std::string dump();
+			DLLEXPORT virtual std::string dump() override;
 		
 		friend class Master;
 		friend struct xguimpl::Toolbar;

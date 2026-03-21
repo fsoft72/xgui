@@ -68,9 +68,10 @@ namespace xgui {
 
 		if (img == 0) {
 			img = new xgui::Image(path);
-			if (img->isValid())
+			if (img->isValid()) {
+				img->ref();
 				Instance()->images_cache_[path] = img;
-			else {
+			} else {
 				delete img;
 				img = 0;
 			}

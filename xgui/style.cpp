@@ -45,37 +45,37 @@ namespace xguimpl
 		return (*this);
 	}
 	
-	bool Style::isTextBold()
+	bool Style::isTextBold() const
 	{
 		return (text_style_ & xgui::StyleManager::TxtBold) != 0;
 	}
 	
-	bool Style::isTextItalic()
+	bool Style::isTextItalic() const
 	{
 		return (text_style_ & xgui::StyleManager::TxtItalic) != 0;
 	}
 	
-	bool Style::isTextUnderlined()
+	bool Style::isTextUnderlined() const
 	{
 		return (text_style_ & xgui::StyleManager::TxtUnderline) != 0;
 	}
 	
-	bool Style::isTextStriked()
+	bool Style::isTextStriked() const
 	{
 		return (text_style_ & xgui::StyleManager::TxtStrikeOut) != 0;
 	}
 	
-	xgui::Image * Style::getIcon()
+	xgui::Image * Style::getIcon() const
 	{
 		return icon_;
 	}
 	
-	std::string const &Style::getFgColor()
+	std::string const &Style::getFgColor() const
 	{
 		return fg_color_;
 	}
 	
-	std::string const &Style::getBgColor()
+	std::string const &Style::getBgColor() const
 	{
 		return bg_color_;
 	}
@@ -243,34 +243,42 @@ namespace xgui
 			return null_str;
 	}
 	
-	unsigned int StyleManager::parseColorString(const std::string & color)
+	unsigned int StyleManager::parseColorString(const std::string & color) const
 	{
 		if (color.empty()) return 0;
-	
+
 		std::string rgb = color;
-		if (rgb[0] == '#') rgb = color.substr(1, 6);
-	
+		if (rgb[0] == '#') rgb = color.substr(1);
+
+		// Pad short hex strings (e.g. "FFF" -> "FFFFFF")
+		if (rgb.size() == 3) {
+			rgb = std::string(1, rgb[0]) + rgb[0] + rgb[1] + rgb[1] + rgb[2] + rgb[2];
+		}
+
+		if (rgb.size() < 6) return 0;
+
+		rgb = rgb.substr(0, 6);
 		rgb.insert(4, " ");
 		rgb.insert(2, " ");
-	
+
 		std::istringstream is(rgb);
-	
-		unsigned int r, g, b;
+
+		unsigned int r = 0, g = 0, b = 0;
 		is >> std::hex >> r;
 		is >> std::hex >> g;
 		is >> std::hex >> b;
-	
+
 		unsigned int retval = 0;
-	
-		unsigned char * pr = (unsigned char *)&retval;
-		pr[0] = (unsigned char)r;
-		pr[1] = (unsigned char)g;
-		pr[2] = (unsigned char)b;
-	
+
+		unsigned char * pr = reinterpret_cast<unsigned char *>(&retval);
+		pr[0] = static_cast<unsigned char>(r);
+		pr[1] = static_cast<unsigned char>(g);
+		pr[2] = static_cast<unsigned char>(b);
+
 		return retval;
 	}
 	
-	xguimpl::StyleManager * StyleManager::getImpl() { return sm_impl_; }
+	xguimpl::StyleManager * StyleManager::getImpl() const { return sm_impl_; }
 
 	std::string StyleManager::dump()
 	{

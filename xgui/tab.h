@@ -40,8 +40,8 @@ namespace xgui
 			DLLEXPORT Tab(xgui::Container * parent, const std::string & alignment);
 			DLLEXPORT virtual ~Tab();
 
-			DLLEXPORT virtual void addChild(xgui::Widget * w);
-			DLLEXPORT virtual void delChild(xgui::Widget * w);
+			DLLEXPORT virtual void addChild(xgui::Widget * w) override;
+			DLLEXPORT virtual void delChild(xgui::Widget * w) override;
 
 		public:
 			DLLEXPORT int setPageIcon(xgui::Widget *, xgui::Image * icon);
@@ -50,7 +50,7 @@ namespace xgui
 			DLLEXPORT xgui::Image * getPageIcon(xgui::Widget * w);
 			DLLEXPORT std::string const &getPageLabel(xgui::Widget * w);
 
-			DLLEXPORT virtual std::string dump();
+			DLLEXPORT virtual std::string dump() override;
 
 		friend class Master;
 		friend struct xguimpl::Tab;

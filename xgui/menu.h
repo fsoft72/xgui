@@ -64,7 +64,7 @@ namespace xgui
 			int setItemText(std::string const &id, std::string const &text);
 			std::string getItemText(std::string const &id);
 
-			DLLEXPORT virtual std::string dump();
+			DLLEXPORT virtual std::string dump() override;
 		
 		friend class Master;
 		friend struct xguimpl::Menu;

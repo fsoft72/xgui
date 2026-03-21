@@ -38,7 +38,7 @@ namespace xgui
 		std::string name;
 		std::string extension;
 		DLLEXPORT FileExtension(std::string const &n, std::string const &ext) : name(n), extension(ext) {}
-		DLLEXPORT FileExtension() : name("All files", "*") {}
+		DLLEXPORT FileExtension() : name("All files"), extension("*") {}
 	};
 }
 

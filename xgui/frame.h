@@ -37,8 +37,8 @@ namespace xgui
 			DLLEXPORT Frame(xgui::Container * parent, const std::string & label);
 			DLLEXPORT virtual ~Frame();
 
-			DLLEXPORT virtual void addChild(xgui::Widget * w);
-			DLLEXPORT virtual void delChild(xgui::Widget * w);
+			DLLEXPORT virtual void addChild(xgui::Widget * w) override;
+			DLLEXPORT virtual void delChild(xgui::Widget * w) override;
 
 		public:
 			DLLEXPORT xgui::Widget * getRootChild();

@@ -60,11 +60,11 @@ namespace xgui
 
 		public:
 			//Dynamic type management
-			DLLEXPORT std::string const &className();
-			DLLEXPORT xgui::ClassInfo *getClass();
+			DLLEXPORT std::string const &className() const;
+			DLLEXPORT xgui::ClassInfo *getClass() const;
 
-			DLLEXPORT bool isIdentifiedAs(std::string const &id);
-			DLLEXPORT std::string const &id();
+			DLLEXPORT bool isIdentifiedAs(std::string const &id) const;
+			DLLEXPORT std::string const &id() const;
 			DLLEXPORT void setId(std::string const &id);
 			
 			//Storable data management
@@ -76,9 +76,9 @@ namespace xgui
 			DLLEXPORT bool set(std::string const &name, std::string const &val);
 			DLLEXPORT bool get(std::string const &name, std::string &dest);
 			DLLEXPORT void registerProperty(std::string const &prop, xgui::PropertySetter setter, xgui::PropertyGetter getter, bool dumpable);
-			DLLEXPORT std::vector<std::string> properties();
-			DLLEXPORT xgui::PropertyType hasProperty(std::string const &property);
-			DLLEXPORT bool isPropertyDumpable(std::string const &property);
+			DLLEXPORT std::vector<std::string> properties() const;
+			DLLEXPORT xgui::PropertyType hasProperty(std::string const &property) const;
+			DLLEXPORT bool isPropertyDumpable(std::string const &property) const;
 
 			//Ownership management for external bindings
 			DLLEXPORT void addOwner(void *o);
@@ -91,8 +91,8 @@ namespace xgui
 			DLLEXPORT static xgui::Object * Unpack(std::string const &obj);
 			DLLEXPORT std::string pack();
 			
-			DLLEXPORT std::vector<std::string> methods();
-			DLLEXPORT DMethod * findMethod(std::string const &name);
+			DLLEXPORT std::vector<std::string> methods() const;
+			DLLEXPORT DMethod * findMethod(std::string const &name) const;
 			DLLEXPORT void registerMethod(std::string const &name, DMethod * m);
 			DLLEXPORT std::string call(std::string const &method);
 			DLLEXPORT std::string call(std::string const &method, std::string const &p1);

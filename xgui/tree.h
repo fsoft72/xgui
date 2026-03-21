@@ -54,7 +54,7 @@ namespace xgui
 			DLLEXPORT virtual int check ( xgui::Model * parent, int child_pos, bool state );
 			DLLEXPORT virtual int checkAll ( xgui::Model * parent, bool state );
 
-			DLLEXPORT virtual std::string dump();
+			DLLEXPORT virtual std::string dump() override;
 
 		friend class Master;
 		friend struct xguimpl::Tree;

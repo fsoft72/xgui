@@ -69,6 +69,7 @@ namespace xgui
 
 	void TreeNode::insertChild(TreeNode *child, int pos)
 	{
+		if (pos < 0 || pos > (int)_children.size()) return;
 		_children.insert(_children.begin() + pos, child);
 		child->ref();
 		child->_parent = this;
@@ -76,28 +77,30 @@ namespace xgui
 
 	void TreeNode::removeChild(int pos)
 	{
+		if (pos < 0 || pos >= (int)_children.size()) return;
 		iterator child = _children.begin() + pos;
 		(*child)->_parent = 0;
 		(*child)->unref();
 		_children.erase(child);
 	}
 
-	TreeNode *TreeNode::getChild(int pos)
+	TreeNode *TreeNode::getChild(int pos) const
 	{
+		if (pos < 0 || pos >= (int)_children.size()) return 0;
 		return _children[pos];
 	}
 
-	std::string TreeNode::path()
+	std::string TreeNode::path() const
 	{
 		std::string path = _parent ? _parent->path() + "/" : "";
 		path += id_;
 		return path;
 	}
 
-	xgui::TreeNode *TreeNode::findByPath(std::string const &path)
+	xgui::TreeNode *TreeNode::findByPath(std::string const &path) const
 	{
 		if (id_ == path)
-			return this;
+			return const_cast<TreeNode *>(this);
 
 		std::string::size_type slash_pos = path.find("/");
 		std::string child_id = path.substr(0, slash_pos);
@@ -109,7 +112,7 @@ namespace xgui
 		if (id_ == child_id)
 			return findByPath(sub_child_path);
 
-		for (iterator child = _children.begin(); child != _children.end(); ++child)
+		for (const_iterator child = _children.begin(); child != _children.end(); ++child)
 		{
 			if ((*child)->id() == child_id)
 				return (*child)->findByPath(sub_child_path);
@@ -132,8 +135,10 @@ namespace xgui
 	}
 
 	TreeNode::iterator TreeNode::begin() { return _children.begin(); }
+	TreeNode::const_iterator TreeNode::begin() const { return _children.begin(); }
 	TreeNode::iterator TreeNode::end() { return _children.end(); }
-	TreeNode *TreeNode::getParent() { return _parent; }
+	TreeNode::const_iterator TreeNode::end() const { return _children.end(); }
+	TreeNode *TreeNode::getParent() const { return _parent; }
 
 	void TreeNode::ref() { ++_owncount; }
 	void TreeNode::unref()
@@ -144,7 +149,7 @@ namespace xgui
 		}
 	}
 
-	unsigned int TreeNode::size()
+	unsigned int TreeNode::size() const
 	{
 		return _children.size();
 	}
@@ -167,10 +172,10 @@ namespace xgui
 
 	void Model::setFlag(unsigned long flag) { flags |= flag; }
 	void Model::unsetFlag(unsigned long flag) { flags &= ~flag; }
-	bool Model::getFlagStatus(unsigned long flag) { return (flag & flags) != 0; }
+	bool Model::getFlagStatus(unsigned long flag) const { return (flag & flags) != 0; }
 
 	void Model::setStyle(std::string const &stname) { style_name = stname; }
-	std::string const &Model::getStyle() { return style_name; }
+	std::string const &Model::getStyle() const { return style_name; }
 
 	int Model::addString(std::string const &str)
 	{
@@ -184,7 +189,7 @@ namespace xgui
 		string_list.at(pos) = str;
 		return 0;
 	}
-	const std::string &Model::getString(int pos)
+	const std::string &Model::getString(int pos) const
 	{
 		static std::string null_str = "";
 		if ((pos >= 0) && (pos < (int)string_list.size()))
@@ -193,7 +198,7 @@ namespace xgui
 			return null_str;
 	}
 	void Model::clearStrings() { string_list.clear(); }
-	unsigned int Model::numberOfStrings() { return string_list.size(); }
+	unsigned int Model::numberOfStrings() const { return string_list.size(); }
 
 	void Model::linkView(View *view)
 	{
@@ -214,7 +219,7 @@ namespace xgui
 		DMESSAGE("Appending Child Of Size: " << child->string_list.size());
 	}
 
-	xgui::Model *Model::getChild(int pos)
+	xgui::Model *Model::getChild(int pos) const
 	{
 		TreeNode *child = 0;
 
@@ -223,15 +228,15 @@ namespace xgui
 		return dynamic_cast<Model *>(child);
 	}
 
-	xgui::Model *Model::findByPath(std::string const &path)
+	xgui::Model *Model::findByPath(std::string const &path) const
 	{
 		return dynamic_cast<Model *>(TreeNode::findByPath(path));
 	}
 
-	int Model::findChildPos(Model *child)
+	int Model::findChildPos(Model *child) const
 	{
 		int p = 0;
-		for (std::vector<TreeNode *>::iterator i = _children.begin(); i != _children.end(); ++i)
+		for (std::vector<TreeNode *>::const_iterator i = _children.begin(); i != _children.end(); ++i)
 		{
 			if (*i == static_cast<TreeNode *>(child))
 				return p;

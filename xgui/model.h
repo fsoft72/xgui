@@ -41,6 +41,7 @@ namespace xgui
 	{
 		public:
 			typedef std::vector<TreeNode *>::iterator iterator;
+			typedef std::vector<TreeNode *>::const_iterator const_iterator;
 	
 			TreeNode ();
 			virtual ~TreeNode ();
@@ -50,16 +51,18 @@ namespace xgui
 			virtual void removeChild ( int pos );
 			virtual void removeAllChildren();
 
-			unsigned int size();
-			std::string path();
+			unsigned int size() const;
+			std::string path() const;
 	
-			TreeNode * getChild ( int pos );
+			TreeNode * getChild ( int pos ) const;
 			virtual void setChild ( TreeNode * new_child, int pos );
-			xgui::TreeNode * findByPath(std::string const &path);
-			TreeNode * getParent();
+			xgui::TreeNode * findByPath(std::string const &path) const;
+			TreeNode * getParent() const;
 	
 			iterator begin ();
+			const_iterator begin () const;
 			iterator end();
+			const_iterator end() const;
 	
 			void ref();
 			void unref();
@@ -99,22 +102,22 @@ namespace xgui
 			void removeChild ( int pos );
 			void removeAllChildren ();
 			void setChild ( TreeNode * new_child, int pos );
-			xgui::Model * getChild( int pos );
-			xgui::Model * findByPath( std::string const &path );
-			int findChildPos(Model * child);
+			xgui::Model * getChild( int pos ) const;
+			xgui::Model * findByPath( std::string const &path ) const;
+			int findChildPos(Model * child) const;
 
 			void setFlag(unsigned long flag);
 			void unsetFlag(unsigned long flag);
-			bool getFlagStatus(unsigned long flag);
+			bool getFlagStatus(unsigned long flag) const;
 
 			void setStyle ( std::string const & style_name );
-			std::string const & getStyle();
+			std::string const & getStyle() const;
 
 			int addString(std::string const &str);
 			void delString(int pos);
 			int setString(std::string const &str, int pos);
-			const std::string & getString ( int pos );
-			unsigned int numberOfStrings();
+			const std::string & getString ( int pos ) const;
+			unsigned int numberOfStrings() const;
 			void clearStrings();
 
 			void updateViews();

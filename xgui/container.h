@@ -44,7 +44,7 @@ namespace xgui
 			DLLEXPORT virtual void delChild(xgui::Widget *);
 
 		public:
-			DLLEXPORT virtual std::string dump();
+			DLLEXPORT virtual std::string dump() override;
 			DLLEXPORT xgui::Widget * findChild(std::string const &child_name);
 			DLLEXPORT xgui::Widget * findDirectChild(std::string const &child_name);
 			DLLEXPORT xgui::Widget * getChild(int pos);
