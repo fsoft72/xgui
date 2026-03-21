@@ -114,8 +114,10 @@ namespace xguimpl
 	void Spin::OnTextInsert ( GtkWidget * editable, gchar * new_text, gint new_text_length, gint * position, Spin * e )
 	{
 		if (!new_text_length) return;
-	
+
 		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
+		// Block value-changed to prevent double callback when text input triggers an implicit value update
+		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
 		bool text_approved = true;
 	
 		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
@@ -134,6 +136,7 @@ namespace xguimpl
 			gtk_editable_insert_text ( GTK_EDITABLE ( editable ) , new_text, new_text_length, position);
 	
 	
+		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
 		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "insert-text" );
 	}
@@ -141,6 +144,8 @@ namespace xguimpl
 	void Spin::OnTextDelete ( GtkEditable *editable, gint start_pos, gint end_pos, Spin * e )
 	{
 		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
+		// Block value-changed to prevent double callback when text deletion triggers an implicit value update
+		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
 		bool deletion_approved = true;
 	
 		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
@@ -152,6 +157,7 @@ namespace xguimpl
 		if ( deletion_approved ) 
 			gtk_editable_delete_text( GTK_EDITABLE(editable), start_pos, end_pos );
 		
+		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
 		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "delete-text" );
 	}
