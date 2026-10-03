@@ -106,7 +106,7 @@ namespace xguimpl
 					this_imgview->scrolled_ = true;
 					g_object_ref(img_widget);
 					gtk_container_remove( GTK_CONTAINER(widget), img_widget );
-					gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scroll_widget), img_widget );
+					gtk_container_add ( GTK_CONTAINER(scroll_widget), img_widget );
 					gtk_box_pack_start( GTK_BOX(widget), scroll_widget, TRUE, TRUE, 0 );
 					g_object_unref(img_widget);
 	

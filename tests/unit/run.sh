@@ -83,4 +83,7 @@ _gui_check "Master::Quit does not leave a dangling singleton" tests/unit/quit_te
 # Item: row style handling shared by List and Tree
 _gui_check "list and tree rows carry their style" tests/unit/row_style_test.cpp
 
+# Item: tree views must not be wrapped in a viewport
+_gui_check "list and tree views are not wrapped in a viewport" tests/unit/scroll_test.cpp
+
 exit $FAILED

@@ -19,3 +19,4 @@
 - `Master::Quit()` now resets the singleton pointer after deleting it (it is reset after the delete because the destructor still calls `Instance()`). Added `tests/unit/quit_test.cpp`.
 - Extracted the triplicated row-style code of `List::insertItem`, `List::refresh` and `Tree::insertSubTree` into `applyRowStyle()` (`xgui/gtk/row_style.h`). Added `tests/unit/row_style_test.cpp`.
 - List and Tree colors now use `GdkRGBA` (`gdk_rgba_parse` with a validity check, `foreground-rgba`/`background-rgba` renderer properties); an invalid color string is reported and leaves the cell empty. Extended `tests/unit/row_style_test.cpp`.
+- Replaced the deprecated `gtk_scrolled_window_add_with_viewport` with `gtk_container_add` in List, Tree and ImageView, so tree views are no longer wrapped in a viewport (lazy row rendering, fixed headers). Added `tests/unit/scroll_test.cpp`.

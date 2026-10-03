@@ -122,7 +122,7 @@ namespace xguimpl
 	
 		g_signal_connect (G_OBJECT (check_renderer), "toggled", G_CALLBACK ( OnCheck ), this);
 
-		gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( list_view ) );
+		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( list_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	}
 

@@ -26,7 +26,7 @@ namespace xguimpl
 	bold_column_id(3), underline_column_id(4), strike_column_id(5), check_column_id(6), 
 	icon_column_id(7), field_column_id(8)
 	{
-		gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( tree_view ) );
+		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( tree_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	}
 
@@ -51,7 +51,7 @@ namespace xguimpl
 		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, NULL );
 		icon_renderer = gtk_cell_renderer_pixbuf_new();
 	
-		gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( tree_view ) );
+		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( tree_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 
 		g_signal_connect (G_OBJECT (check_renderer), "toggled", G_CALLBACK ( OnCheck ), this);
