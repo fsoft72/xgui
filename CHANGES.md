@@ -17,3 +17,4 @@
 - Fixed null parent dereference in `openFileDialog`, `saveFileDialog` and `messageDialog`: a missing parent window now means no transient parent. Added `tests/unit/dialog_test.cpp`.
 - `ParseJsonValue` now stops when `create()` fails (no orphan child widgets, no `finalize(NULL)`), and `FinalizeObject` tolerates an unknown class. Added `tests/unit/json_failed_create_test.cpp`.
 - `Master::Quit()` now resets the singleton pointer after deleting it (it is reset after the delete because the destructor still calls `Instance()`). Added `tests/unit/quit_test.cpp`.
+- Extracted the triplicated row-style code of `List::insertItem`, `List::refresh` and `Tree::insertSubTree` into `applyRowStyle()` (`xgui/gtk/row_style.h`). Added `tests/unit/row_style_test.cpp`.

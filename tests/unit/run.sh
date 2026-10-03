@@ -80,4 +80,7 @@ _gui_check "LoadJson skips children of failed nodes" tests/unit/json_failed_crea
 # Item: Master::Quit must reset the singleton
 _gui_check "Master::Quit does not leave a dangling singleton" tests/unit/quit_test.cpp
 
+# Item: row style handling shared by List and Tree
+_gui_check "list and tree rows carry their style" tests/unit/row_style_test.cpp
+
 exit $FAILED

@@ -16,6 +16,7 @@
 #include "model.h"
 #include "image.h"
 #include "image_impl.h"
+#include "row_style.h"
 
 /**
  * Finds a view column by its xgui id (or by its title as a fallback).
@@ -273,33 +274,7 @@ namespace xguimpl
 			std::string style = child->getStyle();
 			xgui::StyleManager * sm = this_list->styleman_;
 
-			xgui::Image * icon = sm->getIcon(style);
-			if (icon)
-				gtk_list_store_set(store, &curr_ele_iter, icon_column_id, icon->getImpl()->getPixbuf(), -1);
-	
-			std::string const &fg_color_str = sm->getFgColor(style);
-			if (!fg_color_str.empty()) {
-				GdkColor fg_color;
-				gdk_color_parse ( fg_color_str.c_str(), &fg_color);
-				gtk_list_store_set ( store, &curr_ele_iter, fg_column_id, &fg_color, -1 );
-			}
-	
-			std::string const &bg_color_str = sm->getBgColor(style);
-			if (!bg_color_str.empty()) {
-				GdkColor bg_color;
-				gdk_color_parse ( bg_color_str.c_str(), &bg_color);
-				gtk_list_store_set ( store, &curr_ele_iter, bg_column_id, &bg_color, -1 );
-			}
-	
-	
-			gboolean strike = sm->isTextStriked(style);
-			gint bold = (sm->isTextBold(style) ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-			PangoStyle italic = (sm->isTextItalic(style) ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
-			PangoUnderline underline = (sm->isTextUnderlined(style) ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
-	
-			gtk_list_store_set ( store, &curr_ele_iter, 
-						bold_column_id, bold, strike_column_id, strike, italic_column_id, italic,
-						underline_column_id, underline, -1 );
+			applyRowStyle ( GTK_TREE_MODEL(store), &curr_ele_iter, row_style_columns(), sm, style );
 		}
 	
 	
@@ -371,33 +346,7 @@ namespace xguimpl
 				std::string style = child->getStyle();
 				xgui::StyleManager * sm = this_list->styleman_;
 	
-				xgui::Image * icon = sm->getIcon(style);
-				if (icon)
-					gtk_list_store_set(store, &curr_ele_iter, icon_column_id, icon->getImpl()->getPixbuf(), -1);
-		
-				std::string const &fg_color_str = sm->getFgColor(style);
-				if (!fg_color_str.empty()) {
-					GdkColor fg_color;
-					gdk_color_parse ( fg_color_str.c_str(), &fg_color);
-					gtk_list_store_set ( store, &curr_ele_iter, fg_column_id, &fg_color, -1 );
-				}
-		
-				std::string const &bg_color_str = sm->getBgColor(style);
-				if (!bg_color_str.empty()) {
-					GdkColor bg_color;
-					gdk_color_parse ( bg_color_str.c_str(), &bg_color);
-					gtk_list_store_set ( store, &curr_ele_iter, bg_column_id, &bg_color, -1 );
-				}
-		
-		
-				gboolean strike = sm->isTextStriked(style);
-				gint bold = (sm->isTextBold(style) ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
-				PangoStyle italic = (sm->isTextItalic(style) ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL);
-				PangoUnderline underline = (sm->isTextUnderlined(style) ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE);
-		
-				gtk_list_store_set ( store, &curr_ele_iter, 
-							bold_column_id, bold, strike_column_id, strike, italic_column_id, italic,
-							underline_column_id, underline, -1 );
+				applyRowStyle ( GTK_TREE_MODEL(store), &curr_ele_iter, row_style_columns(), sm, style );
 			}
 	
 			//if ( this_list->isSelected(child) ) gtk_tree_selection_select_iter ( sel, &curr_ele_iter );

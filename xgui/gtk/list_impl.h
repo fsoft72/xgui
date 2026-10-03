@@ -16,6 +16,7 @@
 #include "style.h"
 #include "list.h"
 #include "view_impl.h"
+#include "row_style.h"
 
 namespace xgui { class List; }
 
@@ -45,6 +46,13 @@ namespace xguimpl
 
 		std::map<xgui::Model *, GtkTreeIter> iter_map;
 		xgui::List * this_list;
+
+		/** Returns the store columns that hold the style attributes of a row. */
+		RowStyleColumns row_style_columns() const
+		{
+			RowStyleColumns cols = { fg_column_id, bg_column_id, italic_column_id, bold_column_id, underline_column_id, strike_column_id, icon_column_id };
+			return cols;
+		}
 
 		//methods
 		List ( GtkWidget * real_w );

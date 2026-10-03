@@ -15,6 +15,7 @@
 
 #include "widget_impl.h"
 #include "view_impl.h"
+#include "row_style.h"
 #include "callback.h"
 
 namespace xgui { class Window; }
@@ -46,6 +47,13 @@ namespace xguimpl
 		GtkCellRenderer   *icon_renderer;
 		GtkCellRenderer   *check_renderer;
 		
+		/** Returns the store columns that hold the style attributes of a row. */
+		RowStyleColumns row_style_columns() const
+		{
+			RowStyleColumns cols = { fg_column_id, bg_column_id, italic_column_id, bold_column_id, underline_column_id, strike_column_id, icon_column_id };
+			return cols;
+		}
+
 		//methods
 		Tree ( GtkWidget * real_w );
 		Tree ( xgui::Container * parent );
