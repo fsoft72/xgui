@@ -18,7 +18,7 @@ check() {
 	if "$@" > "$OUT/log" 2>&1; then
 		echo "PASS: $name"
 	else
-		echo "FAIL: $name"; head -20 "$OUT/log"; FAILED=1
+		echo "FAIL: $name"; grep -v "Appending Child" "$OUT/log" | tail -20; FAILED=1
 	fi
 }
 
@@ -85,5 +85,8 @@ _gui_check "list and tree rows carry their style" tests/unit/row_style_test.cpp
 
 # Item: tree views must not be wrapped in a viewport
 _gui_check "list and tree views are not wrapped in a viewport" tests/unit/scroll_test.cpp
+
+# Item: addColumn must not rebuild the store every time
+_gui_check "addColumn batches store rebuilds" tests/unit/add_column_test.cpp
 
 exit $FAILED

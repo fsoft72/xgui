@@ -43,6 +43,8 @@ namespace xguimpl
 		int first_fields_column;
 		bool has_icons;
 		bool has_checks;
+		bool model_dirty;
+		guint rebuild_idle_id;
 
 		std::map<xgui::Model *, GtkTreeIter> iter_map;
 		xgui::List * this_list;
@@ -65,6 +67,9 @@ namespace xguimpl
 		bool set_list_prop ( std::string const &name, const std::string &vals );
 		bool linkEvent( std::string const &name );
 		void rebuildGtkModel();
+		void markModelDirty();
+		void syncGtkModel();
+		static gboolean OnRebuildIdle ( gpointer data );
 
 		virtual void insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child );
 		virtual void removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child );

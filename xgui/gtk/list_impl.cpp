@@ -99,11 +99,11 @@ namespace xguimpl
 	List::List ( GtkWidget * real_w ) 
 	: View ( real_w ), list_view(0), fg_column_id(0), bg_column_id(1), italic_column_id(2), 
 	bold_column_id(3), underline_column_id(4), strike_column_id(5), check_column_id(6), 
-	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false) { }
+	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false), model_dirty(false), rebuild_idle_id(0) { }
 
 	List::List ( xgui::Container * parent ) : View ( gtk_scrolled_window_new( NULL, NULL ) ), list_view(0), fg_column_id(0), 
 	bg_column_id(1), italic_column_id(2), bold_column_id(3), underline_column_id(4), strike_column_id(5),check_column_id(6), 
-	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false)
+	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false), model_dirty(false), rebuild_idle_id(0)
 	{
 		list_view = (GtkTreeView*)gtk_tree_view_new();
 		gtk_tree_view_set_enable_search( GTK_TREE_VIEW(list_view), FALSE );
@@ -128,6 +128,7 @@ namespace xguimpl
 
 	List::~List() 
 	{ 
+		if (rebuild_idle_id) g_source_remove(rebuild_idle_id);
 		gtk_widget_destroy ( GTK_WIDGET ( list_view ) );
 	}
 
@@ -154,9 +155,40 @@ namespace xguimpl
 		Widget::setAccessor(w);
 	}
 	
+	/** Idle handler that rebuilds the store once after a burst of addColumn calls. */
+	gboolean List::OnRebuildIdle ( gpointer data )
+	{
+		List * l = (List *)data;
+		l->rebuild_idle_id = 0;
+		l->syncGtkModel();
+		return G_SOURCE_REMOVE;
+	}
+
+	/** Flags the store as outdated: it is rebuilt once, when first needed or when the main loop is idle. */
+	void List::markModelDirty()
+	{
+		model_dirty = true;
+		if (!rebuild_idle_id) rebuild_idle_id = g_idle_add ( OnRebuildIdle, this );
+	}
+
+	/** Rebuilds the store if the columns changed since the last rebuild. */
+	void List::syncGtkModel()
+	{
+		if (model_dirty) rebuildGtkModel();
+	}
+
 	void List::rebuildGtkModel()
 	{
 		int &num_columns = this_list->num_columns_;
+
+		model_dirty = false;
+		if (rebuild_idle_id) {
+			g_source_remove(rebuild_idle_id);
+			rebuild_idle_id = 0;
+		}
+
+		// The rows of the old store are about to disappear: their iterators must not be used anymore
+		iter_map.clear();
 
 		GType * columns_types = new GType[first_fields_column + num_columns];
 	
@@ -248,6 +280,9 @@ namespace xguimpl
 	void List::insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
 	{
 		if ( (!list_view) || (!this_list->getModel()) || (!this_list->num_columns_) ) return;
+
+		// The pending rebuild will add the new row together with all the others
+		if (model_dirty) return;
 		int &num_columns = this_list->num_columns_;
 
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
@@ -313,6 +348,12 @@ namespace xguimpl
 		xgui::StyleManager * stylem = this_list->styleman_;
 
 		if ( (!list_view) || (!model) || (!num_columns) ) return;
+
+		// A pending rebuild repopulates the store, so there is nothing else to do here
+		if (model_dirty) {
+			rebuildGtkModel();
+			return;
+		}
 	
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
@@ -386,7 +427,7 @@ namespace xguimpl
 		g_signal_connect ( G_OBJECT(column), "clicked", G_CALLBACK(OnHeaderClick), this );
 		gtk_tree_view_insert_column ( GTK_TREE_VIEW( list_view ), column, (has_icons ? cpos + 1 : cpos) );
 	
-		rebuildGtkModel();
+		markModelDirty();
 	}
 
 	bool List::delColumn ( const std::string & column_name )
@@ -401,6 +442,7 @@ namespace xguimpl
 
 	void List::sort ( std::string const & column_name, xgui::TextPairCallback * compare_cb )
 	{
+		syncGtkModel();
 		std::pair<GtkTreeViewColumn *, int> col_data = int_find_column( GTK_TREE_VIEW(list_view), column_name );
 		if ( !col_data.first ) return;
 
@@ -417,6 +459,7 @@ namespace xguimpl
 
 	bool List::isSelected(xgui::Model * model, int pos) 
 	{
+		syncGtkModel();
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
 		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(model->getChild(pos));
 		if ( found == iter_map.end() ) return false;
@@ -426,6 +469,7 @@ namespace xguimpl
 
 	void List::select(xgui::Model * parent, int pos, bool state) 
 	{
+		syncGtkModel();
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
 		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(parent->getChild(pos));
 		if ( found == iter_map.end() ) return;
@@ -447,6 +491,7 @@ namespace xguimpl
 
 	bool List::isChecked(xgui::Model * parent, int pos)
 	{
+		syncGtkModel();
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(parent->getChild(pos));
 		if ( found == iter_map.end() ) return false;
@@ -459,6 +504,7 @@ namespace xguimpl
 
 	void List::check(xgui::Model * parent, int pos, bool state)
 	{
+		syncGtkModel();
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(parent->getChild(pos));
 		if ( found == iter_map.end() ) return;
@@ -467,6 +513,7 @@ namespace xguimpl
 
 	void List::checkAll(xgui::Model * parent, bool state)
 	{
+		syncGtkModel();
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		for (xgui::Model::iterator i = parent->begin(); i != parent->end(); ++i) {
 			std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(dynamic_cast<xgui::Model*>(*i));
