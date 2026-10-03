@@ -14,3 +14,4 @@
 - Fixed `int_find_column` in the GTK list: it now returns `{NULL, -1}` when the column is missing (so `delColumn`/`sort` no longer hit the last column) and matches the xgui column id as well as the title. `sort()` now accounts for the checkbox column when computing the data column. Added `tests/unit/list_columns_test.cpp`.
 - Replaced `iter_map[...]` / `tree_map[...]` lookups with `find()` in the GTK List and Tree: unknown model nodes are now ignored instead of passing a zeroed `GtkTreeIter` to GTK. Added `tests/unit/iter_map_test.cpp` (List only; Tree uses the same pattern).
 - Added a bounds check at the top of `Model::removeChild` (out-of-range positions were read before validation). Added `tests/unit/model_test.cpp`; the test runner now builds `libxgui` with `-D_GLIBCXX_ASSERTIONS`.
+- Fixed null parent dereference in `openFileDialog`, `saveFileDialog` and `messageDialog`: a missing parent window now means no transient parent. Added `tests/unit/dialog_test.cpp`.

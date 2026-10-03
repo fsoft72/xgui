@@ -71,4 +71,7 @@ _gui_check "list ignores nodes without a GTK row" tests/unit/iter_map_test.cpp
 # Item: Model::removeChild bounds check
 _gui_check "Model::removeChild ignores bad positions" tests/unit/model_test.cpp
 
+# Item: dialogs without a parent window must not crash
+_gui_check "dialogs work without a parent window" tests/unit/dialog_test.cpp
+
 exit $FAILED

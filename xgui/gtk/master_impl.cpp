@@ -37,6 +37,13 @@ static void IdleParameterDestructor( void * cb_info )
 	delete cb_p;
 }
 
+/** Returns the GTK window to use as transient parent of a dialog, or NULL when there is no parent. */
+static GtkWindow * int_transient_parent ( xgui::Window * parent )
+{
+	if ( !parent ) return NULL;
+	return GTK_WINDOW(parent->getImpl()->widget);
+}
+
 namespace xguimpl
 {
 	Master::Master(xgui::Master * master)
@@ -123,7 +130,7 @@ namespace xguimpl
 			gtk_filters.push_back(ff);
 		}
 	
-		GtkWidget *dialog = gtk_file_chooser_dialog_new ( title.c_str(), GTK_WINDOW(parent->getImpl()->widget),
+		GtkWidget *dialog = gtk_file_chooser_dialog_new ( title.c_str(), int_transient_parent(parent),
 		                                                  GTK_FILE_CHOOSER_ACTION_OPEN,	"_Cancel", GTK_RESPONSE_CANCEL,
 		                                                  "_Open", GTK_RESPONSE_ACCEPT, NULL );
 	
@@ -159,7 +166,7 @@ namespace xguimpl
 			gtk_filters.push_back(ff);
 		}
 	
-		GtkWidget *dialog = gtk_file_chooser_dialog_new ( title.c_str(), GTK_WINDOW(parent->getImpl()->widget), 
+		GtkWidget *dialog = gtk_file_chooser_dialog_new ( title.c_str(), int_transient_parent(parent), 
 		                                                  GTK_FILE_CHOOSER_ACTION_SAVE,	"_Cancel", GTK_RESPONSE_CANCEL,
 		                                                  "_Save", GTK_RESPONSE_ACCEPT, NULL );
 	
@@ -203,7 +210,7 @@ namespace xguimpl
 		else if ( buttons == "yes-no-cancel" ) b = GTK_BUTTONS_YES_NO;
 		else b = GTK_BUTTONS_OK;
 	
-		GtkWidget * mbox = gtk_message_dialog_new ( GTK_WINDOW(parent->getImpl()->widget), GtkDialogFlags(GTK_DIALOG_MODAL |
+		GtkWidget * mbox = gtk_message_dialog_new ( int_transient_parent(parent), GtkDialogFlags(GTK_DIALOG_MODAL |
 		                                            GTK_DIALOG_DESTROY_WITH_PARENT), t, b, "%s", text.c_str() );
 		gtk_window_set_title( GTK_WINDOW(mbox), title.c_str() );
 	
