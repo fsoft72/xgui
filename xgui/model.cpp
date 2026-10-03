@@ -270,6 +270,7 @@ namespace xgui
 
 	void Model::removeChild(int pos)
 	{
+		if (pos < 0 || pos >= (int)_children.size()) return;
 		xgui::Model *child = dynamic_cast<xgui::Model *>(_children[pos]);
 		removeInViews(dynamic_cast<xgui::Model *>(this), pos, dynamic_cast<xgui::Model *>(child));
 		TreeNode::removeChild(pos);

@@ -37,16 +37,16 @@ check "xguimpl::Master initializes threaded" \
 # GUI checks run on a headless GTK Broadway display (needs broadwayd)
 BROADWAY_PORT=:97
 _gui_check() {
-	local name="$1" src="$2"
+	local name="$1" src="$2"; shift 2
 	if [ -z "$LIB_BUILT" ]; then
-		make -f Makefile.gtk lib > "$OUT/lib.log" 2>&1 || { echo "FAIL: libxgui build"; tail -20 "$OUT/lib.log"; FAILED=1; return; }
+		make -B -j8 -f Makefile.gtk lib CPPFLAGS="-g -w -fPIC -D_DEBUG -O0 -fpermissive -D_GLIBCXX_ASSERTIONS" > "$OUT/lib.log" 2>&1 || { echo "FAIL: libxgui build"; tail -20 "$OUT/lib.log"; FAILED=1; return; }
 		broadwayd $BROADWAY_PORT > /dev/null 2>&1 &
 		BROADWAYD_PID=$!
 		trap 'kill $BROADWAYD_PID 2>/dev/null; rm -rf "$OUT"' EXIT
 		sleep 1
 		LIB_BUILT=1
 	fi
-	$CPP -fpermissive -w -D_DEBUG $INCLUDES "$src" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
+	$CPP -fpermissive -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
 		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT"
 }
 
@@ -67,5 +67,8 @@ _gui_check "list column lookup and sort column index" tests/unit/list_columns_te
 
 # Item: unknown model nodes must not insert empty iterators into iter_map
 _gui_check "list ignores nodes without a GTK row" tests/unit/iter_map_test.cpp
+
+# Item: Model::removeChild bounds check
+_gui_check "Model::removeChild ignores bad positions" tests/unit/model_test.cpp
 
 exit $FAILED
