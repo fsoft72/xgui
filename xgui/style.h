@@ -33,6 +33,7 @@ namespace xguimpl
 
 		public:
 			DLLEXPORT Style();
+			DLLEXPORT Style(xguimpl::Style const &other) = default;
 			DLLEXPORT Style(xgui::Image * icon, std::string const &fg_color, std::string const &bg_color, unsigned int text_style);
 			
 			DLLEXPORT void swap(Style &other);

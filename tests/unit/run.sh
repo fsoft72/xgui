@@ -28,7 +28,7 @@ check "master_impl has no non-literal printf format" \
 
 # Item: release builds (no -D_DEBUG) must compile
 check "core and GTK sources compile without -D_DEBUG" \
-	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -fpermissive -w $INCLUDES \$f || exit 1; done"
+	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -w $INCLUDES \$f || exit 1; done"
 
 # Item: Master::threaded must be initialized in the constructor
 check "xguimpl::Master initializes threaded" \
@@ -39,14 +39,14 @@ BROADWAY_PORT=:97
 _gui_check() {
 	local name="$1" src="$2"; shift 2
 	if [ -z "$LIB_BUILT" ]; then
-		make -B -j8 -f Makefile.gtk lib CPPFLAGS="-g -w -fPIC -D_DEBUG -O0 -fpermissive -D_GLIBCXX_ASSERTIONS" > "$OUT/lib.log" 2>&1 || { echo "FAIL: libxgui build"; tail -20 "$OUT/lib.log"; FAILED=1; return; }
+		make -B -j8 -f Makefile.gtk lib CPPFLAGS="-g -w -fPIC -D_DEBUG -O0 -D_GLIBCXX_ASSERTIONS" > "$OUT/lib.log" 2>&1 || { echo "FAIL: libxgui build"; tail -20 "$OUT/lib.log"; FAILED=1; return; }
 		broadwayd $BROADWAY_PORT > /dev/null 2>&1 &
 		BROADWAYD_PID=$!
 		trap 'kill $BROADWAYD_PID 2>/dev/null; rm -rf "$OUT"' EXIT
 		sleep 1
 		LIB_BUILT=1
 	fi
-	$CPP -fpermissive -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
+	$CPP -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
 		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT" "$ROOT"
 }
 
@@ -110,6 +110,12 @@ _gui_check "menu item with icon keeps working" tests/unit/menu_icon_test.cpp
 
 # Item: GTK 2 era APIs must not come back
 check "GTK backend uses no GTK 2 era deprecated API" \
-	bash -c "for f in xgui/gtk/*.cpp; do $CPP -fsyntax-only -fpermissive -Wdeprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f 2>&1; done | grep -E 'gtk_(h|v)scale_new|image_menu_item|GtkImageMenuItem|gtk_menu_popup|gdk_threads_(enter|leave)|gdk_flush|GdkColor|gdk_color' | { ! grep .; }"
+	bash -c "for f in xgui/gtk/*.cpp; do $CPP -fsyntax-only -Wdeprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f 2>&1; done | grep -E 'gtk_(h|v)scale_new|image_menu_item|GtkImageMenuItem|gtk_menu_popup|gdk_threads_(enter|leave)|gdk_flush|GdkColor|gdk_color' | { ! grep .; }"
+
+# Item: strict compiler flags (no -fpermissive, -Wextra clean)
+check "Makefile.gtk uses -Wextra and not -fpermissive" \
+	bash -c '! grep -q -- "-fpermissive" Makefile.gtk && grep -q -- "-Wextra" Makefile.gtk'
+check "sources compile cleanly with -Wall -Wextra -Werror" \
+	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -Wall -Wextra -Wno-unused-parameter -Wno-deprecated-declarations -Werror -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
 
 exit $FAILED

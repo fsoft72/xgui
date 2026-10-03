@@ -63,7 +63,7 @@ struct SortInformations {
 static int int_sort_func ( GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, SortInformations * si )
 {
 	std::string str1, str2;
-	GValue val = {0, };
+	GValue val = G_VALUE_INIT;
 
 	gtk_tree_model_get_value ( model, a, si->sort_column, &val );
 	str1 = g_value_get_string(&val);
@@ -312,7 +312,7 @@ namespace xguimpl
 	
 		unsigned int curr_col_num = 0;
 		for ( ; curr_col_num <  (unsigned int)num_columns; ++curr_col_num ) {
-			GValue str = {0, };
+			GValue str = G_VALUE_INIT;
 
 			if (curr_col_num < child->numberOfStrings()) {
 				g_value_init (&str, G_TYPE_STRING);
@@ -393,7 +393,7 @@ namespace xguimpl
 	
 			int curr_col_num = 0;
 			for ( ; curr_col_num <  num_columns; ++curr_col_num ) {
-				GValue str = {0, };
+				GValue str = G_VALUE_INIT;
 				g_value_init (&str, G_TYPE_STRING);
 				g_value_set_static_string ( &str, child->getString(curr_col_num).c_str() );
 				gtk_list_store_set_value ( store, &curr_ele_iter, first_fields_column + curr_col_num, &str );
@@ -601,7 +601,7 @@ namespace xguimpl
   		GtkTreeIter iter;
 		gtk_tree_model_get_iter ( GTK_TREE_MODEL(store), &iter, path);
 
-		GValue val = {0, };
+		GValue val = G_VALUE_INIT;
 		gtk_tree_model_get_value ( GTK_TREE_MODEL(store), &iter, check_column_id, &val);
 		bool active = g_value_get_boolean(&val);
 		g_value_unset ( &val );

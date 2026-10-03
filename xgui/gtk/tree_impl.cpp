@@ -209,7 +209,7 @@ namespace xguimpl
 		gtk_tree_store_insert( store, &curr_ele_iter, iter_parent, child_pos);
 		tree_map[child] = curr_ele_iter;
 
-		GValue str = {0, };
+		GValue str = G_VALUE_INIT;
 		g_value_init (&str, G_TYPE_STRING);
 		g_value_set_static_string ( &str, child->getString(0).c_str() );
 		gtk_tree_store_set_value ( store, &curr_ele_iter, field_column_id, &str );
@@ -471,7 +471,7 @@ namespace xguimpl
   		GtkTreeIter iter;
 		gtk_tree_model_get_iter ( GTK_TREE_MODEL(store), &iter, path);
 
-		GValue val = {0, };
+		GValue val = G_VALUE_INIT;
 		gtk_tree_model_get_value ( GTK_TREE_MODEL(store), &iter, check_column_id, &val);
 		bool active = g_value_get_boolean(&val);
 		g_value_unset ( &val );

@@ -28,20 +28,6 @@
 #	include <fstream>
 #endif
 
-static std::string trim(std::string const& source, char const* delims = " \t\r\n") {
-  std::string result(source);
-  std::string::size_type index = result.find_last_not_of(delims);
-  if(index != std::string::npos)
-    result.erase(++index);
-
-  index = result.find_first_not_of(delims);
-  if(index != std::string::npos)
-    result.erase(0, index);
-  else
-    result.erase();
-  return result;
-}
-
 namespace xgui
 {
 	xgui::ClassInfo * Master::FindClass(std::string const &node)
