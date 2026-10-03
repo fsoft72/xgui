@@ -9,3 +9,4 @@
 - Fixed List selection and check mapping after `sort()`: `OnSelect` and `swapCheck` now resolve rows through `iter_map` instead of the GTK row index. Added headless GUI test (`tests/unit/list_sort_test.cpp`, runs on a Broadway display).
 - Note: `List::OnSelect` reads the `onselect` event but `List::linkEvent` only accepts `onchange`, so the selection callback is never invoked for lists (not fixed yet).
 - Fixed `LoadJson` crashing on malformed input: the `type` field is validated as a string and the whole parse is wrapped in `try/catch`. Added `tests/unit/json_loader_test.cpp`.
+- Fixed the `focused` widget property: the setter calls `gtk_widget_grab_focus()` (it passed a pointer as `gboolean` to `has-focus`), the getter uses `gtk_widget_is_focus()`. Added `tests/unit/focus_test.cpp`.

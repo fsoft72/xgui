@@ -156,9 +156,7 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "focused" ) {
-			gboolean val;
-			g_object_get( G_OBJECT(widget), "has-focus", &val, NULL);
- 			vals = xgui::semantic_cast<std::string>(val);
+			vals = xgui::semantic_cast<std::string>(gtk_widget_is_focus(widget));
 			return true;
 		}
 
@@ -185,8 +183,7 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "focused" ) {
-			gboolean val = xgui::semantic_cast<gboolean>(vals);
-			g_object_set( G_OBJECT(widget), "has-focus", &val, NULL);
+			if ( xgui::semantic_cast<int>(vals) ) gtk_widget_grab_focus(widget);
 			return true;
 		}
 

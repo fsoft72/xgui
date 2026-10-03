@@ -56,4 +56,7 @@ _gui_check "list selection maps to model after sort" tests/unit/list_sort_test.c
 # Item: malformed JSON must not crash LoadJson
 _gui_check "LoadJson survives malformed JSON" tests/unit/json_loader_test.cpp
 
+# Item: "focused" property must grab focus
+_gui_check "focused property grabs focus" tests/unit/focus_test.cpp
+
 exit $FAILED
