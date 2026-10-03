@@ -1,7 +1,7 @@
 //
 // C++ Implementation: list_impl
 //
-// Description: 
+// Description: List widget on GtkColumnView (GListStore of XguiRow -> GtkMultiSelection -> GtkColumnView)
 //
 //
 // Author: Os3 s.r.l. <xgui@os3.it>, (C) 2005
@@ -18,29 +18,8 @@
 #include "image_impl.h"
 #include "row_style.h"
 
-/**
- * Finds a view column by its xgui id (or by its title as a fallback).
- * Returns the column and its position in the view, or {NULL, -1} when not found.
- */
-static std::pair<GtkTreeViewColumn *, int> int_find_column ( GtkTreeView * list_view, std::string const & name )
-{
-	GList * columns = gtk_tree_view_get_columns( GTK_TREE_VIEW(list_view) );
-	GtkTreeViewColumn * found = 0;
-	int found_pos = -1;
-	int curr_col_n = 0;
-	for ( GList * cur = columns; cur != NULL && !found; cur = cur->next, ++curr_col_n ) {
-		GtkTreeViewColumn * col_data = (GtkTreeViewColumn *)cur->data;
-		std::string const * id = (std::string const *)g_object_get_data( G_OBJECT(col_data), "xgui-column-id" );
-		char const * title = gtk_tree_view_column_get_title(col_data);
-		if ( (id && *id == name) || (title && name == title) ) {
-			found = col_data;
-			found_pos = curr_col_n;
-		}
-	}
-	g_list_free(columns);
-
-	return std::make_pair(found, found_pos);
-}
+/** Data key of the row bound to a checkbox. */
+static char const * const ROW_KEY = "xgui-row";
 
 static float int_map_align ( std::string const & alignment )
 {
@@ -49,77 +28,161 @@ static float int_map_align ( std::string const & alignment )
 	else return 0.0f;
 }
 
-static void int_col_id_destroy_notify( std::string * str )
+/** Returns the row shown by a list item. */
+static XguiRow * int_item_row ( GObject * item )
 {
-	delete str;
+	return XGUI_ROW(gtk_list_item_get_item(GTK_LIST_ITEM(item)));
 }
 
+/* Data columns: a label showing one string of the model node */
+
+static void int_text_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl::ListColumn * col )
+{
+	GtkWidget * label = gtk_label_new(NULL);
+	gtk_label_set_xalign(GTK_LABEL(label), col->xalign);
+	gtk_list_item_set_child(GTK_LIST_ITEM(item), label);
+}
+
+static void int_text_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::ListColumn * col )
+{
+	if ( !col->list ) return;
+	col->list->bindLabel(GTK_LABEL(gtk_list_item_get_child(GTK_LIST_ITEM(item))), int_item_row(item), col->field);
+}
+
+static void int_column_destroy ( gpointer data )
+{
+	delete (xguimpl::ListColumn *)data;
+}
+
+/* Checkbox column: a check button following the "checked" property of the row */
+
+static void int_check_toggled ( GtkCheckButton * button, xguimpl::List * list )
+{
+	XguiRow * row = (XguiRow *)g_object_get_data(G_OBJECT(button), ROW_KEY);
+	if (!row) return;
+
+	gboolean active = gtk_check_button_get_active(button);
+	if (active == xgui_row_get_checked(row)) return;
+	xgui_row_set_checked(row, active);
+	list->notifyCheck(row);
+}
+
+static void int_row_checked_changed ( XguiRow * row, GParamSpec *, GtkCheckButton * button )
+{
+	gtk_check_button_set_active(button, xgui_row_get_checked(row));
+}
+
+static void int_check_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * list )
+{
+	GtkWidget * button = gtk_check_button_new();
+	g_signal_connect(button, "toggled", G_CALLBACK(int_check_toggled), list);
+	gtk_list_item_set_child(GTK_LIST_ITEM(item), button);
+}
+
+static void int_check_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * )
+{
+	GtkWidget * button = gtk_list_item_get_child(GTK_LIST_ITEM(item));
+	XguiRow * row = int_item_row(item);
+
+	// The row is attached after the state is copied, so that binding does not look like a user toggle
+	g_object_set_data(G_OBJECT(button), ROW_KEY, NULL);
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(button), xgui_row_get_checked(row));
+	g_object_set_data(G_OBJECT(button), ROW_KEY, row);
+	g_signal_connect_object(row, "notify::checked", G_CALLBACK(int_row_checked_changed), button, (GConnectFlags)0);
+}
+
+static void int_check_unbind ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * )
+{
+	GtkWidget * button = gtk_list_item_get_child(GTK_LIST_ITEM(item));
+	XguiRow * row = int_item_row(item);
+	g_object_set_data(G_OBJECT(button), ROW_KEY, NULL);
+	if (row) g_signal_handlers_disconnect_by_func(row, (gpointer)int_row_checked_changed, button);
+}
+
+/* Icon column: the icon of the style of the row */
+
+static void int_icon_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * )
+{
+	GtkWidget * picture = gtk_picture_new();
+	gtk_picture_set_can_shrink(GTK_PICTURE(picture), FALSE);
+	gtk_list_item_set_child(GTK_LIST_ITEM(item), picture);
+}
+
+static void int_icon_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * list )
+{
+	list->bindIcon(GTK_PICTURE(gtk_list_item_get_child(GTK_LIST_ITEM(item))), int_item_row(item));
+}
+
+/** Creates a column view column with a signal factory. */
+static GtkColumnViewColumn * int_new_column ( char const * title, GCallback setup, GCallback bind, GCallback unbind, gpointer data )
+{
+	GtkListItemFactory * factory = gtk_signal_list_item_factory_new();
+	g_signal_connect(factory, "setup", setup, data);
+	g_signal_connect(factory, "bind", bind, data);
+	if (unbind) g_signal_connect(factory, "unbind", unbind, data);
+	return gtk_column_view_column_new(title, factory);
+}
+
+/** Compares two rows on one of their strings through the user callback. */
 struct SortInformations {
 	xguimpl::List * list_ptr;
 	xgui::TextPairCallback * compare_cb;
-	unsigned int sort_column;
+	int field;
 };
 
-static int int_sort_func ( GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, SortInformations * si )
+static std::string int_field ( xgui::Model * node, int field )
 {
-	std::string str1, str2;
-	GValue val = G_VALUE_INIT;
-
-	gtk_tree_model_get_value ( model, a, si->sort_column, &val );
-	str1 = g_value_get_string(&val);
-	g_value_unset(&val);
-
-	gtk_tree_model_get_value ( model, b, si->sort_column, &val );
-	str2 = g_value_get_string(&val);
-	g_value_unset(&val);
-
-	if (si->compare_cb)
-		return si->compare_cb->call( dynamic_cast<xgui::Widget*>(si->list_ptr), str1, str2 );
-	else
-		return 0;
+	return (field >= 0 && (unsigned int)field < node->numberOfStrings()) ? node->getString(field) : std::string();
 }
 
+static gint int_sort_func ( gconstpointer a, gconstpointer b, gpointer data )
+{
+	SortInformations * si = (SortInformations *)data;
+	std::string str1 = int_field(xgui_row_get_node(XGUI_ROW((gpointer)a)), si->field);
+	std::string str2 = int_field(xgui_row_get_node(XGUI_ROW((gpointer)b)), si->field);
+	return si->compare_cb->call( dynamic_cast<xgui::Widget*>(si->list_ptr->this_list), str1, str2 );
+}
 
 namespace xguimpl
 {
-	List::List ( GtkWidget * real_w ) 
-	: View ( real_w ), list_view(0), fg_column_id(0), bg_column_id(1), italic_column_id(2), 
-	bold_column_id(3), underline_column_id(4), strike_column_id(5), check_column_id(6), 
-	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false), model_dirty(false), rebuild_idle_id(0) { }
+	List::List ( GtkWidget * real_w )
+	: View ( real_w ), store(0), selection(0), column_view(0), check_column(0), icon_column(0),
+	  has_icons(false), has_checks(false), search_enabled(false), this_list(0) { }
 
-	List::List ( xgui::Container * parent ) : View ( gtk_scrolled_window_new() ), list_view(0), fg_column_id(0), 
-	bg_column_id(1), italic_column_id(2), bold_column_id(3), underline_column_id(4), strike_column_id(5),check_column_id(6), 
-	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false), model_dirty(false), rebuild_idle_id(0)
+	List::List ( xgui::Container * parent )
+	: View ( gtk_scrolled_window_new() ), store(0), selection(0), column_view(0), check_column(0), icon_column(0),
+	  has_icons(false), has_checks(false), search_enabled(false), this_list(0)
 	{
-		list_view = (GtkTreeView*)gtk_tree_view_new();
-		gtk_tree_view_set_enable_search( GTK_TREE_VIEW(list_view), FALSE );
-		gtk_tree_selection_set_mode ( gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) ), GTK_SELECTION_MULTIPLE );
-	
-		left_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( left_align_text_renderer ), "xalign", 0.0f, NULL );
-		center_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( center_align_text_renderer ), "xalign", 0.5f, NULL );
-		right_align_text_renderer = gtk_cell_renderer_text_new ();
-		g_object_set ( G_OBJECT ( right_align_text_renderer ), "xalign", 1.0f, NULL );
-	
-		check_renderer = gtk_cell_renderer_toggle_new();
-		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, NULL );
-		icon_renderer = gtk_cell_renderer_pixbuf_new();
-	
-		g_signal_connect (G_OBJECT (check_renderer), "toggled", G_CALLBACK ( OnCheck ), this);
+		store = g_list_store_new ( XGUI_TYPE_ROW );
+		selection = gtk_multi_selection_new ( G_LIST_MODEL ( g_object_ref ( store ) ) );
+		column_view = GTK_COLUMN_VIEW ( gtk_column_view_new ( GTK_SELECTION_MODEL ( g_object_ref ( selection ) ) ) );
+		gtk_column_view_set_reorderable ( column_view, FALSE );
 
-		gtk_scrolled_window_set_child ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( list_view ) );
+		g_signal_connect ( selection, "selection-changed", G_CALLBACK ( OnSelectionChanged ), this );
+		g_signal_connect ( gtk_column_view_get_sorter ( column_view ), "changed", G_CALLBACK ( OnSorterChanged ), this );
+
+		gtk_scrolled_window_set_child ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( column_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	}
 
-	List::~List() 
-	{ 
-		if (rebuild_idle_id) g_source_remove(rebuild_idle_id);
+	List::~List()
+	{
+		if ( selection ) g_signal_handlers_disconnect_by_data ( selection, this );
+		if ( column_view && GTK_IS_WIDGET(column_view) ) {
+			g_signal_handlers_disconnect_by_data ( gtk_column_view_get_sorter ( column_view ), this );
+			// Unbinds every cell: no factory callback may reach this object any more
+			gtk_column_view_set_model ( column_view, NULL );
+			for ( std::vector<ListColumn *>::iterator c = columns.begin(); c != columns.end(); ++c )
+				(*c)->list = 0;
+		}
+		if ( selection ) g_object_unref ( selection );
+		if ( store ) g_object_unref ( store );
 	}
 
 	bool List::linkEvent( std::string const &name )
 	{
-		if ( (name == "onchange") )
+		// The selection is reported through "onselect"; "onchange" is kept for compatibility
+		if ( (name == "onselect") || (name == "onchange") )
 			return true;
 		else if ( name == "onheaderclick" )
 			return true;
@@ -139,475 +202,255 @@ namespace xguimpl
 
 		Widget::setAccessor(w);
 	}
-	
-	/** Records the store row of a model node in both lookup maps. */
-	void List::mapRow ( xgui::Model * child, GtkTreeIter const & iter )
+
+	XguiRow * List::rowOf ( xgui::Model * node )
 	{
-		iter_map[child] = iter;
-		row_map[iter.user_data] = child;
+		std::map<xgui::Model *, XguiRow *>::iterator found = rows.find(node);
+		return found == rows.end() ? 0 : found->second;
 	}
 
-	/** Forgets the store row of a model node. */
-	void List::unmapRow ( xgui::Model * child )
+	int List::positionOf ( XguiRow * row )
 	{
-		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(child);
-		if ( found == iter_map.end() ) return;
-
-		row_map.erase(found->second.user_data);
-		iter_map.erase(found);
+		guint pos = 0;
+		if ( !row || !g_list_store_find ( store, row, &pos ) ) return -1;
+		return (int)pos;
 	}
 
-	/** Forgets every row of the store. */
-	void List::clearRowMaps()
+	ListColumn * List::findColumn ( std::string const &name )
 	{
-		iter_map.clear();
-		row_map.clear();
+		for ( std::vector<ListColumn *>::iterator c = columns.begin(); c != columns.end(); ++c )
+			if ( ((*c)->id == name) || ((*c)->title == name) ) return *c;
+		return 0;
 	}
 
-	/** Returns the model node shown in the given row, or NULL if the row is unknown. */
-	xgui::Model * List::modelFromIter ( GtkTreeIter const & iter ) const
+	void List::bindLabel ( GtkLabel * label, XguiRow * row, int field )
 	{
-		std::map<gpointer, xgui::Model *>::const_iterator found = row_map.find(iter.user_data);
-		return found == row_map.end() ? 0 : found->second;
+		xgui::Model * node = xgui_row_get_node(row);
+		gtk_label_set_text ( label, int_field(node, field).c_str() );
+		applyLabelStyle ( label, this_list->styleman_, node->getStyle() );
 	}
 
-	/** Idle handler that rebuilds the store once after a burst of addColumn calls. */
-	gboolean List::OnRebuildIdle ( gpointer data )
+	void List::bindIcon ( GtkPicture * picture, XguiRow * row )
 	{
-		List * l = (List *)data;
-		l->rebuild_idle_id = 0;
-		l->syncGtkModel();
-		return G_SOURCE_REMOVE;
+		GdkTexture * icon = rowIcon ( this_list->styleman_, xgui_row_get_node(row)->getStyle() );
+		gtk_picture_set_paintable ( picture, icon ? GDK_PAINTABLE(icon) : NULL );
 	}
 
-	/** Flags the store as outdated: it is rebuilt once, when first needed or when the main loop is idle. */
-	void List::markModelDirty()
+	void List::notifyRefresh ()
 	{
-		model_dirty = true;
-		if (!rebuild_idle_id) rebuild_idle_id = g_idle_add ( OnRebuildIdle, this );
-	}
-
-	/** Rebuilds the store if the columns changed since the last rebuild. */
-	void List::syncGtkModel()
-	{
-		if (model_dirty) rebuildGtkModel();
-	}
-
-	void List::rebuildGtkModel()
-	{
-		int &num_columns = this_list->num_columns_;
-
-		model_dirty = false;
-		if (rebuild_idle_id) {
-			g_source_remove(rebuild_idle_id);
-			rebuild_idle_id = 0;
-		}
-
-		// The rows of the old store are about to disappear: their iterators must not be used anymore
-		clearRowMaps();
-
-		GType * columns_types = new GType[first_fields_column + num_columns];
-	
-		columns_types[fg_column_id] = GDK_TYPE_RGBA;
-		columns_types[bg_column_id] = GDK_TYPE_RGBA;
-		columns_types[italic_column_id] = PANGO_TYPE_STYLE;
-		columns_types[bold_column_id] = G_TYPE_INT;
-		columns_types[underline_column_id] = PANGO_TYPE_UNDERLINE;
-		columns_types[strike_column_id] = G_TYPE_BOOLEAN;
-		columns_types[check_column_id] = G_TYPE_BOOLEAN;
-		columns_types[icon_column_id] = GDK_TYPE_TEXTURE;
-	
-		for (int curr_col_num = first_fields_column; curr_col_num < (first_fields_column + num_columns); ++curr_col_num )
-			columns_types[curr_col_num] = G_TYPE_STRING;
-	
-		GtkListStore *store = gtk_list_store_newv(first_fields_column + num_columns, columns_types);
-		delete [] columns_types;
-		
-		gtk_tree_view_set_model ( GTK_TREE_VIEW ( list_view ), GTK_TREE_MODEL ( store ) );
-		g_object_unref ( store );
-		refresh();
+		xgui::Callback * refresh_cb = this_list->getEvent("onrefresh");
+		if (refresh_cb) refresh_cb->call( this_list );
 	}
 
 	bool List::get_list_prop ( std::string const &name, std::string &vals )
 	{
 		if ( name == "search-enabled" ) {
-			vals = gtk_tree_view_get_enable_search( GTK_TREE_VIEW(list_view) ) ? "1" : "0";
+			vals = search_enabled ? "1" : "0";
 		} else if ( name == "visible-headers" ) {
-			vals = gtk_tree_view_get_headers_visible(GTK_TREE_VIEW ( list_view )) ? "1" : "0";
+			vals = columnViewHeadersVisible ( column_view ) ? "1" : "0";
 		} else if ( name == "has-icons" ) {
 			vals = has_icons ? "1" : "0";
 		} else if ( name == "has-checkboxes" ) {
 			vals = has_checks ? "1" : "0";
 		} else
 			return false;
-	
+
 		return true;
 	}
 
-	bool List::set_list_prop ( std::string const &name, const std::string &vals ) 
+	bool List::set_list_prop ( std::string const &name, const std::string &vals )
 	{
 		if ( name == "search-enabled" ) {
-			gtk_tree_view_set_enable_search( GTK_TREE_VIEW(list_view), (vals == "1" ? 1 : 0) );
+			// GtkColumnView has no interactive search: the value is only kept
+			search_enabled = (vals == "1");
 		} else if ( name == "visible-headers" ) {
-			gtk_tree_view_set_headers_visible( GTK_TREE_VIEW ( list_view ), (vals == "0" ? 0 : 1) );
+			setColumnViewHeadersVisible ( column_view, vals != "0" );
 		} else if ( name == "has-icons" ) {
-			bool should_put_icons = ((vals == "1") ? true : false);
+			bool should_put_icons = (vals == "1");
 			if ( should_put_icons == has_icons ) return true;
-	
-			if (should_put_icons) {
-				has_icons = true;
-				GtkTreeViewColumn * icon_col = gtk_tree_view_column_new();
-				gtk_tree_view_column_pack_start ( icon_col, icon_renderer, FALSE);
-				gtk_tree_view_column_add_attribute ( icon_col, icon_renderer, "texture", icon_column_id );
+			has_icons = should_put_icons;
 
-				int col_pos = 0;
-				if (has_checks) ++col_pos;
-				gtk_tree_view_insert_column ( GTK_TREE_VIEW( list_view ), icon_col, col_pos);
+			if (has_icons) {
+				icon_column = int_new_column ( "", G_CALLBACK(int_icon_setup), G_CALLBACK(int_icon_bind), NULL, this );
+				gtk_column_view_insert_column ( column_view, has_checks ? 1 : 0, icon_column );
+				g_object_unref ( icon_column );
 			}
 			else {
-				int col_pos = 0;
-				if (has_checks) ++col_pos;
-
-				has_icons = false;
-				gtk_tree_view_remove_column( GTK_TREE_VIEW(list_view), gtk_tree_view_get_column( GTK_TREE_VIEW(list_view), col_pos ) );
+				gtk_column_view_remove_column ( column_view, icon_column );
+				icon_column = 0;
 			}
 		} else if ( name == "has-checkboxes" ) {
-			bool should_put_checks = ((vals == "1") ? true : false);
+			bool should_put_checks = (vals == "1");
 			if ( should_put_checks == has_checks ) return true;
-	
-			if (should_put_checks) {
-				has_checks = true;
-				GtkTreeViewColumn * check_col = gtk_tree_view_column_new();
-				gtk_tree_view_column_pack_start ( check_col, check_renderer, FALSE);
-				gtk_tree_view_column_add_attribute ( check_col, check_renderer, "active", check_column_id );
+			has_checks = should_put_checks;
 
- 				gtk_tree_view_insert_column ( GTK_TREE_VIEW( list_view ), check_col, 0);
+			if (has_checks) {
+				check_column = int_new_column ( "", G_CALLBACK(int_check_setup), G_CALLBACK(int_check_bind), G_CALLBACK(int_check_unbind), this );
+				gtk_column_view_insert_column ( column_view, 0, check_column );
+				g_object_unref ( check_column );
 			}
 			else {
-				has_checks = false;
-				gtk_tree_view_remove_column( GTK_TREE_VIEW(list_view), gtk_tree_view_get_column( GTK_TREE_VIEW(list_view), 0 ) );
+				gtk_column_view_remove_column ( column_view, check_column );
+				check_column = 0;
 			}
 		} else
 			return false;
-	
+
 		return true;
 	}
 
 	void List::insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
 	{
-		if ( (!list_view) || (!this_list->getModel()) || (!this_list->num_columns_) ) return;
-
-		// The pending rebuild will add the new row together with all the others
-		if (model_dirty) return;
-		int &num_columns = this_list->num_columns_;
-
-		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
-		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
-	
-		GtkTreeIter curr_ele_iter;	
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-		gtk_list_store_insert ( store, &curr_ele_iter, child_pos );
-		mapRow ( child, curr_ele_iter );
-	
-		unsigned int curr_col_num = 0;
-		for ( ; curr_col_num <  (unsigned int)num_columns; ++curr_col_num ) {
-			GValue str = G_VALUE_INIT;
-
-			if (curr_col_num < child->numberOfStrings()) {
-				g_value_init (&str, G_TYPE_STRING);
-				g_value_set_static_string ( &str, child->getString(curr_col_num).c_str() );
-				gtk_list_store_set_value ( store, &curr_ele_iter, first_fields_column + curr_col_num, &str );
-				g_value_unset (&str);
-			}
-		}
-	
-		if (this_list->styleman_) {
-			std::string style = child->getStyle();
-			xgui::StyleManager * sm = this_list->styleman_;
-
-			applyRowStyle ( GTK_TREE_MODEL(store), &curr_ele_iter, row_style_columns(), sm, style );
-		}
-	
-	
-		xgui::Callback * refresh_cb = this_list->getEvent("onrefresh");
-		if (refresh_cb) refresh_cb->call( this_list );
-	
-		g_signal_connect (G_OBJECT (sel), "changed", G_CALLBACK ( OnSelect ), this);
-	}
-	
-	void List::removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child ) 
-	{
-		if ( (!list_view) || (!this_list->getModel()) || (!this_list->num_columns_) ) return;
-	
-		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
-		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
-	
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(child);
-		if ( found != iter_map.end() ) {
-			GtkTreeIter to_remove = found->second;
-			gtk_list_store_remove (store, &to_remove);
-			unmapRow(child);
-		}
-		delSelection(child);
-	
-		xgui::Callback * refresh_cb = this_list->getEvent("onrefresh");
-		if (refresh_cb) refresh_cb->call( dynamic_cast<xgui::Widget*>(this_list) );
-	
-		g_signal_connect (G_OBJECT (sel), "changed", G_CALLBACK ( OnSelect ), this);
-	}
-
-	void List::refresh() 
-	{
-		int &num_columns = this_list->num_columns_;
 		xgui::Model * model = this_list->getModel();
-		xgui::StyleManager * stylem = this_list->styleman_;
+		if ( (!store) || (!model) || (parent != model) || rowOf(child) ) return;
 
-		if ( (!list_view) || (!model) || (!num_columns) ) return;
+		guint n = g_list_model_get_n_items ( G_LIST_MODEL(store) );
+		guint pos = (child_pos < 0 || (guint)child_pos > n) ? n : (guint)child_pos;
 
-		// A pending rebuild repopulates the store, so there is nothing else to do here
-		if (model_dirty) {
-			rebuildGtkModel();
-			return;
-		}
-	
-		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
-		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
-		
-		
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-		gtk_list_store_clear ( store );
-		clearRowMaps();
-	
-		int curr_row_num = 0;
-		for ( xgui::Model::iterator iter = model->begin(); iter != model->end(); ++iter )
-		{
-			GtkTreeIter curr_ele_iter;
-			xgui::Model * child = dynamic_cast<xgui::Model *>(*iter);
-			
-			gtk_list_store_insert ( store, &curr_ele_iter, curr_row_num++);
-			mapRow ( child, curr_ele_iter );
-	
-			int curr_col_num = 0;
-			for ( ; curr_col_num <  num_columns; ++curr_col_num ) {
-				GValue str = G_VALUE_INIT;
-				g_value_init (&str, G_TYPE_STRING);
-				g_value_set_static_string ( &str, child->getString(curr_col_num).c_str() );
-				gtk_list_store_set_value ( store, &curr_ele_iter, first_fields_column + curr_col_num, &str );
-				g_value_unset (&str);
-			}
-	
-			if (stylem) {
-				std::string style = child->getStyle();
-				xgui::StyleManager * sm = this_list->styleman_;
-	
-				applyRowStyle ( GTK_TREE_MODEL(store), &curr_ele_iter, row_style_columns(), sm, style );
-			}
-	
-			//if ( this_list->isSelected(child) ) gtk_tree_selection_select_iter ( sel, &curr_ele_iter );
-		}
-	
-	
-		xgui::Callback * refresh_cb = this_list->getEvent("onrefresh");
-		if (refresh_cb) refresh_cb->call( this_list );
-	
-		g_signal_connect (G_OBJECT (sel), "changed", G_CALLBACK ( OnSelect ), this);
+		XguiRow * row = xgui_row_new ( child );
+		rows[child] = row;
+		g_list_store_insert ( store, pos, row );
+		g_object_unref ( row );
+
+		notifyRefresh();
 	}
 
-	void List::addColumn ( int cpos, const std::string & cid, const std::string & cname, int cwidth, const std::string & calign ) 
-	{	
-		GtkCellRenderer * renderer = left_align_text_renderer;
-		if (calign == "right") renderer = right_align_text_renderer;
-		else if (calign == "center") renderer = center_align_text_renderer;
+	void List::removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child )
+	{
+		if ( !store ) return;
 
-		GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes ( cname.c_str(), renderer, "text", 
-					(cpos + first_fields_column),
-					"foreground-rgba", fg_column_id,
-					"background-rgba", bg_column_id,
-					"style", italic_column_id,
-					"weight", bold_column_id,
-					"underline", underline_column_id,
-					"strikethrough", strike_column_id,
-					NULL);
+		XguiRow * row = rowOf(child);
+		int pos = positionOf(row);
+		rows.erase(child);
+		delSelection(child);
+		if ( pos >= 0 ) g_list_store_remove ( store, pos );
 
-		g_object_set_data_full( G_OBJECT(column), "xgui-column-id", (void*)new std::string(cid), (GDestroyNotify)int_col_id_destroy_notify );
-		gtk_tree_view_column_set_clickable(column, TRUE);
-		gtk_tree_view_column_set_min_width(column, cwidth);
-		gtk_tree_view_column_set_resizable(column, TRUE);
-		gtk_tree_view_column_set_alignment(column, int_map_align(calign));
-		
-		g_signal_connect ( G_OBJECT(column), "clicked", G_CALLBACK(OnHeaderClick), this );
-		gtk_tree_view_insert_column ( GTK_TREE_VIEW( list_view ), column, (has_icons ? cpos + 1 : cpos) );
-	
-		markModelDirty();
+		notifyRefresh();
+	}
+
+	void List::refresh()
+	{
+		xgui::Model * model = this_list->getModel();
+		if ( (!store) || (!model) ) return;
+
+		rows.clear();
+		std::vector<gpointer> items;
+		for ( xgui::Model::iterator iter = model->begin(); iter != model->end(); ++iter ) {
+			xgui::Model * child = dynamic_cast<xgui::Model *>(*iter);
+			if ( !child || rows.count(child) ) continue;
+			XguiRow * row = xgui_row_new ( child );
+			rows[child] = row;
+			items.push_back ( row );
+		}
+
+		// One splice: the view is notified once for the whole model
+		g_list_store_splice ( store, 0, g_list_model_get_n_items ( G_LIST_MODEL(store) ), items.data(), items.size() );
+		for ( std::vector<gpointer>::iterator i = items.begin(); i != items.end(); ++i )
+			g_object_unref ( *i );
+
+		notifyRefresh();
+	}
+
+	void List::addColumn ( int cpos, const std::string & cid, const std::string & cname, int cwidth, const std::string & calign )
+	{
+		ListColumn * col = new ListColumn();
+		col->list = this;
+		col->id = cid;
+		col->title = cname;
+		col->field = cpos;
+		col->xalign = int_map_align(calign);
+
+		col->column = int_new_column ( cname.c_str(), G_CALLBACK(int_text_setup), G_CALLBACK(int_text_bind), NULL, col );
+		g_object_set_data_full ( G_OBJECT(col->column), "xgui-list-column", col, int_column_destroy );
+		gtk_column_view_column_set_fixed_width ( col->column, cwidth );
+		gtk_column_view_column_set_resizable ( col->column, TRUE );
+		gtk_column_view_column_set_expand ( col->column, FALSE );
+		// The sorter only makes the header clickable: clicks are reported by onheaderclick
+		GtkSorter * sorter = GTK_SORTER ( gtk_custom_sorter_new ( NULL, NULL, NULL ) );
+		gtk_column_view_column_set_sorter ( col->column, sorter );
+		g_object_unref ( sorter );
+
+		// Data columns follow the optional checkbox and icon columns
+		guint first = (has_checks ? 1 : 0) + (has_icons ? 1 : 0);
+		guint n = g_list_model_get_n_items ( gtk_column_view_get_columns ( column_view ) );
+		guint pos = first + (cpos < 0 ? n : (guint)cpos);
+		if (pos > n) pos = n;
+		gtk_column_view_insert_column ( column_view, pos, col->column );
+		g_object_unref ( col->column );
+
+		columns.push_back ( col );
 	}
 
 	bool List::delColumn ( const std::string & column_name )
 	{
-		std::pair<GtkTreeViewColumn *, int> col_data = int_find_column( GTK_TREE_VIEW(list_view), column_name );
-		if (col_data.first) {
-			gtk_tree_view_remove_column(GTK_TREE_VIEW(list_view), col_data.first);
-			return true;
-		}
-		return false;
+		ListColumn * col = findColumn ( column_name );
+		if ( !col ) return false;
+
+		for ( std::vector<ListColumn *>::iterator c = columns.begin(); c != columns.end(); ++c )
+			if ( *c == col ) { columns.erase(c); break; }
+		// Removing the column releases it, and with it the ListColumn
+		gtk_column_view_remove_column ( column_view, col->column );
+		return true;
 	}
 
 	void List::sort ( std::string const & column_name, xgui::TextPairCallback * compare_cb )
 	{
-		syncGtkModel();
-		std::pair<GtkTreeViewColumn *, int> col_data = int_find_column( GTK_TREE_VIEW(list_view), column_name );
-		if ( !col_data.first ) return;
+		ListColumn * col = findColumn ( column_name );
+		if ( !col || !compare_cb ) return;
 
-		// The view also holds the optional checkbox and icon columns, which have no data column of their own
-		int extra_columns = (has_icons ? 1 : 0) + (has_checks ? 1 : 0);
-		SortInformations si = { this, compare_cb, (unsigned int)(col_data.second - extra_columns + first_fields_column) };
-	
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-		gtk_tree_sortable_set_default_sort_func ( GTK_TREE_SORTABLE( store ), (GtkTreeIterCompareFunc)int_sort_func, &si, 0 );
-		gtk_tree_sortable_set_sort_column_id ( GTK_TREE_SORTABLE( store ), GTK_TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID , GTK_SORT_ASCENDING);
-		gtk_tree_sortable_set_sort_column_id ( GTK_TREE_SORTABLE( store ), GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID, GTK_SORT_ASCENDING );
-		gtk_tree_sortable_set_default_sort_func ( GTK_TREE_SORTABLE( store ), 0, 0, 0 );
+		// A one shot sort of the rows, as with GTK 3: later rows are inserted at their model position
+		SortInformations si = { this, compare_cb, col->field };
+		g_list_store_sort ( store, int_sort_func, &si );
 	}
 
-	bool List::isSelected(xgui::Model * model, int pos) 
+	bool List::isSelected(xgui::Model * model, int pos)
 	{
-		syncGtkModel();
-		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
-		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(model->getChild(pos));
-		if ( found == iter_map.end() ) return false;
-
-		return gtk_tree_selection_iter_is_selected(sel, &found->second);
+		int row_pos = positionOf ( rowOf ( model->getChild(pos) ) );
+		if ( row_pos < 0 ) return false;
+		return gtk_selection_model_is_selected ( GTK_SELECTION_MODEL(selection), row_pos );
 	}
 
-	void List::select(xgui::Model * parent, int pos, bool state) 
+	void List::select(xgui::Model * parent, int pos, bool state)
 	{
-		syncGtkModel();
-		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
-		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(parent->getChild(pos));
-		if ( found == iter_map.end() ) return;
+		int row_pos = positionOf ( rowOf ( parent->getChild(pos) ) );
+		if ( row_pos < 0 ) return;
 
 		if (state)
-			gtk_tree_selection_select_iter(sel, &found->second);
+			gtk_selection_model_select_item ( GTK_SELECTION_MODEL(selection), row_pos, FALSE );
 		else
-			gtk_tree_selection_unselect_iter(sel, &found->second);
+			gtk_selection_model_unselect_item ( GTK_SELECTION_MODEL(selection), row_pos );
 	}
 
-	void List::selectAll(xgui::Model * model, bool state) 
+	void List::selectAll(xgui::Model * model, bool state)
 	{
-		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
 		if (state)
-			gtk_tree_selection_select_all(sel);
+			gtk_selection_model_select_all ( GTK_SELECTION_MODEL(selection) );
 		else
-			gtk_tree_selection_unselect_all(sel);
+			gtk_selection_model_unselect_all ( GTK_SELECTION_MODEL(selection) );
 	}
 
 	bool List::isChecked(xgui::Model * parent, int pos)
 	{
-		syncGtkModel();
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(parent->getChild(pos));
-		if ( found == iter_map.end() ) return false;
- 		gboolean state;
-
-		gtk_tree_model_get ( GTK_TREE_MODEL(store), &found->second, check_column_id, &state, -1);
-
-		return state;
+		XguiRow * row = rowOf ( parent->getChild(pos) );
+		return row && xgui_row_get_checked ( row );
 	}
 
 	void List::check(xgui::Model * parent, int pos, bool state)
 	{
-		syncGtkModel();
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(parent->getChild(pos));
-		if ( found == iter_map.end() ) return;
-		gtk_list_store_set ( store, &found->second, check_column_id, state, -1);
+		XguiRow * row = rowOf ( parent->getChild(pos) );
+		if ( row ) xgui_row_set_checked ( row, state );
 	}
 
 	void List::checkAll(xgui::Model * parent, bool state)
 	{
-		syncGtkModel();
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		for (xgui::Model::iterator i = parent->begin(); i != parent->end(); ++i) {
-			std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(dynamic_cast<xgui::Model*>(*i));
-			if ( found == iter_map.end() ) continue;
-			gtk_list_store_set ( store, &found->second, check_column_id, state, -1);
+			XguiRow * row = rowOf ( dynamic_cast<xgui::Model*>(*i) );
+			if ( row ) xgui_row_set_checked ( row, state );
 		}
 	}
 
-	void List::OnSelect ( GtkTreeSelection * sel, List *xl )
+	void List::notifyCheck ( XguiRow * row )
 	{
-		xgui::TextStatusCallback * sel_cb = 0;
-	
-		xgui::Callback * cb = xl->this_list->getEvent("onselect");
-		if (cb) {
-			sel_cb = dynamic_cast<xgui::TextStatusCallback*>(cb);
-			if (!sel_cb)
-				DMESSAGE("onselect event of xgui::List expected a TextStatusCallback");
-		}
-	
-		// Selected rows reported by GTK, resolved to model nodes
-		std::set<xgui::Model*> selected;
-		GtkTreeModel * store = gtk_tree_view_get_model ( gtk_tree_selection_get_tree_view ( sel ) );
-		GList * rows = gtk_tree_selection_get_selected_rows ( sel, &store );
-		for ( GList * r = rows; r != NULL; r = r->next ) {
-			GtkTreeIter iter;
-			if ( !gtk_tree_model_get_iter ( store, &iter, (GtkTreePath *)r->data ) ) continue;
-
-			xgui::Model * node = xl->modelFromIter ( iter );
-			if ( node ) selected.insert ( node );
-		}
-		g_list_free_full ( rows, (GDestroyNotify)gtk_tree_path_free );
-
-		// Diff against the cached selection
-		std::vector<xgui::Model*> deselections;
-		std::vector<xgui::Model*> selections;
-		for ( std::set<xgui::Model*>::iterator c = xl->selset_.begin(); c != xl->selset_.end(); ++c )
-			if ( selected.find(*c) == selected.end() ) deselections.push_back(*c);
-		for ( std::set<xgui::Model*>::iterator n = selected.begin(); n != selected.end(); ++n )
-			if ( !xl->isSelectionCached(*n) ) selections.push_back(*n);
-
-		for (std::vector<xgui::Model*>::iterator sel = deselections.begin(); sel != deselections.end(); ++sel)
-			if ( !sel_cb || sel_cb->call( xl->this_list, (*sel)->path(), 0 ) )
-				xl->delSelection(*sel);
-			
-		for (std::vector<xgui::Model*>::iterator sel = selections.begin(); sel != selections.end(); ++sel)
-			if ( !sel_cb || sel_cb->call( xl->this_list, (*sel)->path(), 1 ) )
-				xl->addSelection(*sel);
-	}
-
-	void List::OnHeaderClick ( GtkTreeViewColumn *tvc, List * l )
-	{
-		xgui::Callback * base_cb = l->this_list->getEvent("onheaderclick");
-		if (!base_cb) return;
-		
-		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(base_cb);
-		if (!cb) {
-			DMESSAGE("onheaderclick event of xgui::List expected a TextCallback");
-			return;
-		}
-	
-		std::string * id = (std::string*)g_object_get_data( G_OBJECT( tvc ), "xgui-column-id" );
-		cb->call ( l->this_list, ( id ? *id : "" ) );
-	}
-
-	void List::swapCheck ( GtkTreePath * path )
-	{
-		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
-  		GtkTreeIter iter;
-		gtk_tree_model_get_iter ( GTK_TREE_MODEL(store), &iter, path);
-
-		GValue val = G_VALUE_INIT;
-		gtk_tree_model_get_value ( GTK_TREE_MODEL(store), &iter, check_column_id, &val);
-		bool active = g_value_get_boolean(&val);
-		g_value_unset ( &val );
-
-		active = (active ? 0 : 1);
-
-		g_value_init (&val, G_TYPE_BOOLEAN);
-		g_value_set_boolean ( &val, active );
-		gtk_list_store_set_value ( store, &iter, check_column_id, &val );
-		g_value_unset (&val);
-
 		xgui::Callback * cb = this_list->getEvent("oncheck");
 		if (!cb) return;
 
@@ -617,17 +460,64 @@ namespace xguimpl
 			return;
 		}
 
-		xgui::Model * node = modelFromIter ( iter );
-		if ( !node ) return;
-
-		chk_cb->call(this_list, node->path(), active);
+		chk_cb->call(this_list, xgui_row_get_node(row)->path(), xgui_row_get_checked(row));
 	}
 
-	void List::OnCheck ( GtkCellRendererToggle *cell, char const * const path_string,  List * xl)
+	void List::updateSelection ( guint position, guint n_items )
 	{
-		GtkTreePath * path = gtk_tree_path_new_from_string (path_string);
-		xl->swapCheck(path);
-		gtk_tree_path_free(path);
+		xgui::TextStatusCallback * sel_cb = 0;
+		xgui::Callback * cb = this_list->getEvent("onselect");
+		if (!cb) cb = this_list->getEvent("onchange");
+		if (cb) {
+			sel_cb = dynamic_cast<xgui::TextStatusCallback*>(cb);
+			if (!sel_cb)
+				DMESSAGE("onselect event of xgui::List expected a TextStatusCallback");
+		}
+
+		// Compare the rows of the changed range with the cached selection
+		std::vector<xgui::Model*> deselections;
+		std::vector<xgui::Model*> selections;
+		guint n = g_list_model_get_n_items ( G_LIST_MODEL(store) );
+		for ( guint i = position; i < position + n_items && i < n; ++i ) {
+			XguiRow * row = XGUI_ROW ( g_list_model_get_item ( G_LIST_MODEL(store), i ) );
+			xgui::Model * node = xgui_row_get_node ( row );
+			g_object_unref ( row );
+
+			bool selected = gtk_selection_model_is_selected ( GTK_SELECTION_MODEL(selection), i );
+			if ( selected && !isSelectionCached(node) ) selections.push_back(node);
+			else if ( !selected && isSelectionCached(node) ) deselections.push_back(node);
+		}
+
+		for (std::vector<xgui::Model*>::iterator sel = deselections.begin(); sel != deselections.end(); ++sel)
+			if ( !sel_cb || sel_cb->call( this_list, (*sel)->path(), 0 ) )
+				delSelection(*sel);
+
+		for (std::vector<xgui::Model*>::iterator sel = selections.begin(); sel != selections.end(); ++sel)
+			if ( !sel_cb || sel_cb->call( this_list, (*sel)->path(), 1 ) )
+				addSelection(*sel);
+	}
+
+	void List::OnSelectionChanged ( GtkSelectionModel * model, guint position, guint n_items, List * xl )
+	{
+		xl->updateSelection ( position, n_items );
+	}
+
+	void List::OnSorterChanged ( GtkSorter * sorter, GtkSorterChange change, List * xl )
+	{
+		// A click on a column title changes the sort column of the view sorter
+		GtkColumnViewColumn * clicked = gtk_column_view_sorter_get_primary_sort_column ( GTK_COLUMN_VIEW_SORTER(sorter) );
+		if ( !clicked ) return;
+
+		xgui::Callback * base_cb = xl->this_list->getEvent("onheaderclick");
+		if (!base_cb) return;
+
+		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(base_cb);
+		if (!cb) {
+			DMESSAGE("onheaderclick event of xgui::List expected a TextCallback");
+			return;
+		}
+
+		ListColumn * col = (ListColumn *)g_object_get_data ( G_OBJECT(clicked), "xgui-list-column" );
+		cb->call ( xl->this_list, ( col ? col->id : "" ) );
 	}
 }
-

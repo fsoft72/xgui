@@ -55,6 +55,51 @@ static int check_row(GtkTreeModel * store, int bold_col, int italic_col, int fg_
 	return failures;
 }
 
+/** Returns the attribute of a type set on a label, or NULL. */
+static PangoAttribute * label_attr(GtkLabel * label, PangoAttrType type)
+{
+	PangoAttrList * attrs = gtk_label_get_attributes(label);
+	if (!attrs) return NULL;
+	PangoAttrIterator * it = pango_attr_list_get_iterator(attrs);
+	PangoAttribute * attr = pango_attr_iterator_get(it, type);
+	pango_attr_iterator_destroy(it);
+	return attr;
+}
+
+/** Binds the first row of a list to a label and checks bold, italic and foreground; returns the number of failures. */
+static int check_list_row(xgui::List * list, xgui::Model * model, char const * label)
+{
+	xguimpl::List * impl = static_cast<xguimpl::List *>(list->getImpl());
+	XguiRow * row = impl->rowOf(model->getChild(0));
+	if (!row) { std::fprintf(stderr, "%s: no row\n", label); return 1; }
+
+	GtkWidget * cell = g_object_ref_sink(gtk_label_new(NULL));
+	impl->bindLabel(GTK_LABEL(cell), row, 0);
+
+	int failures = 0;
+	PangoAttribute * weight = label_attr(GTK_LABEL(cell), PANGO_ATTR_WEIGHT);
+	PangoAttribute * style = label_attr(GTK_LABEL(cell), PANGO_ATTR_STYLE);
+	PangoAttribute * fg = label_attr(GTK_LABEL(cell), PANGO_ATTR_FOREGROUND);
+	if (std::string(gtk_label_get_text(GTK_LABEL(cell))) != "text") { std::fprintf(stderr, "%s: wrong text\n", label); ++failures; }
+	if (!weight || ((PangoAttrInt *)weight)->value != PANGO_WEIGHT_BOLD) { std::fprintf(stderr, "%s: bold not set\n", label); ++failures; }
+	if (!style || ((PangoAttrInt *)style)->value != PANGO_STYLE_ITALIC) { std::fprintf(stderr, "%s: italic not set\n", label); ++failures; }
+	PangoColor * color = fg ? &((PangoAttrColor *)fg)->color : NULL;
+	if (!color || color->red != 65535 || color->green != 0 || color->blue != 0) { std::fprintf(stderr, "%s: foreground is not red\n", label); ++failures; }
+	g_object_unref(cell);
+	return failures;
+}
+
+/** Returns true when the label bound to the first row of a list has a foreground color. */
+static bool list_row_has_fg(xgui::List * list, xgui::Model * model)
+{
+	xguimpl::List * impl = static_cast<xguimpl::List *>(list->getImpl());
+	GtkWidget * cell = g_object_ref_sink(gtk_label_new(NULL));
+	impl->bindLabel(GTK_LABEL(cell), impl->rowOf(model->getChild(0)), 0);
+	bool has_fg = label_attr(GTK_LABEL(cell), PANGO_ATTR_FOREGROUND) != NULL;
+	g_object_unref(cell);
+	return has_fg;
+}
+
 int main()
 {
 	xgui::Window * win = xgui::Master::CreateWindow();
@@ -73,9 +118,7 @@ int main()
 	xgui::Model * list_model = xgui::Master::CreateModel();
 	list_model->appendChild(row, "fancy");
 	list->setModel(list_model);
-	xguimpl::List * list_impl = static_cast<xguimpl::List *>(list->getImpl());
-	GtkTreeModel * list_store = gtk_tree_view_get_model(list_impl->list_view);
-	failures += check_row(list_store, list_impl->bold_column_id, list_impl->italic_column_id, list_impl->fg_column_id, "list refresh");
+	failures += check_list_row(list, list_model, "list refresh");
 
 	// List, insertItem path: the row is appended once the model is linked
 	xgui::List * list2 = xgui::Master::CreateList(win, sm);
@@ -83,11 +126,9 @@ int main()
 	xgui::Model * list_model2 = xgui::Master::CreateModel();
 	list2->setModel(list_model2);
 	list_model2->appendChild(row, "fancy");
-	xguimpl::List * list_impl2 = static_cast<xguimpl::List *>(list2->getImpl());
-	failures += check_row(gtk_tree_view_get_model(list_impl2->list_view), list_impl2->bold_column_id,
-	                      list_impl2->italic_column_id, list_impl2->fg_column_id, "list insert");
+	failures += check_list_row(list2, list_model2, "list insert");
 
-	// An invalid color string must leave the cell empty instead of storing garbage
+	// An invalid color string must not produce a color
 	xgui::Model * broken_model = xgui::Master::CreateModel();
 	std::vector<std::string> broken_row;
 	broken_row.push_back("text");
@@ -95,10 +136,7 @@ int main()
 	list3->addColumn(0, "c", "C", 100);
 	list3->setModel(broken_model);
 	broken_model->appendChild(broken_row, "broken");
-	xguimpl::List * list_impl3 = static_cast<xguimpl::List *>(list3->getImpl());
-	GdkRGBA * broken_fg = cell_rgba(gtk_tree_view_get_model(list_impl3->list_view), list_impl3->fg_column_id);
-	if (broken_fg) { std::fprintf(stderr, "invalid color produced a value\n"); ++failures; }
-	gdk_rgba_free(broken_fg);
+	if (list_row_has_fg(list3, broken_model)) { std::fprintf(stderr, "invalid color produced a value\n"); ++failures; }
 
 	// Tree
 	xgui::Tree * tree = xgui::Master::CreateTree(win, sm);

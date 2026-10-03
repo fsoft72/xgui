@@ -27,17 +27,20 @@ static void add_row(xgui::Model * model, char const * name, char const * value)
 	model->appendChild(row);
 }
 
-/** Returns the text of the first data column of the first GTK row. */
+/** Returns the first string of the model node shown in the first row. */
 static std::string first_row_name(xguimpl::List * impl)
 {
-	GtkTreeModel * store = gtk_tree_view_get_model(impl->list_view);
-	GtkTreeIter iter;
-	gchar * text = 0;
-	gtk_tree_model_get_iter_first(store, &iter);
-	gtk_tree_model_get(store, &iter, impl->first_fields_column, &text, -1);
-	std::string result = text ? text : "";
-	g_free(text);
+	XguiRow * row = XGUI_ROW(g_list_model_get_item(G_LIST_MODEL(impl->store), 0));
+	if (!row) return "";
+	std::string result = xgui_row_get_node(row)->getString(0);
+	g_object_unref(row);
 	return result;
+}
+
+/** Returns the number of columns of the column view. */
+static guint n_columns(xguimpl::List * impl)
+{
+	return g_list_model_get_n_items(gtk_column_view_get_columns(impl->column_view));
 }
 
 int main()
@@ -48,9 +51,9 @@ int main()
 	list->addColumn(1, "col_value", "Value", 100);
 	xguimpl::List * impl = static_cast<xguimpl::List *>(list->getImpl());
 
-	int columns_before = gtk_tree_view_get_n_columns(impl->list_view);
+	guint columns_before = n_columns(impl);
 	impl->delColumn("missing");
-	if (gtk_tree_view_get_n_columns(impl->list_view) != columns_before) {
+	if (n_columns(impl) != columns_before) {
 		std::fprintf(stderr, "delColumn(\"missing\") removed an unrelated column\n");
 		return 1;
 	}

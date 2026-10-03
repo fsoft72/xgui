@@ -1,4 +1,4 @@
-// Regression test: adding several columns must not rebuild and repopulate the whole store each time.
+// Regression test: adding several columns must not rebuild and repopulate the rows each time.
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -22,34 +22,33 @@ int main()
 	for (int i = 0; i < 100; ++i) model->appendChild(row);
 	list->setModel(model);
 
-	// Count how many times the GTK store is replaced while columns are added
-	int replacements = 0;
-	g_object_set_data(G_OBJECT(gtk_tree_view_get_model(impl->list_view)), "marker", (gpointer)1);
+	// Columns only add cells: the rows are not rebuilt
+	GListStore * store = impl->store;
+	XguiRow * first = XGUI_ROW(g_list_model_get_item(G_LIST_MODEL(store), 0));
 	for (int i = 1; i < 5; ++i) {
 		char id[16];
 		std::snprintf(id, sizeof(id), "c%d", i);
 		list->addColumn(i, id, id, 100);
-		GtkTreeModel * store = gtk_tree_view_get_model(impl->list_view);
-		if (!g_object_get_data(G_OBJECT(store), "marker")) ++replacements;
-		g_object_set_data(G_OBJECT(store), "marker", (gpointer)1);
 	}
-	if (replacements > 1) {
-		std::fprintf(stderr, "the store was rebuilt %d times while adding 4 columns\n", replacements);
+	XguiRow * first_after = XGUI_ROW(g_list_model_get_item(G_LIST_MODEL(store), 0));
+	bool same_rows = (impl->store == store) && (first == first_after);
+	g_object_unref(first);
+	g_object_unref(first_after);
+	if (!same_rows) {
+		std::fprintf(stderr, "adding columns replaced the rows\n");
 		return 1;
 	}
 
-	// A row added while the rebuild is pending must show up exactly once
+	// A row added after the columns must show up exactly once
 	model->appendChild(row);
-
-	// The store must be consistent once it is used
-	list->refresh();
-	GtkTreeModel * store = gtk_tree_view_get_model(impl->list_view);
-	if (gtk_tree_model_get_n_columns(store) != impl->first_fields_column + 5) {
-		std::fprintf(stderr, "store has %d columns, expected %d\n", gtk_tree_model_get_n_columns(store), impl->first_fields_column + 5);
+	guint n_columns = g_list_model_get_n_items(gtk_column_view_get_columns(impl->column_view));
+	if (n_columns != 5) {
+		std::fprintf(stderr, "view has %u columns, expected 5\n", n_columns);
 		return 1;
 	}
-	if (gtk_tree_model_iter_n_children(store, NULL) != 101) {
-		std::fprintf(stderr, "store has %d rows, expected 101\n", gtk_tree_model_iter_n_children(store, NULL));
+	guint n_rows = g_list_model_get_n_items(G_LIST_MODEL(store));
+	if (n_rows != 101) {
+		std::fprintf(stderr, "store has %u rows, expected 101\n", n_rows);
 		return 1;
 	}
 	return 0;

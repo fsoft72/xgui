@@ -1,4 +1,4 @@
-// Regression test: tree views must be direct children of their scrolled window (no viewport),
+// Regression test: list widgets must be direct children of their scrolled window (no viewport),
 // otherwise GTK cannot virtualize rows and headers scroll away.
 #include <cstdio>
 
@@ -9,12 +9,12 @@
 #include "gtk/list_impl.h"
 #include "gtk/tree_impl.h"
 
-/** Returns 0 when the scrolled window holds the tree view directly. */
+/** Returns 0 when the scrolled window holds the list widget directly. */
 static int check_direct_child(GtkWidget * scrolled, char const * label)
 {
 	GtkWidget * child = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(scrolled));
-	if (!GTK_IS_TREE_VIEW(child)) {
-		std::fprintf(stderr, "%s: child of the scrolled window is not the tree view\n", label);
+	if (!GTK_IS_COLUMN_VIEW(child) && !GTK_IS_TREE_VIEW(child)) {
+		std::fprintf(stderr, "%s: child of the scrolled window is not the list widget\n", label);
 		return 1;
 	}
 	return 0;

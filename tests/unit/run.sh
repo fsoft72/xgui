@@ -89,6 +89,9 @@ _gui_check "list and tree views are not wrapped in a viewport" tests/unit/scroll
 # Item: addColumn must not rebuild the store every time
 _gui_check "addColumn batches store rebuilds" tests/unit/add_column_test.cpp
 
+# GTK 4 port: List rows on GtkColumnView
+_gui_check "list checkboxes, removed rows and header clicks" tests/unit/list_rows_test.cpp
+
 # Item: OnSelect must keep the selection cache correct
 _gui_check "list selection cache follows selection changes" tests/unit/selection_test.cpp
 
@@ -108,8 +111,8 @@ check "XML load/save/DTD API is removed" \
 # Item: menu items with icons keep their text accessors
 _gui_check "menu item with icon keeps working" tests/unit/menu_icon_test.cpp
 
-# Item: no deprecated GTK 4 API (List, Tree, ComboBox and DndList still use the GtkTreeView/GtkComboBox era widgets)
-DEPRECATED_ALLOWED="list_impl.cpp tree_impl.cpp combobox_impl.cpp dndlist_impl.cpp"
+# Item: no deprecated GTK 4 API (Tree and ComboBox still use the GtkTreeView/GtkComboBox era widgets)
+DEPRECATED_ALLOWED="tree_impl.cpp combobox_impl.cpp"
 check "GTK backend uses no deprecated GTK 4 API" \
 	bash -c "for f in xgui/gtk/*.cpp; do case \" $DEPRECATED_ALLOWED \" in *\" \$(basename \$f) \"*) continue;; esac; $CPP -fsyntax-only -Werror=deprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
 

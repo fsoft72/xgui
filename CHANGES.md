@@ -51,3 +51,8 @@
 - Fixed duplicated include guards of `menu_impl.h`, `toolbar_impl.h`, `imageview_impl.h` and `vbox_impl.h`.
 - List, Tree and Combobox still use the GTK 4 deprecated `GtkTreeView`/`GtkComboBox` widgets until their rewrite; the test runner allows deprecation warnings only in those files.
 - Tests: `event_mask_test` replaced by `event_controller_test`; new `app_lifecycle_test`, `menu_actions_test`, `toolbar_test`, `dnd_test`; `dialog_test` answers the GTK 4 dialogs by pressing their buttons.
+- List rewritten on `GtkColumnView`: a `GListStore` of `XguiRow` objects (new `xgui_row.h/.cpp`, a GObject wrapping a model node and its checkbox state) behind a `GtkMultiSelection`. Cells read the strings and the style of their node when they are bound, so adding columns no longer rebuilds the rows and the style columns of the old store are gone. Styles are applied as Pango attributes on the cell label (`applyLabelStyle`), the icon column shows the style icon.
+- `List::sort()` is still a one shot reorder of the rows (`g_list_store_sort`), as with GTK 3. Header clicks are reported by `onheaderclick` through the column view sorter (the title shows a sort arrow). `visible-headers` hides the header widget of the column view; `search-enabled` is only stored (GtkColumnView has no interactive search).
+- Fixed: `List` reported selection changes to `onselect`, but `linkEvent` only accepted `onchange`, so selection callbacks were never called. Both names are accepted now.
+- `insertItem` only adds rows for direct children of the list model, and rows are no longer tied to having columns.
+- Tests: list tests read the `GListStore` instead of the `GtkListStore`; new `list_rows_test` (checkboxes, removal of a selected row, header clicks, header visibility).

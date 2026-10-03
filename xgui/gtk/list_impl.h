@@ -1,7 +1,7 @@
 //
 // C++ Interface: list_impl
 //
-// Description: 
+// Description:
 //
 //
 // Author: Os3 s.r.l. <xgui@os3.it>, (C) 2005
@@ -16,46 +16,48 @@
 #include "style.h"
 #include "list.h"
 #include "view_impl.h"
-#include "row_style.h"
+#include "xgui_row.h"
+
+#include <map>
+#include <vector>
 
 namespace xgui { class List; }
 
 namespace xguimpl
 {
+	struct List;
+
+	/** A data column of the list: the model string it shows and how. */
+	struct ListColumn
+	{
+		List * list;
+		std::string id;
+		std::string title;
+		/** Index of the model string shown by the column. */
+		int field;
+		float xalign;
+		GtkColumnViewColumn * column;
+	};
+
 	struct List : public View
 	{
-		GtkCellRenderer   *left_align_text_renderer;
-		GtkCellRenderer   *center_align_text_renderer;
-		GtkCellRenderer   *right_align_text_renderer;
-		GtkCellRenderer   *icon_renderer;
-		GtkCellRenderer   *check_renderer;
+		/** Rows in display order: model order, until sort() reorders them. */
+		GListStore * store;
+		GtkMultiSelection * selection;
+		GtkColumnView * column_view;
 
-		GtkTreeView * list_view;
+		/** Row of every model node shown by the list. */
+		std::map<xgui::Model *, XguiRow *> rows;
+		/** Data columns, in no particular order. */
+		std::vector<ListColumn *> columns;
 
-		int fg_column_id;
-		int bg_column_id;
-		int italic_column_id;
-		int bold_column_id;
-		int underline_column_id;
-		int strike_column_id;
-		int check_column_id;
-		int icon_column_id;
-		int first_fields_column;
+		GtkColumnViewColumn * check_column;
+		GtkColumnViewColumn * icon_column;
 		bool has_icons;
 		bool has_checks;
-		bool model_dirty;
-		guint rebuild_idle_id;
+		bool search_enabled;
 
-		std::map<xgui::Model *, GtkTreeIter> iter_map;
-		std::map<gpointer, xgui::Model *> row_map;  // reverse of iter_map, keyed by the row of the store
 		xgui::List * this_list;
-
-		/** Returns the store columns that hold the style attributes of a row. */
-		RowStyleColumns row_style_columns() const
-		{
-			RowStyleColumns cols = { fg_column_id, bg_column_id, italic_column_id, bold_column_id, underline_column_id, strike_column_id, icon_column_id };
-			return cols;
-		}
 
 		//methods
 		List ( GtkWidget * real_w );
@@ -63,18 +65,9 @@ namespace xguimpl
 		virtual ~List();
 		virtual void setAccessor(xgui::Widget * w);
 
-
 		bool get_list_prop ( std::string const &name, std::string &vals );
 		bool set_list_prop ( std::string const &name, const std::string &vals );
 		bool linkEvent( std::string const &name );
-		void rebuildGtkModel();
-		void mapRow ( xgui::Model * child, GtkTreeIter const & iter );
-		void unmapRow ( xgui::Model * child );
-		void clearRowMaps();
-		xgui::Model * modelFromIter ( GtkTreeIter const & iter ) const;
-		void markModelDirty();
-		void syncGtkModel();
-		static gboolean OnRebuildIdle ( gpointer data );
 
 		virtual void insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child );
 		virtual void removeItem ( xgui::Model * parent, int child_pos, xgui::Model * child );
@@ -92,11 +85,25 @@ namespace xguimpl
 		bool delColumn ( const std::string & id );
 		void sort ( const std::string & column_id, xgui::TextPairCallback * callback );
 
-		void swapCheck ( GtkTreePath * path );
+		/** Returns the data column with the given id (or title), or NULL. */
+		ListColumn * findColumn ( std::string const &name );
+		/** Returns the row of a model node, or NULL. */
+		XguiRow * rowOf ( xgui::Model * node );
+		/** Returns the position of a row in the store, or -1. */
+		int positionOf ( XguiRow * row );
+		/** Shows the text and style of a model node in the label of a cell. */
+		void bindLabel ( GtkLabel * label, XguiRow * row, int field );
+		/** Shows the icon of the style of a model node in the picture of a cell. */
+		void bindIcon ( GtkPicture * picture, XguiRow * row );
+		/** Reports a checkbox toggled by the user through the oncheck event. */
+		void notifyCheck ( XguiRow * row );
+		/** Reports the selection changes of a range of rows through onselect and updates the cache. */
+		void updateSelection ( guint position, guint n_items );
+		/** Calls the onrefresh event. */
+		void notifyRefresh ();
 
-		static void OnSelect ( GtkTreeSelection * sel, List *xl );
-		static void OnHeaderClick ( GtkTreeViewColumn *tvc, List * l );
-		static void OnCheck ( GtkCellRendererToggle *cell, char const * const path_string, List * xl);
+		static void OnSelectionChanged ( GtkSelectionModel * model, guint position, guint n_items, List * xl );
+		static void OnSorterChanged ( GtkSorter * sorter, GtkSorterChange change, List * xl );
 	};
 }
 

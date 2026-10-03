@@ -56,7 +56,7 @@ namespace xguimpl
 
 	GtkWidget * DndList::dragWidget()
 	{
-		return GTK_WIDGET ( list_view );
+		return GTK_WIDGET ( column_view );
 	}
 
 	/** Returns the position of the last selected row of the model, or -1. */
