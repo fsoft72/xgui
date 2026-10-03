@@ -284,26 +284,32 @@ namespace xguimpl
 		return 0;
 	}
 	
-	int Widget::OnMouseDown ( GtkWidget * w, GdkEventButton * event, Widget * xw )
+	void Widget::decodeButtonEvent ( GdkEventButton * event, std::string & button, int & status )
 	{
-		std::string button;
-		int status = 0;
-	
+		button.clear();
+		status = 0;
+
 		switch (event->button)
 		{
 			case 1: button = "left"; break;
 			case 2: button = "middle"; break;
 			case 3: button = "right"; break;
 		}
-	
+
 		if (event->state & GDK_BUTTON1_MASK) status |= xgui::mouseLeftMask;
 		if (event->state & GDK_BUTTON2_MASK) status |= xgui::mouseMiddleMask;
 		if (event->state & GDK_BUTTON3_MASK) status |= xgui::mouseRightMask;
-	
+
 		if (event->state & GDK_CONTROL_MASK) status |= xgui::keyControlMask;
 		if (event->state & GDK_SHIFT_MASK) status |= xgui::keyShiftMask;
 		if (event->state & GDK_MOD1_MASK) status |= xgui::keyAltMask;
-	
+	}
+
+	int Widget::OnMouseDown ( GtkWidget * w, GdkEventButton * event, Widget * xw )
+	{
+		std::string button;
+		int status = 0;
+		decodeButtonEvent ( event, button, status );
 	
 		xgui::TextStatusCallback * cb = dynamic_cast<xgui::TextStatusCallback*>(xw->this_widget->getEvent ( "onmousedown" ));	
 		if ( cb ) return !cb->call( xw->this_widget, button, status);
@@ -315,22 +321,7 @@ namespace xguimpl
 	{
 		std::string button;
 		int status = 0;
-	
-		switch (event->button)
-		{
-			case 1: button = "left"; break;
-			case 2: button = "middle"; break;
-			case 3: button = "right"; break;
-		}
-	
-		if (event->state & GDK_BUTTON1_MASK) status |= xgui::mouseLeftMask;
-		if (event->state & GDK_BUTTON2_MASK) status |= xgui::mouseMiddleMask;
-		if (event->state & GDK_BUTTON3_MASK) status |= xgui::mouseRightMask;
-	
-		if (event->state & GDK_CONTROL_MASK) status |= xgui::keyControlMask;
-		if (event->state & GDK_SHIFT_MASK) status |= xgui::keyShiftMask;
-		if (event->state & GDK_MOD1_MASK) status |= xgui::keyAltMask;
-	
+		decodeButtonEvent ( event, button, status );
 	
 		xgui::TextStatusCallback * cb = dynamic_cast<xgui::TextStatusCallback*>(xw->this_widget->getEvent ( "onmouseup" ));	
 		if ( cb ) return !cb->call( xw->this_widget, button, status);
@@ -365,20 +356,7 @@ namespace xguimpl
 					last_event_type = event->type;
 				}
 			
-				switch (btn_event->button)
-				{
-					case 1: button = "left"; break;
-					case 2: button = "middle"; break;
-					case 3: button = "right"; break;
-				}
-			
-				if (btn_event->state & GDK_BUTTON1_MASK) status |= xgui::mouseLeftMask;
-				if (btn_event->state & GDK_BUTTON2_MASK) status |= xgui::mouseMiddleMask;
-				if (btn_event->state & GDK_BUTTON3_MASK) status |= xgui::mouseRightMask;
-			
-				if (btn_event->state & GDK_CONTROL_MASK) status |= xgui::keyControlMask;
-				if (btn_event->state & GDK_SHIFT_MASK) status |= xgui::keyShiftMask;
-				if (btn_event->state & GDK_MOD1_MASK) status |= xgui::keyAltMask;
+				decodeButtonEvent ( btn_event, button, status );
 	
 				if (btn_event->type == GDK_2BUTTON_PRESS) {
 					last_pressed_widget = 0;

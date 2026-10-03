@@ -48,6 +48,8 @@ namespace xguimpl
 		static int OnBlur ( GtkWidget * w, GdkEventFocus * event, Widget * xw );
 		static int OnMouseOver ( GtkWidget * w, GdkEventCrossing *event, Widget * xw );
 		static int OnMouseOut ( GtkWidget * w, GdkEventCrossing *event, Widget * xw );
+		/** Converts a GDK button event into the xgui button name ("left", "middle", "right") and modifier mask. */
+		static void decodeButtonEvent ( GdkEventButton * event, std::string & button, int & status );
 		static int OnMouseDown ( GtkWidget * w, GdkEventButton * event, Widget * xw );
 		static int OnMouseUp ( GtkWidget * w, GdkEventButton * event, Widget * xw );
 		static int OnGdkEvent ( GtkWidget *widget, GdkEvent *event, Widget * xw );

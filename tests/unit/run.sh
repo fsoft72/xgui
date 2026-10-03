@@ -118,4 +118,7 @@ check "Makefile.gtk uses -Wextra and not -fpermissive" \
 check "sources compile cleanly with -Wall -Wextra -Werror" \
 	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -Wall -Wextra -Wno-unused-parameter -Wno-deprecated-declarations -Werror -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
 
+# Item: shared mouse button decoding
+_gui_check "button events decode to name and mask" tests/unit/button_decode_test.cpp
+
 exit $FAILED
