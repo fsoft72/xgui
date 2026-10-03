@@ -89,4 +89,7 @@ _gui_check "list and tree views are not wrapped in a viewport" tests/unit/scroll
 # Item: addColumn must not rebuild the store every time
 _gui_check "addColumn batches store rebuilds" tests/unit/add_column_test.cpp
 
+# Item: OnSelect must keep the selection cache correct
+_gui_check "list selection cache follows selection changes" tests/unit/selection_test.cpp
+
 exit $FAILED

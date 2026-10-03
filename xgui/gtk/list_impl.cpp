@@ -42,20 +42,6 @@ static std::pair<GtkTreeViewColumn *, int> int_find_column ( GtkTreeView * list_
 	return std::make_pair(found, found_pos);
 }
 
-/** Returns true when both iterators point to the same row of the same store. */
-static bool int_iter_equal ( GtkTreeIter const & a, GtkTreeIter const & b )
-{
-	return a.stamp == b.stamp && a.user_data == b.user_data;
-}
-
-/** Returns the model node mapped to the given row, or NULL if the row is unknown. */
-static xgui::Model * int_model_from_iter ( std::map<xgui::Model *, GtkTreeIter> const & iter_map, GtkTreeIter const & iter )
-{
-	for ( std::map<xgui::Model *, GtkTreeIter>::const_iterator i = iter_map.begin(); i != iter_map.end(); ++i )
-		if ( int_iter_equal ( i->second, iter ) ) return i->first;
-	return 0;
-}
-
 static float int_map_align ( std::string const & alignment )
 {
 	if (alignment == "right") return 1.0f;
@@ -155,6 +141,37 @@ namespace xguimpl
 		Widget::setAccessor(w);
 	}
 	
+	/** Records the store row of a model node in both lookup maps. */
+	void List::mapRow ( xgui::Model * child, GtkTreeIter const & iter )
+	{
+		iter_map[child] = iter;
+		row_map[iter.user_data] = child;
+	}
+
+	/** Forgets the store row of a model node. */
+	void List::unmapRow ( xgui::Model * child )
+	{
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = iter_map.find(child);
+		if ( found == iter_map.end() ) return;
+
+		row_map.erase(found->second.user_data);
+		iter_map.erase(found);
+	}
+
+	/** Forgets every row of the store. */
+	void List::clearRowMaps()
+	{
+		iter_map.clear();
+		row_map.clear();
+	}
+
+	/** Returns the model node shown in the given row, or NULL if the row is unknown. */
+	xgui::Model * List::modelFromIter ( GtkTreeIter const & iter ) const
+	{
+		std::map<gpointer, xgui::Model *>::const_iterator found = row_map.find(iter.user_data);
+		return found == row_map.end() ? 0 : found->second;
+	}
+
 	/** Idle handler that rebuilds the store once after a burst of addColumn calls. */
 	gboolean List::OnRebuildIdle ( gpointer data )
 	{
@@ -188,7 +205,7 @@ namespace xguimpl
 		}
 
 		// The rows of the old store are about to disappear: their iterators must not be used anymore
-		iter_map.clear();
+		clearRowMaps();
 
 		GType * columns_types = new GType[first_fields_column + num_columns];
 	
@@ -291,7 +308,7 @@ namespace xguimpl
 		GtkTreeIter curr_ele_iter;	
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		gtk_list_store_insert ( store, &curr_ele_iter, child_pos );
-		iter_map[child] = curr_ele_iter;
+		mapRow ( child, curr_ele_iter );
 	
 		unsigned int curr_col_num = 0;
 		for ( ; curr_col_num <  (unsigned int)num_columns; ++curr_col_num ) {
@@ -331,7 +348,7 @@ namespace xguimpl
 		if ( found != iter_map.end() ) {
 			GtkTreeIter to_remove = found->second;
 			gtk_list_store_remove (store, &to_remove);
-			iter_map.erase(found);
+			unmapRow(child);
 		}
 		delSelection(child);
 	
@@ -363,7 +380,7 @@ namespace xguimpl
 		
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		gtk_list_store_clear ( store );
-		iter_map.clear();
+		clearRowMaps();
 	
 		int curr_row_num = 0;
 		for ( xgui::Model::iterator iter = model->begin(); iter != model->end(); ++iter )
@@ -372,7 +389,7 @@ namespace xguimpl
 			xgui::Model * child = dynamic_cast<xgui::Model *>(*iter);
 			
 			gtk_list_store_insert ( store, &curr_ele_iter, curr_row_num++);
-			iter_map[child] = curr_ele_iter;
+			mapRow ( child, curr_ele_iter );
 	
 			int curr_col_num = 0;
 			for ( ; curr_col_num <  num_columns; ++curr_col_num ) {
@@ -533,21 +550,26 @@ namespace xguimpl
 				DMESSAGE("onselect event of xgui::List expected a TextStatusCallback");
 		}
 	
+		// Selected rows reported by GTK, resolved to model nodes
+		std::set<xgui::Model*> selected;
+		GtkTreeModel * store = gtk_tree_view_get_model ( gtk_tree_selection_get_tree_view ( sel ) );
+		GList * rows = gtk_tree_selection_get_selected_rows ( sel, &store );
+		for ( GList * r = rows; r != NULL; r = r->next ) {
+			GtkTreeIter iter;
+			if ( !gtk_tree_model_get_iter ( store, &iter, (GtkTreePath *)r->data ) ) continue;
+
+			xgui::Model * node = xl->modelFromIter ( iter );
+			if ( node ) selected.insert ( node );
+		}
+		g_list_free_full ( rows, (GDestroyNotify)gtk_tree_path_free );
+
+		// Diff against the cached selection
 		std::vector<xgui::Model*> deselections;
 		std::vector<xgui::Model*> selections;
-
-		xgui::Model * model = xl->this_list->getModel();
-		for ( unsigned int row_num = 0; row_num < model->size(); ++row_num ) {
-			xgui::Model * curr_data = dynamic_cast<xgui::Model*>(model->getChild(row_num));
-			std::map<xgui::Model *, GtkTreeIter>::iterator it = xl->iter_map.find(curr_data);
-			if ( it == xl->iter_map.end() ) continue;
-			bool selection_selected = gtk_tree_selection_iter_is_selected ( sel, &it->second );
-
-			if ( !selection_selected && xl->isSelectionCached(curr_data) )
-				deselections.push_back(curr_data);
-			else if ( selection_selected && !xl->isSelectionCached(curr_data))
-				selections.push_back(curr_data);
-		}
+		for ( std::set<xgui::Model*>::iterator c = xl->selset_.begin(); c != xl->selset_.end(); ++c )
+			if ( selected.find(*c) == selected.end() ) deselections.push_back(*c);
+		for ( std::set<xgui::Model*>::iterator n = selected.begin(); n != selected.end(); ++n )
+			if ( !xl->isSelectionCached(*n) ) selections.push_back(*n);
 
 		for (std::vector<xgui::Model*>::iterator sel = deselections.begin(); sel != deselections.end(); ++sel)
 			if ( !sel_cb || sel_cb->call( xl->this_list, (*sel)->path(), 0 ) )
@@ -600,7 +622,7 @@ namespace xguimpl
 			return;
 		}
 
-		xgui::Model * node = int_model_from_iter ( iter_map, iter );
+		xgui::Model * node = modelFromIter ( iter );
 		if ( !node ) return;
 
 		chk_cb->call(this_list, node->path(), active);

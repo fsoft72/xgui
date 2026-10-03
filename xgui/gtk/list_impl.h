@@ -47,6 +47,7 @@ namespace xguimpl
 		guint rebuild_idle_id;
 
 		std::map<xgui::Model *, GtkTreeIter> iter_map;
+		std::map<gpointer, xgui::Model *> row_map;  // reverse of iter_map, keyed by the row of the store
 		xgui::List * this_list;
 
 		/** Returns the store columns that hold the style attributes of a row. */
@@ -67,6 +68,10 @@ namespace xguimpl
 		bool set_list_prop ( std::string const &name, const std::string &vals );
 		bool linkEvent( std::string const &name );
 		void rebuildGtkModel();
+		void mapRow ( xgui::Model * child, GtkTreeIter const & iter );
+		void unmapRow ( xgui::Model * child );
+		void clearRowMaps();
+		xgui::Model * modelFromIter ( GtkTreeIter const & iter ) const;
 		void markModelDirty();
 		void syncGtkModel();
 		static gboolean OnRebuildIdle ( gpointer data );
