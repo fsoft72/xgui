@@ -24,16 +24,25 @@ static int cell_int(GtkTreeModel * store, int column)
 	return value;
 }
 
-/** Returns true when the foreground cell of the first row is set. */
-static bool fg_is_set(GtkTreeModel * store, int column)
+/** Returns the GdkRGBA stored in the first row, or NULL if the cell is empty or is not a GdkRGBA. */
+static GdkRGBA * cell_rgba(GtkTreeModel * store, int column)
 {
 	GtkTreeIter iter;
 	GValue val = G_VALUE_INIT;
 	gtk_tree_model_get_iter_first(store, &iter);
 	gtk_tree_model_get_value(store, &iter, column, &val);
-	bool set = g_value_get_boxed(&val) != NULL;
+	GdkRGBA * rgba = G_VALUE_HOLDS(&val, GDK_TYPE_RGBA) ? (GdkRGBA *)g_value_dup_boxed(&val) : NULL;
 	g_value_unset(&val);
-	return set;
+	return rgba;
+}
+
+/** Returns true when the foreground cell of the first row is pure red. */
+static bool fg_is_red(GtkTreeModel * store, int column)
+{
+	GdkRGBA * rgba = cell_rgba(store, column);
+	bool red = rgba && rgba->red == 1.0 && rgba->green == 0.0 && rgba->blue == 0.0;
+	gdk_rgba_free(rgba);
+	return red;
 }
 
 /** Checks bold, italic and foreground of the first row; returns the number of failures. */
@@ -42,7 +51,7 @@ static int check_row(GtkTreeModel * store, int bold_col, int italic_col, int fg_
 	int failures = 0;
 	if (cell_int(store, bold_col) != PANGO_WEIGHT_BOLD) { std::fprintf(stderr, "%s: bold not set\n", label); ++failures; }
 	if (cell_int(store, italic_col) != PANGO_STYLE_ITALIC) { std::fprintf(stderr, "%s: italic not set\n", label); ++failures; }
-	if (!fg_is_set(store, fg_col)) { std::fprintf(stderr, "%s: foreground not set\n", label); ++failures; }
+	if (!fg_is_red(store, fg_col)) { std::fprintf(stderr, "%s: foreground is not red\n", label); ++failures; }
 	return failures;
 }
 
@@ -51,6 +60,8 @@ int main()
 	xgui::Window * win = xgui::Master::CreateWindow();
 	xgui::StyleManager * sm = xgui::Master::CreateStyleManager();
 	sm->addStyle("fancy", 0, "#ff0000", "#00ff00", xgui::StyleManager::TxtBold | xgui::StyleManager::TxtItalic);
+
+	sm->addStyle("broken", 0, "not-a-color", "", 0);
 
 	std::vector<std::string> row;
 	row.push_back("text");
@@ -75,6 +86,19 @@ int main()
 	xguimpl::List * list_impl2 = static_cast<xguimpl::List *>(list2->getImpl());
 	failures += check_row(gtk_tree_view_get_model(list_impl2->list_view), list_impl2->bold_column_id,
 	                      list_impl2->italic_column_id, list_impl2->fg_column_id, "list insert");
+
+	// An invalid color string must leave the cell empty instead of storing garbage
+	xgui::Model * broken_model = xgui::Master::CreateModel();
+	std::vector<std::string> broken_row;
+	broken_row.push_back("text");
+	xgui::List * list3 = xgui::Master::CreateList(win, sm);
+	list3->addColumn(0, "c", "C", 100);
+	list3->setModel(broken_model);
+	broken_model->appendChild(broken_row, "broken");
+	xguimpl::List * list_impl3 = static_cast<xguimpl::List *>(list3->getImpl());
+	GdkRGBA * broken_fg = cell_rgba(gtk_tree_view_get_model(list_impl3->list_view), list_impl3->fg_column_id);
+	if (broken_fg) { std::fprintf(stderr, "invalid color produced a value\n"); ++failures; }
+	gdk_rgba_free(broken_fg);
 
 	// Tree
 	xgui::Tree * tree = xgui::Master::CreateTree(win, sm);

@@ -160,8 +160,8 @@ namespace xguimpl
 
 		GType * columns_types = new GType[first_fields_column + num_columns];
 	
-		columns_types[fg_column_id] = GDK_TYPE_COLOR;
-		columns_types[bg_column_id] = GDK_TYPE_COLOR;
+		columns_types[fg_column_id] = GDK_TYPE_RGBA;
+		columns_types[bg_column_id] = GDK_TYPE_RGBA;
 		columns_types[italic_column_id] = PANGO_TYPE_STYLE;
 		columns_types[bold_column_id] = G_TYPE_INT;
 		columns_types[underline_column_id] = PANGO_TYPE_UNDERLINE;
@@ -369,8 +369,8 @@ namespace xguimpl
 
 		GtkTreeViewColumn *column = gtk_tree_view_column_new_with_attributes ( cname.c_str(), renderer, "text", 
 					(cpos + first_fields_column),
-					"foreground-gdk", fg_column_id,
-					"background-gdk", bg_column_id,
+					"foreground-rgba", fg_column_id,
+					"background-rgba", bg_column_id,
 					"style", italic_column_id,
 					"weight", bold_column_id,
 					"underline", underline_column_id,

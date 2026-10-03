@@ -11,6 +11,7 @@
 #include <string>
 #include <gtk/gtk.h>
 
+#include "base.h"
 #include "image.h"
 #include "image_impl.h"
 #include "style.h"
@@ -50,14 +51,17 @@ namespace xguimpl
 		g_value_unset(&val);
 	}
 
-	/** Sets a color cell from a color string. */
+	/** Sets a color cell from a color string; invalid colors are reported and leave the cell empty. */
 	static inline void setRowColor(GtkTreeModel * store, GtkTreeIter * iter, int column, std::string const & color_str)
 	{
-		GdkColor color;
-		gdk_color_parse(color_str.c_str(), &color);
+		GdkRGBA color;
+		if (!gdk_rgba_parse(&color, color_str.c_str())) {
+			XGUI_ERROR("Invalid color in style: " << color_str);
+			return;
+		}
 
 		GValue val = G_VALUE_INIT;
-		g_value_init(&val, GDK_TYPE_COLOR);
+		g_value_init(&val, GDK_TYPE_RGBA);
 		g_value_set_boxed(&val, &color);
 		setRowValue(store, iter, column, &val);
 		g_value_unset(&val);
