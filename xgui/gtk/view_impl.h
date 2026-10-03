@@ -14,6 +14,7 @@
 #define _XGUI_VIEW_IMPL_H_
 
 #include "widget_impl.h"
+#include "xgui_row.h"
 
 namespace xgui { class Model; }
 
@@ -38,6 +39,9 @@ namespace xguimpl
 		void delSelection ( xgui::Model * model );
 		void clearSelectionsCache();
 		bool isSelectionCached( xgui::Model * model );
+
+		/** Reports a row checkbox toggled by the user (views with a checkbox column override it). */
+		virtual void notifyCheck ( XguiRow * row ) {}
 	};
 }
 

@@ -29,6 +29,20 @@ void xgui_row_set_checked ( XguiRow * row, gboolean checked );
 
 namespace xguimpl
 {
+	struct View;
+
+	/** Returns the XguiRow shown by a list item (also when the item is a GtkTreeListRow), or NULL. */
+	XguiRow * listItemRow ( GObject * list_item );
+
+	/**
+	 * Creates a column view column with a signal list item factory.
+	 * unbind may be NULL. Returns a new reference.
+	 */
+	GtkColumnViewColumn * newColumn ( char const * title, GCallback setup, GCallback bind, GCallback unbind, gpointer data );
+
+	/** Creates the checkbox column of a view: toggles by the user are reported by view->notifyCheck(). Returns a new reference. */
+	GtkColumnViewColumn * newCheckColumn ( View * view );
+
 	/** Shows or hides the column titles of a column view (GTK 4 has no property for it). */
 	void setColumnViewHeadersVisible ( GtkColumnView * view, bool visible );
 

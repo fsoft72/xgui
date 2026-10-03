@@ -18,20 +18,11 @@
 #include "image_impl.h"
 #include "row_style.h"
 
-/** Data key of the row bound to a checkbox. */
-static char const * const ROW_KEY = "xgui-row";
-
 static float int_map_align ( std::string const & alignment )
 {
 	if (alignment == "right") return 1.0f;
 	else if (alignment == "center") return 0.5f;
 	else return 0.0f;
-}
-
-/** Returns the row shown by a list item. */
-static XguiRow * int_item_row ( GObject * item )
-{
-	return XGUI_ROW(gtk_list_item_get_item(GTK_LIST_ITEM(item)));
 }
 
 /* Data columns: a label showing one string of the model node */
@@ -46,57 +37,12 @@ static void int_text_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl
 static void int_text_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::ListColumn * col )
 {
 	if ( !col->list ) return;
-	col->list->bindLabel(GTK_LABEL(gtk_list_item_get_child(GTK_LIST_ITEM(item))), int_item_row(item), col->field);
+	col->list->bindLabel(GTK_LABEL(gtk_list_item_get_child(GTK_LIST_ITEM(item))), xguimpl::listItemRow(item), col->field);
 }
 
 static void int_column_destroy ( gpointer data )
 {
 	delete (xguimpl::ListColumn *)data;
-}
-
-/* Checkbox column: a check button following the "checked" property of the row */
-
-static void int_check_toggled ( GtkCheckButton * button, xguimpl::List * list )
-{
-	XguiRow * row = (XguiRow *)g_object_get_data(G_OBJECT(button), ROW_KEY);
-	if (!row) return;
-
-	gboolean active = gtk_check_button_get_active(button);
-	if (active == xgui_row_get_checked(row)) return;
-	xgui_row_set_checked(row, active);
-	list->notifyCheck(row);
-}
-
-static void int_row_checked_changed ( XguiRow * row, GParamSpec *, GtkCheckButton * button )
-{
-	gtk_check_button_set_active(button, xgui_row_get_checked(row));
-}
-
-static void int_check_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * list )
-{
-	GtkWidget * button = gtk_check_button_new();
-	g_signal_connect(button, "toggled", G_CALLBACK(int_check_toggled), list);
-	gtk_list_item_set_child(GTK_LIST_ITEM(item), button);
-}
-
-static void int_check_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * )
-{
-	GtkWidget * button = gtk_list_item_get_child(GTK_LIST_ITEM(item));
-	XguiRow * row = int_item_row(item);
-
-	// The row is attached after the state is copied, so that binding does not look like a user toggle
-	g_object_set_data(G_OBJECT(button), ROW_KEY, NULL);
-	gtk_check_button_set_active(GTK_CHECK_BUTTON(button), xgui_row_get_checked(row));
-	g_object_set_data(G_OBJECT(button), ROW_KEY, row);
-	g_signal_connect_object(row, "notify::checked", G_CALLBACK(int_row_checked_changed), button, (GConnectFlags)0);
-}
-
-static void int_check_unbind ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * )
-{
-	GtkWidget * button = gtk_list_item_get_child(GTK_LIST_ITEM(item));
-	XguiRow * row = int_item_row(item);
-	g_object_set_data(G_OBJECT(button), ROW_KEY, NULL);
-	if (row) g_signal_handlers_disconnect_by_func(row, (gpointer)int_row_checked_changed, button);
 }
 
 /* Icon column: the icon of the style of the row */
@@ -110,17 +56,7 @@ static void int_icon_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl
 
 static void int_icon_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::List * list )
 {
-	list->bindIcon(GTK_PICTURE(gtk_list_item_get_child(GTK_LIST_ITEM(item))), int_item_row(item));
-}
-
-/** Creates a column view column with a signal factory. */
-static GtkColumnViewColumn * int_new_column ( char const * title, GCallback setup, GCallback bind, GCallback unbind, gpointer data )
-{
-	GtkListItemFactory * factory = gtk_signal_list_item_factory_new();
-	g_signal_connect(factory, "setup", setup, data);
-	g_signal_connect(factory, "bind", bind, data);
-	if (unbind) g_signal_connect(factory, "unbind", unbind, data);
-	return gtk_column_view_column_new(title, factory);
+	list->bindIcon(GTK_PICTURE(gtk_list_item_get_child(GTK_LIST_ITEM(item))), xguimpl::listItemRow(item));
 }
 
 /** Compares two rows on one of their strings through the user callback. */
@@ -271,7 +207,7 @@ namespace xguimpl
 			has_icons = should_put_icons;
 
 			if (has_icons) {
-				icon_column = int_new_column ( "", G_CALLBACK(int_icon_setup), G_CALLBACK(int_icon_bind), NULL, this );
+				icon_column = newColumn ( "", G_CALLBACK(int_icon_setup), G_CALLBACK(int_icon_bind), NULL, this );
 				gtk_column_view_insert_column ( column_view, has_checks ? 1 : 0, icon_column );
 				g_object_unref ( icon_column );
 			}
@@ -285,7 +221,7 @@ namespace xguimpl
 			has_checks = should_put_checks;
 
 			if (has_checks) {
-				check_column = int_new_column ( "", G_CALLBACK(int_check_setup), G_CALLBACK(int_check_bind), G_CALLBACK(int_check_unbind), this );
+				check_column = newCheckColumn ( this );
 				gtk_column_view_insert_column ( column_view, 0, check_column );
 				g_object_unref ( check_column );
 			}
@@ -360,7 +296,7 @@ namespace xguimpl
 		col->field = cpos;
 		col->xalign = int_map_align(calign);
 
-		col->column = int_new_column ( cname.c_str(), G_CALLBACK(int_text_setup), G_CALLBACK(int_text_bind), NULL, col );
+		col->column = newColumn ( cname.c_str(), G_CALLBACK(int_text_setup), G_CALLBACK(int_text_bind), NULL, col );
 		g_object_set_data_full ( G_OBJECT(col->column), "xgui-list-column", col, int_column_destroy );
 		gtk_column_view_column_set_fixed_width ( col->column, cwidth );
 		gtk_column_view_column_set_resizable ( col->column, TRUE );

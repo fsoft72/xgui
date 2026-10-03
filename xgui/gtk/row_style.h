@@ -1,7 +1,7 @@
 //
 // C++ Interface: row_style
 //
-// Description: Applies a xgui style (icon, colors, text attributes) to a row of a GTK list or tree store
+// Description: Applies a xgui style (icon, colors, text attributes) to the cells of List and Tree rows
 //
 //
 
@@ -18,18 +18,6 @@
 
 namespace xguimpl
 {
-	/** Store column ids holding the style attributes of a row. */
-	struct RowStyleColumns
-	{
-		int fg;
-		int bg;
-		int italic;
-		int bold;
-		int underline;
-		int strike;
-		int icon;
-	};
-
 	/** Returns the icon of the style named `style`, or NULL when it has none. */
 	static inline GdkTexture * rowIcon(xgui::StyleManager * sm, std::string const & style)
 	{

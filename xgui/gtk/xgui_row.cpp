@@ -6,8 +6,12 @@
 //
 
 #include "xgui_row.h"
+#include "view_impl.h"
 
 #include <cstring>
+
+/** Data key of the row bound to a checkbox. */
+static char const * const ROW_KEY = "xgui-row";
 
 struct _XguiRow
 {
@@ -89,8 +93,80 @@ static GtkWidget * int_find_header ( GtkWidget * w )
 	return NULL;
 }
 
+/* Checkbox column: a check button following the "checked" property of the row */
+
+static void int_check_toggled ( GtkCheckButton * button, xguimpl::View * view )
+{
+	XguiRow * row = (XguiRow *)g_object_get_data(G_OBJECT(button), ROW_KEY);
+	if (!row) return;
+
+	gboolean active = gtk_check_button_get_active(button);
+	if (active == xgui_row_get_checked(row)) return;
+	xgui_row_set_checked(row, active);
+	view->notifyCheck(row);
+}
+
+static void int_row_checked_changed ( XguiRow * row, GParamSpec *, GtkCheckButton * button )
+{
+	gtk_check_button_set_active(button, xgui_row_get_checked(row));
+}
+
+static void int_check_setup ( GtkSignalListItemFactory *, GObject * item, xguimpl::View * view )
+{
+	GtkWidget * button = gtk_check_button_new();
+	g_signal_connect(button, "toggled", G_CALLBACK(int_check_toggled), view);
+	gtk_list_item_set_child(GTK_LIST_ITEM(item), button);
+}
+
+static void int_check_bind ( GtkSignalListItemFactory *, GObject * item, xguimpl::View * )
+{
+	GtkWidget * button = gtk_list_item_get_child(GTK_LIST_ITEM(item));
+	XguiRow * row = xguimpl::listItemRow(item);
+	if (!row) return;
+
+	// The row is attached after the state is copied, so that binding does not look like a user toggle
+	g_object_set_data(G_OBJECT(button), ROW_KEY, NULL);
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(button), xgui_row_get_checked(row));
+	g_object_set_data(G_OBJECT(button), ROW_KEY, row);
+	g_signal_connect_object(row, "notify::checked", G_CALLBACK(int_row_checked_changed), button, (GConnectFlags)0);
+}
+
+static void int_check_unbind ( GtkSignalListItemFactory *, GObject * item, xguimpl::View * )
+{
+	GtkWidget * button = gtk_list_item_get_child(GTK_LIST_ITEM(item));
+	XguiRow * row = (XguiRow *)g_object_get_data(G_OBJECT(button), ROW_KEY);
+	g_object_set_data(G_OBJECT(button), ROW_KEY, NULL);
+	if (row) g_signal_handlers_disconnect_by_func(row, (gpointer)int_row_checked_changed, button);
+}
+
 namespace xguimpl
 {
+	XguiRow * listItemRow ( GObject * list_item )
+	{
+		gpointer item = gtk_list_item_get_item(GTK_LIST_ITEM(list_item));
+		if (GTK_IS_TREE_LIST_ROW(item)) {
+			// The store keeps the row alive: the reference returned by the tree row is not needed
+			gpointer inner = gtk_tree_list_row_get_item(GTK_TREE_LIST_ROW(item));
+			if (inner) g_object_unref(inner);
+			item = inner;
+		}
+		return (item && XGUI_IS_ROW(item)) ? XGUI_ROW(item) : NULL;
+	}
+
+	GtkColumnViewColumn * newColumn ( char const * title, GCallback setup, GCallback bind, GCallback unbind, gpointer data )
+	{
+		GtkListItemFactory * factory = gtk_signal_list_item_factory_new();
+		g_signal_connect(factory, "setup", setup, data);
+		g_signal_connect(factory, "bind", bind, data);
+		if (unbind) g_signal_connect(factory, "unbind", unbind, data);
+		return gtk_column_view_column_new(title, factory);
+	}
+
+	GtkColumnViewColumn * newCheckColumn ( View * view )
+	{
+		return newColumn("", G_CALLBACK(int_check_setup), G_CALLBACK(int_check_bind), G_CALLBACK(int_check_unbind), view);
+	}
+
 	void setColumnViewHeadersVisible ( GtkColumnView * view, bool visible )
 	{
 		GtkWidget * header = int_find_header(GTK_WIDGET(view));

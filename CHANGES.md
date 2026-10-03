@@ -56,3 +56,7 @@
 - Fixed: `List` reported selection changes to `onselect`, but `linkEvent` only accepted `onchange`, so selection callbacks were never called. Both names are accepted now.
 - `insertItem` only adds rows for direct children of the list model, and rows are no longer tied to having columns.
 - Tests: list tests read the `GListStore` instead of the `GtkListStore`; new `list_rows_test` (checkboxes, removal of a selected row, header clicks, header visibility).
+- Tree rewritten on `GtkTreeListModel`: the top level rows are a `GListStore` of `XguiRow`, the children of a node get their own store the first time GTK asks for them, and a `GtkColumnView` with a `GtkTreeExpander` cell (style icon and text) shows them behind a `GtkSingleSelection`. A node that had no children when GTK asked becomes expandable when its first child is added (its row is replaced). Selecting a node hidden in a collapsed parent expands the parents.
+- `Tree::sort()` now sorts the children of a node with the user callback (it was a no-op). `onexpand` reports real expansion changes (path, 1/0) for user and API expansions. Fixed `onselect` of Tree, rejected by `linkEvent` like the List one.
+- Checkbox columns of List and Tree share one implementation (`newCheckColumn`, user toggles reported through `View::notifyCheck`).
+- Tests: `row_style_test` and `scroll_test` use the column views; new `tree_test` (nested rows, expansion events, children added to collapsed parents and to leaves, checks, sort, selection, removal of the selected subtree).

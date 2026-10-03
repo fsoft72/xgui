@@ -13,7 +13,7 @@
 static int check_direct_child(GtkWidget * scrolled, char const * label)
 {
 	GtkWidget * child = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(scrolled));
-	if (!GTK_IS_COLUMN_VIEW(child) && !GTK_IS_TREE_VIEW(child)) {
+	if (!GTK_IS_COLUMN_VIEW(child)) {
 		std::fprintf(stderr, "%s: child of the scrolled window is not the list widget\n", label);
 		return 1;
 	}

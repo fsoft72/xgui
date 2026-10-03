@@ -96,7 +96,7 @@ namespace xguimpl
 		/** Shows the icon of the style of a model node in the picture of a cell. */
 		void bindIcon ( GtkPicture * picture, XguiRow * row );
 		/** Reports a checkbox toggled by the user through the oncheck event. */
-		void notifyCheck ( XguiRow * row );
+		virtual void notifyCheck ( XguiRow * row );
 		/** Reports the selection changes of a range of rows through onselect and updates the cache. */
 		void updateSelection ( guint position, guint n_items );
 		/** Calls the onrefresh event. */
