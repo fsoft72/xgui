@@ -499,28 +499,6 @@ Initializes the dynamic class environment.
 
 ---
 
-#### `static xgui::Object * LoadXml(std::string const &filename, xgui::Object * parent = 0)`
-
-Loads an XML file representing a structure of XGUI widgets and returns the root object of the hierarchy.
-
-**Parameters:**
-- `filename` - Path to the XML file to load
-- `parent` - The object that will contain the loaded object (default: `0`)
-
-**Returns:** Pointer to the root object of the loaded hierarchy.
-
----
-
-#### `static void SaveXml(xgui::Object * root, std::string const &filename)`
-
-Saves the `root` object in an XML structured file.
-
-**Parameters:**
-- `root` - Pointer to the root object to save
-- `filename` - Path to the XML file to create
-
----
-
 #### `static void LoadLibrary(std::string const &filename)`
 
 Loads an external plugin containing XGUI widgets.

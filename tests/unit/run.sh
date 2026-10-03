@@ -98,4 +98,11 @@ _gui_check "onenable and ondisable fire for the new state" tests/unit/enable_tes
 # Item: JSON numbers must keep their textual form
 _gui_check "JSON numbers are not turned into 200.000000" tests/unit/json_numbers_test.cpp
 
+# Item: dump() must escape attribute values
+_gui_check "dump escapes attribute values" tests/unit/dump_test.cpp
+
+# Item: the dead XML pipeline must stay removed
+check "XML load/save/DTD API is removed" \
+	bash -c '! grep -rEq "LoadXml|SaveXml|GenerateDTD|ParseXmlNode" xgui pywrap tests/plan'
+
 exit $FAILED

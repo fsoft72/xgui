@@ -998,9 +998,7 @@ class PlanUi : public Window
 			menu = Master::CreateMenu(this);
 			menu->addItem("", "File_mnu", "&File");
 			menu->addItem("File_mnu", "LoadJson_mnu", "&Load Json");
-			menu->addItem("File_mnu", "SaveJson_mnu", "&Save Json");
 			menu->addItem("", "Master_mnu", "&Master");
-			menu->addItem("Master_mnu", "DTD_mnu", "&Generate Dtd");
 			menu->addItem("Master_mnu", "Plugin_mnu", "Load &Plugin");
 
 			main_box = Master::CreateHBox(this, 0, 0);
@@ -1046,30 +1044,6 @@ class PlanUi : public Window
 					if(loaded_obj)
 						objects->addObject(loaded_obj);
 				}
-			}
-			else if(id == "SaveJson_mnu") {
-				FileExtensionsVector filters;
-				filters.push_back(FileExtension("(.json) Json Gui Description", "*.json"));
-				std::string file = Master::SaveFileDialog(this, filters, "Save");
-
-				Object * to_dump = objects->getSelected();
-				if(!to_dump) return EVT_PROPAGATE;
-
-				Master::SaveXml(to_dump, file);
-			}
-			else if(id == "DTD_mnu") {
-				FileExtensionsVector filters;
-				filters.push_back(FileExtension("(.dtd) Xml Document Type Definitions", "*.dtd"));
-				std::string file = Master::SaveFileDialog(this, filters, "Save");
-
-				if(file.empty()) return EVT_PROPAGATE;
-
-				std::string dtd = Master::GenerateDTD();
-				std::ofstream f(file.c_str());
-				if(!f) return EVT_PROPAGATE;
-
-				f << dtd;
-				f.close();
 			}
 			else if(id == "Plugin_mnu") {
 				FileExtensionsVector filters;

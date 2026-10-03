@@ -44,16 +44,6 @@ static std::string trim(std::string const& source, char const* delims = " \t\r\n
 
 namespace xgui
 {
-	void Master::SaveXml(xgui::Object * root, std::string const &filename)
-	{
-		std::string dump = root->dump();
-		std::ofstream file(filename.c_str());
-
-		file << dump;
-
-		file.close();
-	}
-
 	xgui::ClassInfo * Master::FindClass(std::string const &node)
 	{
 		ClassInfoList::iterator c;
@@ -143,19 +133,6 @@ namespace xgui
 		}
 		else 
 			delete object;
-	}
-
-	// XML support removed - use LoadJson instead
-	xgui::Object * Master::ParseXmlNode(xgui::Object * parent_object, void * n)
-	{
-		XGUI_ERROR("XML support has been removed. Please use LoadJson() instead.");
-		return 0;
-	}
-
-	DLLEXPORT xgui::Object * xgui::Master::LoadXml(std::string const &file, xgui::Object * parent)
-	{
-		XGUI_ERROR("XML support has been removed. Please use LoadJson() instead.");
-		return 0;
 	}
 
 	xgui::Object * Master::ParseJsonValue(xgui::Object * parent_object, const nlohmann::json &j)
@@ -1606,55 +1583,4 @@ namespace xgui
 	}
 
 
-	std::string Master::GenerateDTD()
-	{
-		Master * master = Instance();
-
-		std::string dtd = "<!--\n" \
-			"ciao\n" \
-			"-->\n\n";
-
-		ClassInfoList::iterator tag_class_iter;
-		for ( tag_class_iter = master->class_info_.begin();
-			tag_class_iter != master->class_info_.end(); ++tag_class_iter ) {
-
-			ClassInfo * tag_class = *tag_class_iter;
-
-			std::string entity = tag_class->tag() + "_children";
-
-			dtd += "<!ENTITY % xgui." + entity + " \"";
-
-			std::string child_list = "";
-
-			if (tag_class->hasProperty("text") == PROPERTY_READ_WRITE)
-				child_list += "#PCDATA";
-			else if (tag_class->initProperties().find("text") != tag_class->initProperties().end())
-				child_list += "#PCDATA";
-			else
-				child_list += "empty";
-
-			ClassInfoList::iterator child_class_iter;
-			for ( child_class_iter = master->class_info_.begin();
-				child_class_iter != master->class_info_.end(); ++child_class_iter ) {
-
-				ClassInfo * child_class = *child_class_iter;
-
-				if ( child_class->canBeContainedIn ( tag_class ) &&
-					tag_class->canContain ( child_class ) ) {
-
-					std::string child_tag = child_class->tag();
-					child_list += "|" + child_tag;
-
-				}
-
-			}
-
-			dtd += child_list;
-			dtd += "\">\n";
-			dtd += tag_class->dtd() + "\n";
-
-		}
-
-		return dtd + "\n";
-	}
 }

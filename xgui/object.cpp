@@ -261,6 +261,22 @@ namespace xgui
 		owner_destruction_notifier_ = notifier;
 	}
 
+	/** Escapes the characters that are not allowed inside a double quoted XML attribute value. */
+	static std::string escapeAttribute(std::string const &value)
+	{
+		std::string escaped;
+		for (std::string::const_iterator c = value.begin(); c != value.end(); ++c) {
+			switch (*c) {
+				case '&': escaped += "&amp;"; break;
+				case '<': escaped += "&lt;"; break;
+				case '>': escaped += "&gt;"; break;
+				case '"': escaped += "&quot;"; break;
+				default: escaped += *c;
+			}
+		}
+		return escaped;
+	}
+
 	// Dynamic Methods Management
 	std::string Object::dumpProperties()
 	{
@@ -279,7 +295,7 @@ namespace xgui
 				{
 					xml += *iter;
 					xml += "=\"";
-					xml += value;
+					xml += escapeAttribute(value);
 					xml += "\" ";
 				}
 			}

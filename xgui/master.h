@@ -62,7 +62,6 @@ namespace xgui
 			DLLEXPORT Master();
 			DLLEXPORT ~Master();
 
-			DLLEXPORT static xgui::Object * ParseXmlNode(xgui::Object * parent_object, void * node);
 		DLLEXPORT static xgui::Object * ParseJsonValue(xgui::Object * parent_object, const nlohmann::json &j);
 
 		public:
@@ -127,10 +126,7 @@ namespace xgui
 			DLLEXPORT static xgui::ClassInfo * FindClassByTag(std::string const &tag);
 			DLLEXPORT static xgui::ClassInfo * FindClass(std::string const &cname);
 			DLLEXPORT static std::vector<std::string> availableClasses();
-			DLLEXPORT static xgui::Object * LoadXml(std::string const &filename, xgui::Object * parent = 0);
 			DLLEXPORT static xgui::Object * LoadJson(std::string const &filename, xgui::Object * parent = 0);
-			DLLEXPORT static void SaveXml(xgui::Object * root, std::string const &filename);
-			DLLEXPORT static std::string GenerateDTD();
 
 			DLLEXPORT static void LoadLibrary(std::string const &filename);
 			DLLEXPORT static void UnloadLibrary(std::string const &filename);

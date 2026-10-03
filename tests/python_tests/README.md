@@ -199,7 +199,7 @@ def get_widget(self, widget_name):
     return self.widgets.get(widget_name)
 ```
 
-Alternatively, when using LoadJson/LoadXml, widgets can be found using the Container.findChild() method:
+Alternatively, when using LoadJson, widgets can be found using the Container.findChild() method:
 ```python
 # On a container (window, vbox, etc.)
 widget = container.findChild("myWidgetId")
