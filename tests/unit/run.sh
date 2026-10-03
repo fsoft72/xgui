@@ -34,7 +34,8 @@ check "core and GTK sources compile without -D_DEBUG" \
 check "xguimpl::Master initializes threaded" \
 	grep -Pzq "Master\(xgui::Master \* master\)\s*:\s*threaded\(false\)" xgui/gtk/master_impl.cpp
 
-# GUI checks run on a headless GTK Broadway display (needs broadwayd)
+# GUI checks run on a headless GTK Broadway display (needs gtk4-broadwayd). Portals are disabled, otherwise
+# the file dialogs would open on the desktop of the user through xdg-desktop-portal. A hanging test fails after 60s.
 BROADWAY_PORT=:97
 _gui_check() {
 	local name="$1" src="$2"; shift 2
@@ -47,7 +48,7 @@ _gui_check() {
 		LIB_BUILT=1
 	fi
 	$CPP -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk4 --libs) -o "$OUT/gui_test" \
-		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT" "$ROOT"
+		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT GDK_DEBUG=no-portals timeout 60 "$OUT/gui_test" "$OUT" "$ROOT"
 }
 
 # Item: selection must map to the right model node after sort()
@@ -92,6 +93,7 @@ _gui_check "addColumn batches store rebuilds" tests/unit/add_column_test.cpp
 # GTK 4 port: List rows on GtkColumnView
 _gui_check "list checkboxes, removed rows and header clicks" tests/unit/list_rows_test.cpp
 _gui_check "tree rows, expansion, checks, sort and selection" tests/unit/tree_test.cpp
+_gui_check "combobox drop down and editable entry" tests/unit/combobox_test.cpp
 
 # Item: OnSelect must keep the selection cache correct
 _gui_check "list selection cache follows selection changes" tests/unit/selection_test.cpp
@@ -112,10 +114,9 @@ check "XML load/save/DTD API is removed" \
 # Item: menu items with icons keep their text accessors
 _gui_check "menu item with icon keeps working" tests/unit/menu_icon_test.cpp
 
-# Item: no deprecated GTK 4 API (ComboBox still uses GtkComboBox)
-DEPRECATED_ALLOWED="combobox_impl.cpp"
+# Item: no deprecated GTK 4 API
 check "GTK backend uses no deprecated GTK 4 API" \
-	bash -c "for f in xgui/gtk/*.cpp; do case \" $DEPRECATED_ALLOWED \" in *\" \$(basename \$f) \"*) continue;; esac; $CPP -fsyntax-only -Werror=deprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
+	bash -c "for f in xgui/gtk/*.cpp; do $CPP -fsyntax-only -Werror=deprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
 
 # Item: strict compiler flags (no -fpermissive, -Wextra clean)
 check "Makefile.gtk uses -Wextra and not -fpermissive" \

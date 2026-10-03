@@ -55,7 +55,10 @@ namespace xguimpl
 		virtual void recalcLayout();
 		virtual void setAccessor(xgui::Widget * w);
 
-		/** The widget receiving the input controllers (a wrapped widget may differ from the container one). */
+		/**
+		 * The widget that takes the keyboard focus (a wrapped widget may differ from the container one).
+		 * Input controllers are attached to the container widget: events of the inner widgets reach it in bubble phase.
+		 */
 		virtual GtkWidget * eventWidget();
 
 		void ensureClickGesture();

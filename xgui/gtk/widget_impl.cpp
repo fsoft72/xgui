@@ -260,7 +260,7 @@ namespace xguimpl
 		gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click_gesture), 0);
 		g_signal_connect ( click_gesture, "pressed", G_CALLBACK ( OnClickPressed ), this );
 		g_signal_connect ( click_gesture, "released", G_CALLBACK ( OnClickReleased ), this );
-		gtk_widget_add_controller(eventWidget(), GTK_EVENT_CONTROLLER(click_gesture));
+		gtk_widget_add_controller(widget, GTK_EVENT_CONTROLLER(click_gesture));
 	}
 
 	void Widget::ensureMotionController()
@@ -270,7 +270,7 @@ namespace xguimpl
 		g_signal_connect ( motion_controller, "motion", G_CALLBACK ( OnMotion ), this );
 		g_signal_connect ( motion_controller, "enter", G_CALLBACK ( OnEnter ), this );
 		g_signal_connect ( motion_controller, "leave", G_CALLBACK ( OnLeave ), this );
-		gtk_widget_add_controller(eventWidget(), motion_controller);
+		gtk_widget_add_controller(widget, motion_controller);
 	}
 
 	void Widget::ensureKeyController()
@@ -279,7 +279,7 @@ namespace xguimpl
 		key_controller = gtk_event_controller_key_new();
 		g_signal_connect ( key_controller, "key-pressed", G_CALLBACK ( OnKeyPressed ), this );
 		g_signal_connect ( key_controller, "key-released", G_CALLBACK ( OnKeyReleased ), this );
-		gtk_widget_add_controller(eventWidget(), key_controller);
+		gtk_widget_add_controller(widget, key_controller);
 	}
 
 	void Widget::ensureFocusController()
@@ -288,7 +288,7 @@ namespace xguimpl
 		focus_controller = gtk_event_controller_focus_new();
 		g_signal_connect ( focus_controller, "enter", G_CALLBACK ( OnFocusEnter ), this );
 		g_signal_connect ( focus_controller, "leave", G_CALLBACK ( OnFocusLeave ), this );
-		gtk_widget_add_controller(eventWidget(), focus_controller);
+		gtk_widget_add_controller(widget, focus_controller);
 	}
 
 	void Widget::ensureResizeTick()
