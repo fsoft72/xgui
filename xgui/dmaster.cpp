@@ -32,51 +32,42 @@ namespace xgui
 {
 	xgui::ClassInfo * Master::FindClass(std::string const &node)
 	{
-		ClassInfoList::iterator c;
-		for(c = Instance()->class_info_.begin(); c != Instance()->class_info_.end(); ++c) {
-			if ((*c)->className() == node)
-				return *c;
-		}
-
-		return 0;
+		ClassInfoMap const &classes = Instance()->classes_by_name_;
+		ClassInfoMap::const_iterator c = classes.find(node);
+		return c == classes.end() ? 0 : c->second;
 	}
 
 	xgui::ClassInfo * Master::FindClassByTag(std::string const &tag)
 	{
-		ClassInfoList::iterator c;
-		for(c = Instance()->class_info_.begin(); c != Instance()->class_info_.end(); ++c) {
-			std::string const &c_tag = (*c)->tag();
-
-			if (c_tag == tag)
-				return *c;
-		}
-
-		return 0;
+		ClassInfoMap const &classes = Instance()->classes_by_tag_;
+		ClassInfoMap::const_iterator c = classes.find(tag);
+		return c == classes.end() ? 0 : c->second;
 	}
 
 	std::vector<std::string> Master::availableClasses()
 	{
-		ClassInfoList::iterator c;
 		std::vector<std::string> classes;
-		for(c = Instance()->class_info_.begin(); c != Instance()->class_info_.end(); ++c)
-			classes.push_back((*c)->className());
+		for(ClassInfoMap::const_iterator c = Instance()->classes_by_name_.begin(); c != Instance()->classes_by_name_.end(); ++c)
+			classes.push_back(c->first);
 		return classes;
 	}
 
 	void Master::RegisterClass(xgui::ClassInfo * ginfo)
 	{
-		Instance()->class_info_.insert(ginfo);
+		// The first class registered with a given name or tag wins
+		Instance()->classes_by_name_.insert(std::make_pair(ginfo->className(), ginfo));
+		Instance()->classes_by_tag_.insert(std::make_pair(ginfo->tag(), ginfo));
 	} 
 
 	void Master::UnregisterClass(std::string const &node) 
 	{
-		ClassInfoList::iterator c;
-		for(c = Instance()->class_info_.begin(); c != Instance()->class_info_.end(); ++c) {
-			if ((*c)->className() == node) {
-				Instance()->class_info_.erase(c);
-				return;
-			}
-		}
+		ClassInfoMap::iterator c = Instance()->classes_by_name_.find(node);
+		if (c == Instance()->classes_by_name_.end()) return;
+
+		ClassInfoMap::iterator t = Instance()->classes_by_tag_.find(c->second->tag());
+		if (t != Instance()->classes_by_tag_.end() && t->second == c->second)
+			Instance()->classes_by_tag_.erase(t);
+		Instance()->classes_by_name_.erase(c);
 	}
 
 	xgui::Object * Master::CreateObject(std::string const &class_name, xgui::Object * parent, xgui::StringMap const &properties)

@@ -45,7 +45,7 @@ namespace xgui
 	class Master
 	{
 		private:
-			typedef std::set<xgui::ClassInfo *> ClassInfoList;
+			typedef std::map<std::string, xgui::ClassInfo *> ClassInfoMap;
 			typedef std::set<xgui::Object *> ObjectsPool;
 
 			static Master * instance_;
@@ -56,7 +56,8 @@ namespace xgui
 			ObjectsPool objects_pool_;
 			xgui::ImagesMap images_cache_;
 			
-			ClassInfoList class_info_;
+			ClassInfoMap classes_by_name_;
+			ClassInfoMap classes_by_tag_;
 			StrVoidMap modules_map_;
 
 			DLLEXPORT Master();

@@ -121,4 +121,10 @@ check "sources compile cleanly with -Wall -Wextra -Werror" \
 # Item: shared mouse button decoding
 _gui_check "button events decode to name and mask" tests/unit/button_decode_test.cpp
 
+# Item: indexed class lookups
+_gui_check "class lookup by name and tag is consistent" tests/unit/class_lookup_test.cpp
+
+# Smoke test: all JSON examples load
+_gui_check "JSON examples load" tests/unit/examples_test.cpp
+
 exit $FAILED
