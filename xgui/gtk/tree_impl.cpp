@@ -198,7 +198,12 @@ namespace xguimpl
 		GtkTreeIter curr_ele_iter;
 		/*GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );*/
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
-		GtkTreeIter * iter_parent = (parent != 0) ? &tree_map[parent] : 0;
+		GtkTreeIter * iter_parent = 0;
+		if ( parent != 0 ) {
+			std::map<xgui::Model *, GtkTreeIter>::iterator found_parent = tree_map.find(parent);
+			if ( found_parent == tree_map.end() ) return;
+			iter_parent = &found_parent->second;
+		}
 
 		gtk_tree_store_insert( store, &curr_ele_iter, iter_parent, child_pos);
 		tree_map[child] = curr_ele_iter;
@@ -256,9 +261,12 @@ namespace xguimpl
 			removeSubTree(dynamic_cast<xgui::Model*>(*sub_child));
 
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
-		GtkTreeIter to_remove = tree_map[child];
-		gtk_tree_store_remove(store, &to_remove);
-		tree_map.erase(child);
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(child);
+		if ( found != tree_map.end() ) {
+			GtkTreeIter to_remove = found->second;
+			gtk_tree_store_remove(store, &to_remove);
+			tree_map.erase(found);
+		}
 		delSelection(child);
 	}
 
@@ -341,8 +349,8 @@ namespace xguimpl
 
 	void Tree::selectSubTree(GtkTreeSelection * sel, xgui::Model * model, int child_pos, xgui::TextStatusCallback * sel_cb )
 	{
-		GtkTreeIter curr_iter = tree_map[model];
-		bool selection_selected = gtk_tree_selection_iter_is_selected ( sel, &curr_iter );
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(model);
+		bool selection_selected = found != tree_map.end() && gtk_tree_selection_iter_is_selected ( sel, &found->second );
 
 		if ( !selection_selected && isSelectionCached(model) ) {
 			if ( !sel_cb || sel_cb->call( this_tree, model->path(), 0 ) )
@@ -362,22 +370,22 @@ namespace xguimpl
 	bool Tree::isSelected(xgui::Model * model, int pos) 
 	{
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
-		xgui::Model * child = model->getChild(pos);
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(model->getChild(pos));
+		if ( found == tree_map.end() ) return false;
 
-		GtkTreeIter iter = tree_map[child];
-		return gtk_tree_selection_iter_is_selected(sel, &iter);
+		return gtk_tree_selection_iter_is_selected(sel, &found->second);
 	}
 
 	void Tree::select(xgui::Model * parent, int pos, bool state) 
 	{
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
-		xgui::Model * child = parent->getChild(pos);
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(parent->getChild(pos));
+		if ( found == tree_map.end() ) return;
 
-		GtkTreeIter iter = tree_map[child];
 		if (state)
-			gtk_tree_selection_select_iter(sel, &iter);
+			gtk_tree_selection_select_iter(sel, &found->second);
 		else
-			gtk_tree_selection_unselect_iter(sel, &iter);
+			gtk_tree_selection_unselect_iter(sel, &found->second);
 	}
 
 	void Tree::selectAll(xgui::Model * model, bool state) 
@@ -407,10 +415,11 @@ namespace xguimpl
 	bool Tree::isChecked(xgui::Model * parent, int pos)
 	{
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
-		GtkTreeIter * iter = &tree_map[parent->getChild(pos)];
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(parent->getChild(pos));
+		if ( found == tree_map.end() ) return false;
  		gboolean state;
 
-		gtk_tree_model_get ( GTK_TREE_MODEL(store), iter, check_column_id, &state, -1);
+		gtk_tree_model_get ( GTK_TREE_MODEL(store), &found->second, check_column_id, &state, -1);
 
 		return state;
 	}
@@ -418,16 +427,18 @@ namespace xguimpl
 	void Tree::check(xgui::Model * parent, int pos, bool state)
 	{
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
-		GtkTreeIter * iter = &tree_map[parent->getChild(pos)];
-		gtk_tree_store_set ( store, iter, check_column_id, state, -1);
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(parent->getChild(pos));
+		if ( found == tree_map.end() ) return;
+		gtk_tree_store_set ( store, &found->second, check_column_id, state, -1);
 	}
 
 	void Tree::checkAll(xgui::Model * parent, bool state)
 	{
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
 		for (xgui::Model::iterator i = parent->begin(); i != parent->end(); ++i) {
-			GtkTreeIter * iter = &tree_map[dynamic_cast<xgui::Model*>(*i)];
-			gtk_tree_store_set ( store, iter, check_column_id, state, -1);
+			std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(dynamic_cast<xgui::Model*>(*i));
+			if ( found == tree_map.end() ) continue;
+			gtk_tree_store_set ( store, &found->second, check_column_id, state, -1);
 		}
 	}
 
@@ -454,8 +465,9 @@ namespace xguimpl
 		if (!node) return;
 
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
-		GtkTreeIter iter = tree_map[node];
-		GtkTreePath * path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(node);
+		if ( found == tree_map.end() ) return;
+		GtkTreePath * path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &found->second);
 
 		gtk_tree_view_expand_row ( tree_view, path, false);
 
@@ -467,8 +479,9 @@ namespace xguimpl
 		if (!node) return;
 
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
-		GtkTreeIter iter = tree_map[node];
-		GtkTreePath * path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+		std::map<xgui::Model *, GtkTreeIter>::iterator found = tree_map.find(node);
+		if ( found == tree_map.end() ) return;
+		GtkTreePath * path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &found->second);
 
 		gtk_tree_view_collapse_row ( tree_view, path);
 

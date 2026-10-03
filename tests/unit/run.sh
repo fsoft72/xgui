@@ -65,4 +65,7 @@ _gui_check "widgets subscribe to mouse/key events" tests/unit/event_mask_test.cp
 # Item: column lookup must not fall back to the last column
 _gui_check "list column lookup and sort column index" tests/unit/list_columns_test.cpp
 
+# Item: unknown model nodes must not insert empty iterators into iter_map
+_gui_check "list ignores nodes without a GTK row" tests/unit/iter_map_test.cpp
+
 exit $FAILED
