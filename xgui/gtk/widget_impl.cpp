@@ -21,13 +21,9 @@ namespace xguimpl
 	Widget::Widget(GtkWidget * real_w)
 	: this_widget(0), widget(real_w), last_x(0), last_y(0), last_w(0), last_h(0)
 	{
-		if (gtk_widget_get_has_window(widget)) {
-			GdkWindow* window = gtk_widget_get_window(widget);
-			if (window != NULL) {
-				int emask = gdk_window_get_events(window);
-				gdk_window_set_events(window, (GdkEventMask)(emask | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK) );
-			}
-		}
+		// Masks must be added on the widget: the GdkWindow does not exist before realization
+		gtk_widget_add_events(widget, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK
+		                              | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK | GDK_POINTER_MOTION_MASK);
 
 		g_signal_connect ( G_OBJECT ( widget ), "destroy", G_CALLBACK ( OnDestroy ), this );
 		g_signal_connect ( G_OBJECT ( widget ), "event", G_CALLBACK ( OnGdkEvent ), this );

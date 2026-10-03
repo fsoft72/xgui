@@ -59,4 +59,7 @@ _gui_check "LoadJson survives malformed JSON" tests/unit/json_loader_test.cpp
 # Item: "focused" property must grab focus
 _gui_check "focused property grabs focus" tests/unit/focus_test.cpp
 
+# Item: event masks must be applied at construction time
+_gui_check "widgets subscribe to mouse/key events" tests/unit/event_mask_test.cpp
+
 exit $FAILED
