@@ -225,7 +225,9 @@ namespace xguimpl
 			return true;
 		}
 		else if ( (name == "onenable") || (name == "ondisable") ) {
-			g_signal_connect ( G_OBJECT ( widget ), "state-changed", G_CALLBACK ( OnEnableDisable ), this );
+			// onenable and ondisable share one handler: connect it only once
+			if ( !g_signal_handler_find ( widget, (GSignalMatchType)(G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA), 0, 0, NULL, (gpointer)OnEnableDisable, this ) )
+				g_signal_connect ( G_OBJECT ( widget ), "notify::sensitive", G_CALLBACK ( OnEnableDisable ), this );
 			return true;
 		}
 		else if ( name == "onresize" )
@@ -493,15 +495,10 @@ namespace xguimpl
 		return rv;
 	}
 	
-	int Widget::OnEnableDisable ( GtkWidget *w, GtkStateType state, Widget * xw )
+	int Widget::OnEnableDisable ( GtkWidget *w, GParamSpec * pspec, Widget * xw )
 	{
-		xgui::Callback * cb = 0;
-	
-		if ( state == GTK_STATE_INSENSITIVE )
-			cb = xw->this_widget->getEvent("ondisable");
-		else if ( !gtk_widget_get_sensitive(w) )
-			cb = xw->this_widget->getEvent("onenable" );
-	
+		xgui::Callback * cb = xw->this_widget->getEvent( gtk_widget_get_sensitive(w) ? "onenable" : "ondisable" );
+
 		if (cb) return !cb->call(xw->this_widget);
 		return 0;
 	}

@@ -55,7 +55,7 @@ namespace xguimpl
 		static int OnShow ( GtkWidget * w, Widget * xw );
 		static int OnHide ( GtkWidget * w, Widget * xw );
 		static int OnDestroy ( GtkWidget * w, Widget * xw );
-		static int OnEnableDisable ( GtkWidget *w, GtkStateType state, Widget * xw );
+		static int OnEnableDisable ( GtkWidget *w, GParamSpec * pspec, Widget * xw );
 	};
 }
 

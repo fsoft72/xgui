@@ -92,4 +92,7 @@ _gui_check "addColumn batches store rebuilds" tests/unit/add_column_test.cpp
 # Item: OnSelect must keep the selection cache correct
 _gui_check "list selection cache follows selection changes" tests/unit/selection_test.cpp
 
+# Item: onenable/ondisable must not be inverted
+_gui_check "onenable and ondisable fire for the new state" tests/unit/enable_test.cpp
+
 exit $FAILED
