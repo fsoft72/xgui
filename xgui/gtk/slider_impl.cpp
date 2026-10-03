@@ -15,12 +15,7 @@
 
 static GtkWidget * MkSliderWidget( int min, int max, bool vertical )
 {
-	GtkWidget * widget;
-
-	if ( vertical ) widget = gtk_vscale_new_with_range ( min, max, 1);
-	else widget = gtk_hscale_new_with_range (min, max, 1);
-
-	return widget;
+	return gtk_scale_new_with_range ( vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, min, max, 1 );
 }
 
 namespace xguimpl

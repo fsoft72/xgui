@@ -37,6 +37,9 @@ static void IdleParameterDestructor( void * cb_info )
 	delete cb_p;
 }
 
+/** Serializes the callers of GuiLock()/GuiUnlock(); the old GDK global lock is deprecated since GTK 3.6. */
+static GRecMutex gui_mutex;
+
 /** Returns the GTK window to use as transient parent of a dialog, or NULL when there is no parent. */
 static GtkWindow * int_transient_parent ( xgui::Window * parent )
 {
@@ -72,18 +75,15 @@ namespace xguimpl
 
 	void Master::guiLock()
 	{
-		// Thread locking is deprecated in GTK 3+
-		// Applications should use GLib's thread primitives instead
 		if (threaded)
-			gdk_threads_enter();
+			g_rec_mutex_lock(&gui_mutex);
 	}
 
 	void Master::guiUnlock()
 	{
-		// Thread unlocking is deprecated in GTK 3+
 		if (threaded) {
-			gdk_flush();
-			gdk_threads_leave();
+			gdk_display_flush(gdk_display_get_default());
+			g_rec_mutex_unlock(&gui_mutex);
 		}
 	}
 	

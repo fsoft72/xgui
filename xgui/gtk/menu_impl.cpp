@@ -16,6 +16,22 @@
 #include "image.h"
 #include "image_impl.h"
 
+/** Returns the label shown by a menu item (also when the item has an icon), or NULL if it has none. */
+static GtkLabel * int_item_label ( GtkMenuItem * item )
+{
+	GtkWidget * child = gtk_bin_get_child ( GTK_BIN(item) );
+	if ( !child ) return NULL;
+	if ( GTK_IS_LABEL(child) ) return GTK_LABEL(child);
+	if ( !GTK_IS_CONTAINER(child) ) return NULL;
+
+	GtkLabel * label = NULL;
+	GList * children = gtk_container_get_children ( GTK_CONTAINER(child) );
+	for ( GList * c = children; c != NULL && !label; c = c->next )
+		if ( GTK_IS_LABEL(c->data) ) label = GTK_LABEL(c->data);
+	g_list_free ( children );
+	return label;
+}
+
 static void int_item_id_destroy_notify( std::string * str )
 {
 	delete str;
@@ -93,9 +109,17 @@ namespace xguimpl
 			if (icon == 0)
 				mnu_item = GTK_MENU_ITEM(gtk_menu_item_new_with_mnemonic(real_name.c_str()));
 			else {
-				mnu_item = GTK_MENU_ITEM(gtk_image_menu_item_new_with_mnemonic(real_name.c_str()));
+				// A plain menu item holding an icon and a mnemonic label (GtkImageMenuItem is deprecated)
+				mnu_item = GTK_MENU_ITEM(gtk_menu_item_new());
+				GtkWidget * box = gtk_box_new ( GTK_ORIENTATION_HORIZONTAL, 6 );
+				GtkWidget * label = gtk_label_new_with_mnemonic ( real_name.c_str() );
+				gtk_label_set_xalign ( GTK_LABEL(label), 0.0f );
+				gtk_label_set_mnemonic_widget ( GTK_LABEL(label), GTK_WIDGET(mnu_item) );
 				icon->ref();
-				gtk_image_menu_item_set_image( GTK_IMAGE_MENU_ITEM(mnu_item), GTK_WIDGET(icon->getImpl()->getImage()) );
+				gtk_box_pack_start ( GTK_BOX(box), GTK_WIDGET(icon->getImpl()->getImage()), FALSE, FALSE, 0 );
+				gtk_box_pack_start ( GTK_BOX(box), label, TRUE, TRUE, 0 );
+				gtk_container_add ( GTK_CONTAINER(mnu_item), box );
+				gtk_widget_show_all ( box );
 				g_object_set_data_full(G_OBJECT(mnu_item), "xgui-mnuitem-icon", (void*)icon, (GDestroyNotify)int_item_icon_destroy_notify);
 			}
 		}
@@ -145,7 +169,7 @@ namespace xguimpl
 		std::pair<MenuItemMap::iterator, GtkMenuItem *> e = findMenuItem(id);
 		if (e.second) {
 			GtkMenu * mnu = GTK_MENU(gtk_menu_item_get_submenu(e.second));
-			if (mnu) gtk_menu_popup ( mnu, NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+			if (mnu) gtk_menu_popup_at_pointer ( mnu, NULL );
 		}
 	}
 	
@@ -199,8 +223,8 @@ namespace xguimpl
 	{
 		std::pair<MenuItemMap::iterator, GtkMenuItem *> e = findMenuItem(id);
 		if (e.second) {
-			GtkLabel * lbl = GTK_LABEL( gtk_bin_get_child(GTK_BIN(e.second)) );
-			gtk_label_set_text(lbl, text.c_str());
+			GtkLabel * lbl = int_item_label(e.second);
+			if (lbl) gtk_label_set_text(lbl, text.c_str());
 		}
 	}
 	
@@ -208,8 +232,8 @@ namespace xguimpl
 	{
 		std::pair<MenuItemMap::iterator, GtkMenuItem *> e = findMenuItem(id);
 		if (e.second) {
-			GtkLabel * lbl = GTK_LABEL( gtk_bin_get_child(GTK_BIN(e.second)) );
-			return gtk_label_get_text(lbl);
+			GtkLabel * lbl = int_item_label(e.second);
+			return lbl ? gtk_label_get_text(lbl) : "";
 		}
 		else
 			return "";

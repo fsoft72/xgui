@@ -47,7 +47,7 @@ _gui_check() {
 		LIB_BUILT=1
 	fi
 	$CPP -fpermissive -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
-		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT"
+		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT" "$ROOT"
 }
 
 # Item: selection must map to the right model node after sort()
@@ -104,5 +104,12 @@ _gui_check "dump escapes attribute values" tests/unit/dump_test.cpp
 # Item: the dead XML pipeline must stay removed
 check "XML load/save/DTD API is removed" \
 	bash -c '! grep -rEq "LoadXml|SaveXml|GenerateDTD|ParseXmlNode" xgui pywrap tests/plan'
+
+# Item: menu items with icons keep their text accessors
+_gui_check "menu item with icon keeps working" tests/unit/menu_icon_test.cpp
+
+# Item: GTK 2 era APIs must not come back
+check "GTK backend uses no GTK 2 era deprecated API" \
+	bash -c "for f in xgui/gtk/*.cpp; do $CPP -fsyntax-only -fpermissive -Wdeprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f 2>&1; done | grep -E 'gtk_(h|v)scale_new|image_menu_item|GtkImageMenuItem|gtk_menu_popup|gdk_threads_(enter|leave)|gdk_flush|GdkColor|gdk_color' | { ! grep .; }"
 
 exit $FAILED
