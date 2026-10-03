@@ -204,7 +204,7 @@ namespace xguimpl
 		else b = GTK_BUTTONS_OK;
 	
 		GtkWidget * mbox = gtk_message_dialog_new ( GTK_WINDOW(parent->getImpl()->widget), GtkDialogFlags(GTK_DIALOG_MODAL |
-		                                            GTK_DIALOG_DESTROY_WITH_PARENT), t, b, text.c_str(), 0 );
+		                                            GTK_DIALOG_DESTROY_WITH_PARENT), t, b, "%s", text.c_str() );
 		gtk_window_set_title( GTK_WINDOW(mbox), title.c_str() );
 	
 		if ( buttons == "yes-no-cancel" ) gtk_dialog_add_buttons ( GTK_DIALOG(mbox), "_Cancel", GTK_RESPONSE_CANCEL, NULL);
