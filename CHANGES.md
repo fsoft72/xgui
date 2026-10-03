@@ -16,3 +16,4 @@
 - Added a bounds check at the top of `Model::removeChild` (out-of-range positions were read before validation). Added `tests/unit/model_test.cpp`; the test runner now builds `libxgui` with `-D_GLIBCXX_ASSERTIONS`.
 - Fixed null parent dereference in `openFileDialog`, `saveFileDialog` and `messageDialog`: a missing parent window now means no transient parent. Added `tests/unit/dialog_test.cpp`.
 - `ParseJsonValue` now stops when `create()` fails (no orphan child widgets, no `finalize(NULL)`), and `FinalizeObject` tolerates an unknown class. Added `tests/unit/json_failed_create_test.cpp`.
+- `Master::Quit()` now resets the singleton pointer after deleting it (it is reset after the delete because the destructor still calls `Instance()`). Added `tests/unit/quit_test.cpp`.

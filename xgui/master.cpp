@@ -94,8 +94,11 @@ namespace xgui {
 
 	DLLEXPORT void Master::Quit()
 	{
-		if (Master::Instance()->master_impl_->quit())
-			delete Master::Instance();
+		if (!Master::Instance()->master_impl_->quit()) return;
+
+		// The destructor still uses Instance(), so the pointer is reset only after the delete
+		delete Master::Instance();
+		Master::instance_ = 0;
 	}
 
 	DLLEXPORT xgui::Container * Master::FindContext(std::string const &cname)
