@@ -34,4 +34,23 @@ check "core and GTK sources compile without -D_DEBUG" \
 check "xguimpl::Master initializes threaded" \
 	grep -Pzq "Master\(xgui::Master \* master\)\s*:\s*threaded\(false\)" xgui/gtk/master_impl.cpp
 
+# GUI checks run on a headless GTK Broadway display (needs broadwayd)
+BROADWAY_PORT=:97
+_gui_check() {
+	local name="$1" src="$2"
+	if [ -z "$LIB_BUILT" ]; then
+		make -f Makefile.gtk lib > "$OUT/lib.log" 2>&1 || { echo "FAIL: libxgui build"; tail -20 "$OUT/lib.log"; FAILED=1; return; }
+		broadwayd $BROADWAY_PORT > /dev/null 2>&1 &
+		BROADWAYD_PID=$!
+		trap 'kill $BROADWAYD_PID 2>/dev/null; rm -rf "$OUT"' EXIT
+		sleep 1
+		LIB_BUILT=1
+	fi
+	$CPP -fpermissive -w -D_DEBUG $INCLUDES "$src" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
+		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test"
+}
+
+# Item: selection must map to the right model node after sort()
+_gui_check "list selection maps to model after sort" tests/unit/list_sort_test.cpp
+
 exit $FAILED

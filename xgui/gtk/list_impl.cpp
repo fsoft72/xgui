@@ -39,6 +39,20 @@ static std::pair<GtkTreeViewColumn *, int> int_find_column ( GtkTreeView * list_
 	return std::make_pair(col_data, column_pos);
 }
 
+/** Returns true when both iterators point to the same row of the same store. */
+static bool int_iter_equal ( GtkTreeIter const & a, GtkTreeIter const & b )
+{
+	return a.stamp == b.stamp && a.user_data == b.user_data;
+}
+
+/** Returns the model node mapped to the given row, or NULL if the row is unknown. */
+static xgui::Model * int_model_from_iter ( std::map<xgui::Model *, GtkTreeIter> const & iter_map, GtkTreeIter const & iter )
+{
+	for ( std::map<xgui::Model *, GtkTreeIter>::const_iterator i = iter_map.begin(); i != iter_map.end(); ++i )
+		if ( int_iter_equal ( i->second, iter ) ) return i->first;
+	return 0;
+}
+
 static float int_map_align ( std::string const & alignment )
 {
 	if (alignment == "right") return 1.0f;
@@ -518,15 +532,14 @@ namespace xguimpl
 		xgui::Model * model = xl->this_list->getModel();
 		for ( unsigned int row_num = 0; row_num < model->size(); ++row_num ) {
 			xgui::Model * curr_data = dynamic_cast<xgui::Model*>(model->getChild(row_num));
-			GtkTreePath * cpath = gtk_tree_path_new_from_indices ( row_num, -1 );
-			bool selection_selected = gtk_tree_selection_path_is_selected ( sel, cpath );
+			std::map<xgui::Model *, GtkTreeIter>::iterator it = xl->iter_map.find(curr_data);
+			if ( it == xl->iter_map.end() ) continue;
+			bool selection_selected = gtk_tree_selection_iter_is_selected ( sel, &it->second );
 
 			if ( !selection_selected && xl->isSelectionCached(curr_data) )
 				deselections.push_back(curr_data);
 			else if ( selection_selected && !xl->isSelectionCached(curr_data))
 				selections.push_back(curr_data);
-	
-			gtk_tree_path_free ( cpath );
 		}
 
 		for (std::vector<xgui::Model*>::iterator sel = deselections.begin(); sel != deselections.end(); ++sel)
@@ -580,8 +593,8 @@ namespace xguimpl
 			return;
 		}
 
-		gint * indices = gtk_tree_path_get_indices (path);
-		xgui::Model * node = this_list->getModel()->getChild(indices[0]);
+		xgui::Model * node = int_model_from_iter ( iter_map, iter );
+		if ( !node ) return;
 
 		chk_cb->call(this_list, node->path(), active);
 	}
