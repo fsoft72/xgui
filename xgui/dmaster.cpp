@@ -119,7 +119,7 @@ namespace xgui
 	xgui::Object * Master::FinalizeObject(xgui::Object * o)
 	{
 		xgui::ClassInfo * cinfo = Instance()->FindClass(o->className());
-		if (cinfo->mustFinalize())
+		if (cinfo && cinfo->mustFinalize())
 			cinfo->finalize(o);
 		return o;
 	}
@@ -214,25 +214,25 @@ namespace xgui
 			}
 		}
 
-		if (class_builder != 0) {
-			result = class_builder->create(parent_object, properties);
-
-			if (result) {
-				for (xgui::StringMap::iterator p = properties.begin(); p != properties.end(); ++p) {
-					if (result->hasProperty(p->first) == xgui::PROPERTY_NOT_FOUND) {
-						XGUI_ERROR("Trying to set a not available property: " << p->first);
-					}
-					else
-						result->set(p->first, p->second);
-				}
-			}
-
-			for (std::vector<nlohmann::json>::iterator i = children.begin(); i != children.end(); ++i)
-				ParseJsonValue(result, *i);
-
-			if (class_builder->mustFinalize())
-				class_builder->finalize(result);
+		result = class_builder->create(parent_object, properties);
+		if (!result) {
+			XGUI_ERROR("Unable to create an object for node " << node_name);
+			return 0;
 		}
+
+		for (xgui::StringMap::iterator p = properties.begin(); p != properties.end(); ++p) {
+			if (result->hasProperty(p->first) == xgui::PROPERTY_NOT_FOUND) {
+				XGUI_ERROR("Trying to set a not available property: " << p->first);
+			}
+			else
+				result->set(p->first, p->second);
+		}
+
+		for (std::vector<nlohmann::json>::iterator i = children.begin(); i != children.end(); ++i)
+			ParseJsonValue(result, *i);
+
+		if (class_builder->mustFinalize())
+			class_builder->finalize(result);
 
 		return result;
 	}

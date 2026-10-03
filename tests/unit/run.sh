@@ -74,4 +74,7 @@ _gui_check "Model::removeChild ignores bad positions" tests/unit/model_test.cpp
 # Item: dialogs without a parent window must not crash
 _gui_check "dialogs work without a parent window" tests/unit/dialog_test.cpp
 
+# Item: JSON loader must stop at a node whose create() failed
+_gui_check "LoadJson skips children of failed nodes" tests/unit/json_failed_create_test.cpp
+
 exit $FAILED

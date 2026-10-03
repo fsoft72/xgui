@@ -15,3 +15,4 @@
 - Replaced `iter_map[...]` / `tree_map[...]` lookups with `find()` in the GTK List and Tree: unknown model nodes are now ignored instead of passing a zeroed `GtkTreeIter` to GTK. Added `tests/unit/iter_map_test.cpp` (List only; Tree uses the same pattern).
 - Added a bounds check at the top of `Model::removeChild` (out-of-range positions were read before validation). Added `tests/unit/model_test.cpp`; the test runner now builds `libxgui` with `-D_GLIBCXX_ASSERTIONS`.
 - Fixed null parent dereference in `openFileDialog`, `saveFileDialog` and `messageDialog`: a missing parent window now means no transient parent. Added `tests/unit/dialog_test.cpp`.
+- `ParseJsonValue` now stops when `create()` fails (no orphan child widgets, no `finalize(NULL)`), and `FinalizeObject` tolerates an unknown class. Added `tests/unit/json_failed_create_test.cpp`.
