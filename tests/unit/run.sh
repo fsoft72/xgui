@@ -95,4 +95,7 @@ _gui_check "list selection cache follows selection changes" tests/unit/selection
 # Item: onenable/ondisable must not be inverted
 _gui_check "onenable and ondisable fire for the new state" tests/unit/enable_test.cpp
 
+# Item: JSON numbers must keep their textual form
+_gui_check "JSON numbers are not turned into 200.000000" tests/unit/json_numbers_test.cpp
+
 exit $FAILED

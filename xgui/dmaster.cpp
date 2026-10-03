@@ -196,7 +196,8 @@ namespace xgui
 				properties[key] = el.value().get<std::string>();
 			}
 			else if (el.value().is_number()) {
-				properties[key] = std::to_string(el.value().get<double>());
+				// dump() keeps integers exact and is locale independent
+				properties[key] = el.value().dump();
 			}
 			else if (el.value().is_boolean()) {
 				properties[key] = el.value().get<bool>() ? "1" : "0";
