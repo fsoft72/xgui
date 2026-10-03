@@ -127,4 +127,9 @@ _gui_check "class lookup by name and tag is consistent" tests/unit/class_lookup_
 # Smoke test: all JSON examples load
 _gui_check "JSON examples load" tests/unit/examples_test.cpp
 
+# Core unit tests
+check "semantic_cast conversions" \
+	bash -c "$CPP -w -I$ROOT/xgui $ROOT/tests/unit/semantic_cast_test.cpp -o $OUT/semantic_cast_test && $OUT/semantic_cast_test"
+_gui_check "Model and TreeNode structure handling" tests/unit/model_tree_test.cpp
+
 exit $FAILED
