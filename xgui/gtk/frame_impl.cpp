@@ -24,7 +24,7 @@ namespace xguimpl
 		if (child) return false;
 	
 		child = wid;
-		gtk_container_add ( GTK_CONTAINER(widget), GTK_WIDGET(wid->getImpl()->widget) );
+		gtk_frame_set_child ( GTK_FRAME(widget), GTK_WIDGET(wid->getImpl()->widget) );
 		return true;
 	}
 	
@@ -39,18 +39,12 @@ namespace xguimpl
 	bool Frame::get_frame_prop ( std::string const &name, std::string &vals )
 	{
 		if ( name == "alignment" ) {
-			std::string valign = "center", halign = "center";
-			float valign_v, halign_v;
-	
-			gtk_frame_get_label_align ( GTK_FRAME(widget), &halign_v, &valign_v );
-	
-			if (valign_v == 1.0f) valign = "bottom";
-			else if (valign_v == 0.0f) valign = "top";
-	
-			if (halign_v == 1.0f) halign = "right";
-			else if (halign_v == 0.0f) halign = "left";
+			// GTK 4 frames only have a horizontal label alignment
+			float halign_v = gtk_frame_get_label_align ( GTK_FRAME(widget) );
+			vals = joinAlignment(halign_v, 0.5f);
 		} else if ( name == "text" ) {
-			vals = gtk_frame_get_label(GTK_FRAME(widget));
+			const char * label = gtk_frame_get_label(GTK_FRAME(widget));
+			vals = label ? label : "";
 		} else
 			return false;
 	
@@ -60,20 +54,8 @@ namespace xguimpl
 	bool Frame::set_frame_prop ( std::string const &name, std::string const &vals )
 	{
 		if ( name == "alignment" ) {
-			std::string::size_type p = vals.find('-');
-			if (p != std::string::npos) {
-				float valign_v = 0, halign_v = 0;
-				std::string valign = vals.substr(0, p);
-				std::string halign = vals.substr(++p, std::string::npos);
-	
-				if (valign == "bottom") valign_v = 1.0f;
-				else if (valign == "top") valign_v = 0.0f;
-	
-				if (halign == "right") halign_v = 1.0f;
-				else if (halign == "left") halign_v = 0.0f;
-	
-				gtk_frame_set_label_align ( GTK_FRAME(widget), halign_v, valign_v );
-			}
+			// GTK 4 frames only have a horizontal label alignment
+			gtk_frame_set_label_align ( GTK_FRAME(widget), splitAlignment(vals).first );
 		} else if ( name == "text" ) {
 			gtk_frame_set_label(GTK_FRAME(widget), vals.c_str());
 		} else

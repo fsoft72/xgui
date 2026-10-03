@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT" || exit 1
 
 CPP=${CPP:-g++}
-GTK_FLAGS=$(pkg-config gtk+-3.0 --cflags)
+GTK_FLAGS=$(pkg-config gtk4 --cflags)
 INCLUDES="-I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS -Wno-deprecated-declarations"
 OUT=$(mktemp -d)
 trap 'rm -rf "$OUT"' EXIT
@@ -40,13 +40,13 @@ _gui_check() {
 	local name="$1" src="$2"; shift 2
 	if [ -z "$LIB_BUILT" ]; then
 		make -B -j8 -f Makefile.gtk lib CPPFLAGS="-g -w -fPIC -D_DEBUG -O0 -D_GLIBCXX_ASSERTIONS" > "$OUT/lib.log" 2>&1 || { echo "FAIL: libxgui build"; tail -20 "$OUT/lib.log"; FAILED=1; return; }
-		broadwayd $BROADWAY_PORT > /dev/null 2>&1 &
+		gtk4-broadwayd $BROADWAY_PORT > /dev/null 2>&1 &
 		BROADWAYD_PID=$!
 		trap 'kill $BROADWAYD_PID 2>/dev/null; rm -rf "$OUT"' EXIT
 		sleep 1
 		LIB_BUILT=1
 	fi
-	$CPP -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
+	$CPP -w -D_DEBUG $INCLUDES "$src" "$@" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk4 --libs) -o "$OUT/gui_test" \
 		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT" "$ROOT"
 }
 
@@ -59,8 +59,8 @@ _gui_check "LoadJson survives malformed JSON" tests/unit/json_loader_test.cpp
 # Item: "focused" property must grab focus
 _gui_check "focused property grabs focus" tests/unit/focus_test.cpp
 
-# Item: event masks must be applied at construction time
-_gui_check "widgets subscribe to mouse/key events" tests/unit/event_mask_test.cpp
+# Item: mouse and key events go through GTK 4 event controllers
+_gui_check "mouse and key events use event controllers" tests/unit/event_controller_test.cpp
 
 # Item: column lookup must not fall back to the last column
 _gui_check "list column lookup and sort column index" tests/unit/list_columns_test.cpp
@@ -108,9 +108,10 @@ check "XML load/save/DTD API is removed" \
 # Item: menu items with icons keep their text accessors
 _gui_check "menu item with icon keeps working" tests/unit/menu_icon_test.cpp
 
-# Item: GTK 2 era APIs must not come back
-check "GTK backend uses no GTK 2 era deprecated API" \
-	bash -c "for f in xgui/gtk/*.cpp; do $CPP -fsyntax-only -Wdeprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f 2>&1; done | grep -E 'gtk_(h|v)scale_new|image_menu_item|GtkImageMenuItem|gtk_menu_popup|gdk_threads_(enter|leave)|gdk_flush|GdkColor|gdk_color' | { ! grep .; }"
+# Item: no deprecated GTK 4 API (List, Tree, ComboBox and DndList still use the GtkTreeView/GtkComboBox era widgets)
+DEPRECATED_ALLOWED="list_impl.cpp tree_impl.cpp combobox_impl.cpp dndlist_impl.cpp"
+check "GTK backend uses no deprecated GTK 4 API" \
+	bash -c "for f in xgui/gtk/*.cpp; do case \" $DEPRECATED_ALLOWED \" in *\" \$(basename \$f) \"*) continue;; esac; $CPP -fsyntax-only -Werror=deprecated-declarations -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
 
 # Item: strict compiler flags (no -fpermissive, -Wextra clean)
 check "Makefile.gtk uses -Wextra and not -fpermissive" \
@@ -123,6 +124,12 @@ _gui_check "button events decode to name and mask" tests/unit/button_decode_test
 
 # Item: indexed class lookups
 _gui_check "class lookup by name and tag is consistent" tests/unit/class_lookup_test.cpp
+
+# GTK 4 port: application lifecycle, menu actions, toolbar buttons, drag and drop
+_gui_check "GtkApplication lifecycle and nested Run/Quit" tests/unit/app_lifecycle_test.cpp
+_gui_check "menu items are driven by actions" tests/unit/menu_actions_test.cpp
+_gui_check "toolbar buttons" tests/unit/toolbar_test.cpp
+_gui_check "DndList drag and drop" tests/unit/dnd_test.cpp
 
 # Smoke test: all JSON examples load
 _gui_check "JSON examples load" tests/unit/examples_test.cpp

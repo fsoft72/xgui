@@ -33,6 +33,7 @@ namespace xguimpl
 		virtual ~Combobox();
 
 		virtual void setAccessor(xgui::Widget * w);
+		virtual GtkWidget * eventWidget();
 		bool linkEvent( std::string const &name );
 
 		virtual void insertItem ( xgui::Model * parent, int child_pos, xgui::Model * child );

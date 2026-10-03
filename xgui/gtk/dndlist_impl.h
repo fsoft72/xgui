@@ -25,6 +25,15 @@ namespace xguimpl
 	{
 		//methods
 		DndList ( xgui::Container * parent );
+
+		/** The widget the drag source and the drop target are attached to. */
+		GtkWidget * dragWidget();
+		/** Gets the string dragged out of the list (first string of the selected row); false if nothing is selected. */
+		bool dragData ( std::string &data );
+		/** Removes the dragged row after a move. */
+		void dragDelete ();
+		/** Appends a dropped string as a new row; false if the list has no model. */
+		bool dropData ( std::string const &data );
 	};
 }
 

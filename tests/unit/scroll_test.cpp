@@ -12,7 +12,7 @@
 /** Returns 0 when the scrolled window holds the tree view directly. */
 static int check_direct_child(GtkWidget * scrolled, char const * label)
 {
-	GtkWidget * child = gtk_bin_get_child(GTK_BIN(scrolled));
+	GtkWidget * child = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(scrolled));
 	if (!GTK_IS_TREE_VIEW(child)) {
 		std::fprintf(stderr, "%s: child of the scrolled window is not the tree view\n", label);
 		return 1;

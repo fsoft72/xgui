@@ -24,13 +24,13 @@ static GtkWidget * MkButtonWidget(std::string const &text, xgui::Image * img, bo
 		widget = gtk_button_new_with_label ( text.c_str() );
 	else if ( (img) && (!toggle) ) {
 		widget = gtk_button_new ();
-		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( img->getImpl()->getImage() ) );
+		gtk_button_set_child ( GTK_BUTTON ( widget ), img->getImpl()->getImage() );
 	}
 	else if ( (!img) && (toggle) )
 		widget = gtk_toggle_button_new_with_label ( text.c_str() );
 	else if ( (img) && (toggle) ) {
 		widget = gtk_toggle_button_new();
-		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( img->getImpl()->getImage() ) );
+		gtk_button_set_child ( GTK_BUTTON ( widget ), img->getImpl()->getImage() );
 	}
 
 	return widget;
@@ -73,7 +73,8 @@ namespace xguimpl
 	bool Button::get_button_prop ( std::string const &name, std::string &vals )
 	{
 		if ( name == "text" ) {
-			vals = gtk_button_get_label(GTK_BUTTON(widget));
+			const char * label = gtk_button_get_label(GTK_BUTTON(widget));
+			vals = label ? label : "";
 			return true;
 		}
 		else if ( name == "pressed" ) {
@@ -108,19 +109,11 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "alignment" ) {
-			// gtk_misc_set_alignment deprecated in GTK 3.14, removed in GTK 4
-			// Use gtk_widget_set_halign/valign for GTK 3.x alignment
-			GtkWidget* child = gtk_bin_get_child( GTK_BIN(widget) );
+			GtkWidget* child = gtk_button_get_child( GTK_BUTTON(widget) );
+			if ( !child ) return true;
 			std::pair<float, float> align = splitAlignment(vals);
-
-			// Convert float alignment to GtkAlign
-			GtkAlign halign = (align.first == 0.0f) ? GTK_ALIGN_START :
-			                  (align.first == 1.0f) ? GTK_ALIGN_END : GTK_ALIGN_CENTER;
-			GtkAlign valign = (align.second == 0.0f) ? GTK_ALIGN_START :
-			                  (align.second == 1.0f) ? GTK_ALIGN_END : GTK_ALIGN_CENTER;
-
-			gtk_widget_set_halign(child, halign);
-			gtk_widget_set_valign(child, valign);
+			gtk_widget_set_halign(child, toGtkAlign(align.first));
+			gtk_widget_set_valign(child, toGtkAlign(align.second));
 			return true;
 		}
 
@@ -129,11 +122,8 @@ namespace xguimpl
 
 	void Button::setIcon ( xgui::Image * img )
 	{
-		if (img) {
-			gtk_container_remove(GTK_CONTAINER(widget), gtk_bin_get_child(GTK_BIN(widget)));
-			gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( img->getImpl()->getImage() ) );
-			gtk_widget_show(gtk_bin_get_child(GTK_BIN(widget)));
-		}
+		if (img)
+			gtk_button_set_child ( GTK_BUTTON ( widget ), img->getImpl()->getImage() );
 	}
 
 	int Button::OnClick ( GtkWidget * w, Button * btn )

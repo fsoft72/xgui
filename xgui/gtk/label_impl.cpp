@@ -16,7 +16,7 @@
 static GtkWidget * MkLabelWidget ( std::string const &text )
 {
 	GtkWidget * widget = gtk_label_new ( "-" );
-	gtk_label_set_line_wrap ( GTK_LABEL ( widget ), 1 );
+	gtk_label_set_wrap ( GTK_LABEL ( widget ), 1 );
 	gtk_label_set_markup ( GTK_LABEL ( widget ), text.c_str() );
 
 	return widget;

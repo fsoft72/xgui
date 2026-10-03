@@ -17,7 +17,12 @@ namespace xguimpl
 {
 	HBox::HBox(xgui::Container * parent, int space, bool border) : Widget(gtk_box_new(GTK_ORIENTATION_HORIZONTAL, space)), this_box(0)
 	{
-		gtk_container_set_border_width ( GTK_CONTAINER ( widget ), border );
+		// GTK 4 has no container border: a margin gives the same spacing
+		int margin = border ? 1 : 0;
+		gtk_widget_set_margin_start ( widget, margin );
+		gtk_widget_set_margin_end ( widget, margin );
+		gtk_widget_set_margin_top ( widget, margin );
+		gtk_widget_set_margin_bottom ( widget, margin );
 	}
 
 	HBox::HBox(GtkWidget * real_w) : Widget(real_w), this_box(0) { }
@@ -35,14 +40,15 @@ namespace xguimpl
 
 	void HBox::addChild(xgui::Widget * w)
 	{
-		gtk_box_pack_start ( GTK_BOX ( widget ), GTK_WIDGET ( w->getImpl()->widget ), 0, 0, 0 );
+		gtk_box_append ( GTK_BOX ( widget ), GTK_WIDGET ( w->getImpl()->widget ) );
 	}
 
 	void HBox::setExpand(xgui::Widget * w, float expand)
 	{
 		int expand_flag = ((expand == 0.0) ? 0 : 1);
 
-		gtk_box_set_child_packing ( GTK_BOX ( widget ), GTK_WIDGET ( w->getImpl()->widget ), expand_flag, expand_flag, 0, GTK_PACK_START );
+		// Expanding along the box orientation, filling is the default alignment of GTK 4 widgets
+		gtk_widget_set_hexpand ( GTK_WIDGET ( w->getImpl()->widget ), expand_flag );
 	}
 }
 

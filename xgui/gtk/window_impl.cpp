@@ -1,7 +1,7 @@
 //
 // C++ Implementation: window_impl
 //
-// Description: 
+// Description:
 //
 //
 // Author: Os3 s.r.l. <xgui@os3.it>, (C) 2005
@@ -11,24 +11,23 @@
 //
 
 #include "window_impl.h"
+#include "master_impl.h"
 #include "window.h"
 #include "callback.h"
 #include "image.h"
 #include "image_impl.h"
 #include "menu.h"
 
+/** Creates the GTK window, transient for the modal parent if there is one, and attaches it to the application. */
 static GtkWidget * MkWindow(xgui::Window * modal_parent)
 {
-	GtkWidget * widget;
+	GtkWidget * widget = gtk_window_new();
 
-	if (modal_parent) {
-		widget = gtk_dialog_new();
+	if (modal_parent)
 		gtk_window_set_transient_for ( GTK_WINDOW ( widget ), GTK_WINDOW ( modal_parent->getImpl()->widget ) );
-		// gtk_dialog_set_has_separator removed in GTK 3
-	}
-	else
-		widget = gtk_window_new ( GTK_WINDOW_TOPLEVEL );
-	gtk_widget_realize ( widget );
+
+	GtkApplication * app = xguimpl::application();
+	if (app) gtk_window_set_application ( GTK_WINDOW ( widget ), app );
 
 	return widget;
 }
@@ -36,19 +35,23 @@ static GtkWidget * MkWindow(xgui::Window * modal_parent)
 namespace xguimpl
 {
 	Window::Window(xgui::Window * parent)
-	: Widget(MkWindow(parent)), this_window(0), vbox(0), status(0)
+	: Widget(MkWindow(parent)), this_window(0), vbox(0), status(0), modal_loop(0), modal_response(-1), pointer_x(0), pointer_y(0)
 	{
-		if(!parent) {
-			vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-			gtk_container_add( GTK_CONTAINER(widget), vbox );
-		}
-		else
-			vbox = gtk_dialog_get_content_area(GTK_DIALOG(widget));
+		vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+		gtk_window_set_child( GTK_WINDOW(widget), vbox );
+
+		GtkEventController * motion = gtk_event_controller_motion_new();
+		g_signal_connect ( motion, "motion", G_CALLBACK ( OnPointerMotion ), this );
+		gtk_widget_add_controller ( widget, motion );
 	}
 
-	Window::Window(GtkWidget * real_w) : Widget(real_w), this_window(0), vbox(0), status(0)	{ }
+	Window::Window(GtkWidget * real_w)
+	: Widget(real_w), this_window(0), vbox(0), status(0), modal_loop(0), modal_response(-1), pointer_x(0), pointer_y(0) { }
 
-	Window::~Window() { }
+	Window::~Window()
+	{
+		if (modal_loop) g_main_loop_quit(modal_loop);
+	}
 
 	void Window::setAccessor(xgui::Widget * w)
 	{
@@ -62,23 +65,21 @@ namespace xguimpl
 	bool Window::get_window_prop ( std::string const &name, std::string &vals )
 	{
 		if ( name == "size" ) {
-			int x, y;
-			gtk_window_get_size ( GTK_WINDOW ( widget ), &x, &y );
+			int x = gtk_widget_get_width ( widget );
+			int y = gtk_widget_get_height ( widget );
+			// Before the window is shown it has no size yet: report the requested one
+			if ( (x == 0) && (y == 0) ) gtk_window_get_default_size ( GTK_WINDOW ( widget ), &x, &y );
 			vals = xgui::semantic_cast<std::string>(std::make_pair(x, y));
 			return true;
 		}
 		else if ( name == "text" ) {
-			gchararray title;
-			g_object_get(widget, "title", &title, NULL);
+			const char * title = gtk_window_get_title ( GTK_WINDOW ( widget ) );
 			vals = title ? title : "";
-			g_free(title);
 			return true;
 		}
 		else if ( name == "position" ) {
-			int x,y;
-			gtk_window_get_position ( GTK_WINDOW ( widget ), &x, &y );
-			vals = xgui::semantic_cast<std::string>(std::make_pair(x, y));
-			return true;
+			// GTK 4 cannot report the position of a window
+			return false;
 		}
 		else if ( name == "resizable" ) {
 			vals = gtk_window_get_resizable( GTK_WINDOW(widget) ) ? "1" : "0";
@@ -89,7 +90,7 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "status-text" ) {
-			vals = "";
+			vals = status ? gtk_label_get_text( GTK_LABEL(status) ) : "";
 			return true;
 		}
 
@@ -101,7 +102,7 @@ namespace xguimpl
 		if ( name == "size" ) {
 			std::pair<int, int> size = xgui::semantic_cast< std::pair<int, int> >(vals);
 			gtk_widget_set_size_request( GTK_WIDGET(widget), size.first, size.second );
-			gtk_window_resize( GTK_WINDOW(widget), size.first, size.second );
+			gtk_window_set_default_size( GTK_WINDOW(widget), size.first, size.second );
 			return true;
 		}
 		else if ( name == "text" ) {
@@ -109,13 +110,9 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "position" ) {
-			if ( vals == "center") 
-				gtk_window_set_position( GTK_WINDOW(widget), GTK_WIN_POS_CENTER );
-			else {
-				std::pair<int, int> pos = xgui::semantic_cast< std::pair<int, int> >(vals);
-				gtk_window_move ( GTK_WINDOW ( widget ), pos.first, pos.second );
-			}
-			return true;
+			// GTK 4 lets the window manager place windows: "center" is what it does already
+			if ( vals != "center" ) XGUI_ERROR("Window position '" << vals << "' is not supported by the GTK 4 backend");
+			return false;
 		}
 		else if ( name == "resizable" ) {
 			gtk_window_set_resizable( GTK_WINDOW(widget), ( vals == "1" ? 1 : 0 ) );
@@ -128,17 +125,17 @@ namespace xguimpl
 		else if ( name == "status-text" ) {
 			if (!vals.empty()) {
 				if (!status) {
-					status = gtk_statusbar_new();
-					gtk_box_pack_start( GTK_BOX(vbox), status, 0, 1, 0 );
+					status = gtk_label_new("");
+					gtk_label_set_xalign( GTK_LABEL(status), 0.0f );
+					gtk_widget_add_css_class( status, "statusbar" );
+					gtk_box_append( GTK_BOX(vbox), status );
 					reorderChildren();
-					gtk_widget_show(status);
 				}
-				gtk_statusbar_push(GTK_STATUSBAR(status), 
-						gtk_statusbar_get_context_id(GTK_STATUSBAR(status), "XGUIStatusMessage"), vals.c_str());
+				gtk_label_set_text( GTK_LABEL(status), vals.c_str() );
 			}
 			else {
 				if(status) {
-					gtk_widget_destroy(status);
+					gtk_box_remove( GTK_BOX(vbox), status );
 					status = 0;
 				}
 			}
@@ -150,71 +147,71 @@ namespace xguimpl
 
 	void Window::show()
 	{
-		xgui::Menu * mnu = this_window->getMenu();
-		bool is_menu_visible = true;
-		if(mnu) {
-			std::string mnu_vis;
-			mnu->get("visible", mnu_vis);
-			is_menu_visible = ((mnu_vis == "1") ? true : false);
-		}
-
-		gtk_widget_show_all ( widget );
-		if (!is_menu_visible)
-			mnu->set("visible", "0");
+		gtk_window_present ( GTK_WINDOW ( widget ) );
 	}
 
-	int Window::modalRun() 
+	int Window::modalRun()
 	{
-		int dret = -1;
+		if ( !this_window->isModal() ) return -1;
+		if ( modal_loop ) return -1;
 
-		if (this_window->isModal()) {
-			gtk_window_set_modal ( GTK_WINDOW( widget ), TRUE );
-			dret = gtk_dialog_run ( GTK_DIALOG ( widget ) );
-			gtk_window_set_modal ( GTK_WINDOW( widget ), FALSE );
-			if (dret < 0) return -1;
-		}
-	
-		return ( dret );
+		modal_response = -1;
+		modal_loop = g_main_loop_new(NULL, FALSE);
+		gulong close_id = g_signal_connect ( G_OBJECT ( widget ), "close-request", G_CALLBACK ( OnModalClose ), this );
+
+		gtk_window_set_modal ( GTK_WINDOW( widget ), TRUE );
+		gtk_window_present ( GTK_WINDOW( widget ) );
+		runNestedLoop ( modal_loop );
+
+		g_main_loop_unref ( modal_loop );
+		modal_loop = 0;
+		g_signal_handler_disconnect ( widget, close_id );
+		gtk_window_set_modal ( GTK_WINDOW( widget ), FALSE );
+
+		return modal_response;
 	}
 
-	void Window::modalReturn(int response) 
+	void Window::modalReturn(int response)
 	{
-		if (this_window->isModal())
-			gtk_dialog_response ( GTK_DIALOG ( widget ), response );
+		if ( !this_window->isModal() || !modal_loop ) return;
+		modal_response = response;
+		g_main_loop_quit ( modal_loop );
 	}
 
 	void Window::reorderChildren()
 	{
-		if (this_window->menu_ && status && this_window->child_) {
-			gtk_box_reorder_child(GTK_BOX(vbox), this_window->menu_->getImpl()->widget, 0);
-			gtk_box_reorder_child(GTK_BOX(vbox), this_window->child_->getImpl()->widget, 1);
-			gtk_box_reorder_child(GTK_BOX(vbox), status, 2);
-		}
-		else if (this_window->menu_ && this_window->child_) {
-			gtk_box_reorder_child(GTK_BOX(vbox), this_window->menu_->getImpl()->widget, 0);
-			gtk_box_reorder_child(GTK_BOX(vbox), this_window->child_->getImpl()->widget, 1);
-		}
-		else if (status && this_window->child_) {
-			gtk_box_reorder_child(GTK_BOX(vbox), this_window->child_->getImpl()->widget, 0);
-			gtk_box_reorder_child(GTK_BOX(vbox), status, 1);
+		GtkWidget * order[3] = {
+			this_window->menu_ ? this_window->menu_->getImpl()->widget : NULL,
+			this_window->child_ ? this_window->child_->getImpl()->widget : NULL,
+			status
+		};
+
+		GtkWidget * previous = NULL;
+		for (int i = 0; i < 3; ++i) {
+			if ( !order[i] ) continue;
+			gtk_box_reorder_child_after( GTK_BOX(vbox), order[i], previous );
+			previous = order[i];
 		}
 	}
 
-	bool Window::addChild(xgui::Widget * w) 
+	bool Window::addChild(xgui::Widget * w)
 	{
 		bool done = false;
+		GtkWidget * child = w->getImpl()->widget;
 
-		if ((GTK_IS_MENU_BAR(w->getImpl()->widget)) && (!this_window->menu_)) {
+		if ((GTK_IS_POPOVER_MENU_BAR(child)) && (!this_window->menu_)) {
 			this_window->menu_ = reinterpret_cast<xgui::Menu*>(w);
-			gtk_box_pack_start( GTK_BOX(vbox), w->getImpl()->widget, 0, 1, 0);
+			gtk_box_append( GTK_BOX(vbox), child );
 			done = true;
 		}
 		else if (!this_window->child_) {
 			this_window->child_ = w;
-			gtk_box_pack_start(GTK_BOX(vbox), w->getImpl()->widget, 1, 1, 0);
+			gtk_widget_set_hexpand( child, TRUE );
+			gtk_widget_set_vexpand( child, TRUE );
+			gtk_box_append( GTK_BOX(vbox), child );
 			done = true;
 		}
-	
+
 		reorderChildren();
 		return done;
 	}
@@ -229,40 +226,52 @@ namespace xguimpl
 	{
 		gtk_window_maximize( GTK_WINDOW(widget) );
 	}
-	
+
 	void Window::minimize()
 	{
-		gtk_window_iconify( GTK_WINDOW(widget) );
+		gtk_window_minimize( GTK_WINDOW(widget) );
 	}
-	
+
 	void Window::restore()
 	{
 		gtk_window_unmaximize( GTK_WINDOW(widget) );
-		gtk_window_deiconify( GTK_WINDOW(widget) );
+		gtk_window_unminimize( GTK_WINDOW(widget) );
 	}
 
 	bool Window::linkEvent(std::string const &name)
 	{
 		if ( name == "onclose" ) {
-			g_signal_connect ( G_OBJECT ( widget ), "delete_event", G_CALLBACK ( OnClose ), this );
+			g_signal_connect ( G_OBJECT ( widget ), "close-request", G_CALLBACK ( OnClose ), this );
 			return true;
 		}
-	
+
 		return Widget::linkEvent(name);
 	}
 
-	int Window::OnClose ( GtkWidget * w, GdkEvent * e, Window * xw )
+	gboolean Window::OnClose ( GtkWindow * w, Window * xw )
 	{
 		xgui::Callback * cb =  xw->this_widget->getEvent( "onclose" );
 		if ( cb ) return !cb->call( xw->this_widget );
-		return 0;
+		return FALSE;
+	}
+
+	gboolean Window::OnModalClose ( GtkWindow * w, Window * xw )
+	{
+		// Like gtk_dialog_run(): closing a modal window ends modalRun() with -1 but keeps the window
+		xw->modal_response = -1;
+		if ( xw->modal_loop ) g_main_loop_quit ( xw->modal_loop );
+		return TRUE;
+	}
+
+	void Window::OnPointerMotion ( GtkEventControllerMotion * ctrl, double x, double y, Window * xw )
+	{
+		xw->pointer_x = x;
+		xw->pointer_y = y;
 	}
 
 	void Window::setIcon(xgui::Image * img)
 	{
-		if (img)
-			gtk_window_set_icon( GTK_WINDOW(widget), img->getImpl()->getPixbuf() );
-		else
-			gtk_window_set_icon( GTK_WINDOW(widget), NULL );
+		// GTK 4 windows only take a themed icon name, an image file cannot be used as window icon
+		DMESSAGE("Window icons from images are not supported by the GTK 4 backend");
 	}
 }

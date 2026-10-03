@@ -21,7 +21,7 @@ static GtkWidget * MkEntryWidget(std::string const &text, int maxlen, bool edita
 	if ( maxlen > 0 )
 		gtk_entry_set_max_length ( GTK_ENTRY ( widget ), maxlen );
 
-	gtk_entry_set_text ( GTK_ENTRY ( widget ), text.c_str() );
+	gtk_editable_set_text ( GTK_EDITABLE ( widget ), text.c_str() );
 	gtk_editable_set_editable ( GTK_EDITABLE ( widget ), editable );
 	gtk_entry_set_visibility ( GTK_ENTRY ( widget ), ! password_mode );
 
@@ -54,8 +54,10 @@ namespace xguimpl
 			return true;
 		}
 		else if (name == "onchange") {
-			g_signal_connect ( G_OBJECT ( widget ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
-			g_signal_connect ( G_OBJECT ( widget ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
+			// In GTK 4 the text is edited by a delegate GtkText, which emits insert-text/delete-text
+			GtkEditable * delegate = gtk_editable_get_delegate ( GTK_EDITABLE ( widget ) );
+			g_signal_connect ( G_OBJECT ( delegate ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
+			g_signal_connect ( G_OBJECT ( delegate ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
 			return true;
 		}
 		/*else if (name == "oncursormove") {  * DISABLED cause not available on win32 *
@@ -70,7 +72,7 @@ namespace xguimpl
 	bool Entry::set_entry_prop ( std::string const &name, std::string const &vals )
 	{
 		if ( name == "text" ) {
-			gtk_entry_set_text ( GTK_ENTRY ( widget ), vals.c_str() );
+			gtk_editable_set_text ( GTK_EDITABLE ( widget ), vals.c_str() );
 			return true;
 		}
 		else if ( name == "editable" ) {
@@ -103,13 +105,11 @@ namespace xguimpl
 	bool Entry::get_entry_prop ( std::string const &name, std::string &vals )
 	{
 		if ( name == "text" ) {
-			vals = gtk_entry_get_text(GTK_ENTRY(widget));
+			vals = gtk_editable_get_text(GTK_EDITABLE(widget));
 			return true;
 		}
 		else if ( name == "editable" ) {
-			gboolean edit;
-			g_object_get( G_OBJECT(widget), "editable", (GValue*)&edit, NULL );
-			vals = xgui::semantic_cast<std::string>(edit);
+			vals = xgui::semantic_cast<std::string>(gtk_editable_get_editable( GTK_EDITABLE(widget) ));
 			return true;
 		}
 		else if ( name == "password-mode" || name == "password" ) {
@@ -137,27 +137,27 @@ namespace xguimpl
 
 	void Entry::insertText(std::string const &text, int pos)
 	{
-		std::string str = gtk_entry_get_text( GTK_ENTRY(widget) );
+		std::string str = gtk_editable_get_text( GTK_EDITABLE(widget) );
 		if ( (pos > 0) && (((unsigned int)pos) < str.size()) )
 			str.insert(pos, text);
-		gtk_entry_set_text( GTK_ENTRY(widget), str.c_str() );
+		gtk_editable_set_text( GTK_EDITABLE(widget), str.c_str() );
 	}
 	
 	void Entry::prependText(std::string const &txt)
 	{
 		// gtk_entry_prepend_text removed in GTK 3
-		std::string str = gtk_entry_get_text ( GTK_ENTRY(widget) );
+		std::string str = gtk_editable_get_text ( GTK_EDITABLE(widget) );
 		str = txt + str;
-		gtk_entry_set_text( GTK_ENTRY(widget), str.c_str() );
+		gtk_editable_set_text( GTK_EDITABLE(widget), str.c_str() );
 	}
 
 
 	void Entry::appendText(std::string const &txt)
 	{
 		// gtk_entry_append_text removed in GTK 3
-		std::string str = gtk_entry_get_text ( GTK_ENTRY(widget) );
+		std::string str = gtk_editable_get_text ( GTK_EDITABLE(widget) );
 		str += txt;
-		gtk_entry_set_text( GTK_ENTRY(widget), str.c_str() );
+		gtk_editable_set_text( GTK_EDITABLE(widget), str.c_str() );
 	}
 
 	int Entry::OnSubmit ( GtkWidget * w, Entry * e )
@@ -171,7 +171,7 @@ namespace xguimpl
 			return 0;
 		}
 	
-		std::string buf = gtk_entry_get_text ( GTK_ENTRY ( e->widget ) );
+		std::string buf = gtk_editable_get_text ( GTK_EDITABLE ( e->widget ) );
 		return cb->call( e->this_entry, buf);
 	}
 
@@ -182,8 +182,8 @@ namespace xguimpl
 		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
 		bool text_approved = true;
 	
-		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
-		text_after_change.insert(*position, text_after_change);
+		std::string text_after_change = gtk_editable_get_text( GTK_EDITABLE(editable) );
+		text_after_change.insert(*position, new_text, new_text_length);
 	
 		xgui::Callback * base_cb = e->this_entry->getEvent("onchange");
 		if (base_cb) {
@@ -207,7 +207,7 @@ namespace xguimpl
 		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
 		bool deletion_approved = true;
 	
-		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
+		std::string text_after_change = gtk_editable_get_text( GTK_EDITABLE(editable) );
 		text_after_change.erase(start_pos, end_pos - start_pos);
 	
 		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(e->this_entry->getEvent("onchange"));

@@ -17,79 +17,84 @@
 
 namespace xguimpl
 {
-	static void DNDDataRequestCB(GtkWidget *widget, GdkDragContext *dc, GtkSelectionData *selection_data, guint info, guint t, DndList * li)
+	/** Builds the payload of a drag: the first string of the selected row. */
+	static GdkContentProvider * int_on_drag_prepare ( GtkDragSource * source, double x, double y, DndList * li )
 	{
-		xgui::DndList * l = dynamic_cast<xgui::DndList*>(li->this_list);
-
-		xgui::Model * m = l->getModel();
-		xgui::Model * selected = 0;
-
-		for(int i = 0; i < (int)m->size(); ++i) {
-			xgui::Model * c = m->getChild(i);
-			if (l->isSelected(m, i))
-				selected = c;
-		}
-
-		std::string data = "ERROR";
-			
-		if (selected)
-			data = selected->getString(0);	
-
-		gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)data.c_str(), data.size() );
+		std::string data;
+		if ( !li->dragData(data) ) return NULL;
+		return gdk_content_provider_new_typed ( G_TYPE_STRING, data.c_str() );
 	}
 
-	static void DNDDataRecievedCB(GtkWidget *widget, GdkDragContext *dc, gint x, gint y, GtkSelectionData *selection_data, guint info, guint t, DndList * li)
+	/** A moved row is removed from the source list once the drop succeeded. */
+	static void int_on_drag_end ( GtkDragSource * source, GdkDrag * drag, gboolean delete_data, DndList * li )
 	{
-		xgui::DndList * l = dynamic_cast<xgui::DndList*>(li->this_list);
-
-		xgui::Model * m = l->getModel();
-
-		const guchar* raw_data = gtk_selection_data_get_data(selection_data);
-		std::string data = raw_data ? (const char*)raw_data : "";
-
-		if(data != "ERROR")
-			m->appendChild(data);
+		if ( delete_data ) li->dragDelete();
 	}
 
-	static void DNDDataDeleteCB(GtkWidget *widget, GdkDragContext *dc, DndList * li)
+	/** A dropped string becomes a new row of the target list. */
+	static gboolean int_on_drop ( GtkDropTarget * target, const GValue * value, double x, double y, DndList * li )
 	{
-		xgui::DndList * l = dynamic_cast<xgui::DndList*>(li->this_list);
-
-		xgui::Model * m = l->getModel();
-		int selected = -1;
-
-		for(int i = 0; i < (int)m->size(); ++i) {
-			if (l->isSelected(m, i))
-				selected = i;
-		}
-
-		if(selected != -1)
-			m->removeChild(selected);
+		if ( !G_VALUE_HOLDS_STRING(value) ) return FALSE;
+		const char * data = g_value_get_string ( value );
+		return li->dropData ( data ? data : "" );
 	}
 
 	DndList::DndList ( xgui::Container * parent ) : List ( parent )
 	{
- 		GtkTargetEntry target_entry[1];
-                target_entry[0].target = const_cast<gchar*>("text/plain");
-                target_entry[0].flags = 0;
-                target_entry[0].info =  0;
+		GtkWidget * view = dragWidget();
 
-                gtk_drag_dest_set(GTK_WIDGET(list_view), GTK_DEST_DEFAULT_ALL, target_entry, sizeof(target_entry) / sizeof(GtkTargetEntry), (GdkDragAction)(GDK_ACTION_MOVE | GDK_ACTION_COPY) );
+		GtkDragSource * source = gtk_drag_source_new();
+		gtk_drag_source_set_actions ( source, (GdkDragAction)(GDK_ACTION_MOVE | GDK_ACTION_COPY) );
+		g_signal_connect ( source, "prepare", G_CALLBACK ( int_on_drag_prepare ), this );
+		g_signal_connect ( source, "drag-end", G_CALLBACK ( int_on_drag_end ), this );
+		gtk_widget_add_controller ( view, GTK_EVENT_CONTROLLER ( source ) );
 
-		gtk_drag_source_set(GTK_WIDGET(list_view), (GdkModifierType)(GDK_BUTTON1_MASK | GDK_BUTTON2_MASK), target_entry,        sizeof(target_entry) / sizeof(GtkTargetEntry), (GdkDragAction)(GDK_ACTION_MOVE | GDK_ACTION_COPY) );
+		GtkDropTarget * target = gtk_drop_target_new ( G_TYPE_STRING, (GdkDragAction)(GDK_ACTION_MOVE | GDK_ACTION_COPY) );
+		g_signal_connect ( target, "drop", G_CALLBACK ( int_on_drop ), this );
+		gtk_widget_add_controller ( view, GTK_EVENT_CONTROLLER ( target ) );
+	}
 
-                g_signal_connect(
-                        G_OBJECT(list_view), "drag_data_get",
-                        G_CALLBACK(DNDDataRequestCB), this
-                );
-                g_signal_connect(
-                        G_OBJECT(list_view), "drag_data_received",
-                        G_CALLBACK(DNDDataRecievedCB), this
-                );
-                g_signal_connect(
-                        G_OBJECT(list_view), "drag_data_delete",
-                        G_CALLBACK(DNDDataDeleteCB), this
-                );
+	GtkWidget * DndList::dragWidget()
+	{
+		return GTK_WIDGET ( list_view );
+	}
+
+	/** Returns the position of the last selected row of the model, or -1. */
+	static int int_selected_position ( xgui::DndList * l )
+	{
+		xgui::Model * m = l->getModel();
+		if ( !m ) return -1;
+
+		int selected = -1;
+		for (int i = 0; i < (int)m->size(); ++i)
+			if (l->isSelected(m, i)) selected = i;
+		return selected;
+	}
+
+	bool DndList::dragData ( std::string &data )
+	{
+		xgui::DndList * l = dynamic_cast<xgui::DndList*>(this_list);
+		int selected = l ? int_selected_position(l) : -1;
+		if ( selected < 0 ) return false;
+
+		data = l->getModel()->getChild(selected)->getString(0);
+		return true;
+	}
+
+	void DndList::dragDelete ()
+	{
+		xgui::DndList * l = dynamic_cast<xgui::DndList*>(this_list);
+		int selected = l ? int_selected_position(l) : -1;
+		if ( selected >= 0 ) l->getModel()->removeChild(selected);
+	}
+
+	bool DndList::dropData ( std::string const &data )
+	{
+		xgui::DndList * l = dynamic_cast<xgui::DndList*>(this_list);
+		xgui::Model * m = l ? l->getModel() : 0;
+		if ( !m ) return false;
+
+		m->appendChild(data);
+		return true;
 	}
 }
-

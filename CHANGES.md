@@ -31,3 +31,23 @@
 - Class lookups are now indexed: `Master` keeps `std::map`s by class name and by tag (first registration wins) instead of scanning a pointer-ordered `std::set`; `availableClasses()` returns sorted names. Added `tests/unit/class_lookup_test.cpp` and a smoke test that loads every `examples/*.json` (`tests/unit/examples_test.cpp`).
 - Added core unit tests without GUI dependency on a display: `semantic_cast` (`tests/unit/semantic_cast_test.cpp`) and `Model`/`TreeNode` structure handling (`tests/unit/model_tree_test.cpp`), and a `make -f Makefile.gtk unit` target that runs `tests/unit/run.sh` (GUI tests use a headless Broadway display, `broadwayd` is required).
 - All items of `OPTIMIZE.md` are now marked as done.
+
+## 2026-10-03 - GTK 4 port (branch `gtk4`)
+
+- Design spec `docs/superpowers/specs/2026-10-03-gtk4-port-design.md` and plan `docs/superpowers/plans/2026-10-03-gtk4-port.md`.
+- The GTK backend now builds against GTK 4 (`pkg-config gtk4`); GTK 3 is no longer supported. The tests run on `gtk4-broadwayd`.
+- `Master` drives a `GtkApplication`: it is registered when the Master is created (this initializes GTK), windows are attached to it, the outermost `Run()` is `g_application_run()` and nested `Run()` levels use their own `GMainLoop`. The application lives until `Quit()`, as before. New `Master::SetApplicationId(id, unique = false)` (also in the Python bindings); the default id is `org.xgui.<program name>` with `G_APPLICATION_NON_UNIQUE`.
+- Mouse, key, focus and pointer crossing events use GTK 4 event controllers attached on demand by `linkEvent()`; click, double click and key events are still reported only for the innermost widget. `onresize` compares the widget size on every frame. `decodeButtonEvent()` takes a button number and a `GdkModifierType`.
+- Not supported any more (GTK 4 has no API for them): the window `position` property (`"center"` is accepted silently, coordinates print an error), the `onmove` event, window icons from image files, and the message type icon of `MessageDialog`.
+- Modal windows are plain `GtkWindow`s run in a nested loop (`GtkDialog` is deprecated); closing one ends `modalRun()` with -1 and keeps the window. The status bar is a label (`GtkStatusbar` is deprecated).
+- `OpenFileDialog`/`SaveFileDialog` use `GtkFileDialog` and `MessageDialog` uses `GtkAlertDialog`; their synchronous signatures are unchanged (a nested loop waits for the answer).
+- Menus are a `GtkPopoverMenuBar` on a `GMenu` model with one action per item (check items: boolean state, radio groups: one string state action); separators start a new section; top level items are always submenus. GTK 4 usually does not draw menu item icons.
+- Fixed: the menu reported item selection to the `onselect` event, which `linkEvent` rejected, while applications link `onclick`: menu callbacks were never called. Both names are accepted now.
+- The toolbar is a box of flat buttons (`GtkToolbar` is gone), keeping the item API, styles, check and radio buttons.
+- Images are `GdkTexture`s shown by `GtkPicture` at their pixel size; `ImageView` stretches the picture to the view size or scrolls it at natural size.
+- `DndList` uses `GtkDragSource`/`GtkDropTarget` (the payload is the first string of the selected row; a move removes it from the source).
+- Entry, Spin and editable Combobox validate text through the `insert-text`/`delete-text` signals of the GTK 4 delegate `GtkText`. Fixed the text passed to `onchange` on insertion in Entry and Combobox (the old text was inserted into itself).
+- The `focused` property also reports focus held by an inner child (GTK 4 composite widgets like `GtkEntry`).
+- Fixed duplicated include guards of `menu_impl.h`, `toolbar_impl.h`, `imageview_impl.h` and `vbox_impl.h`.
+- List, Tree and Combobox still use the GTK 4 deprecated `GtkTreeView`/`GtkComboBox` widgets until their rewrite; the test runner allows deprecation warnings only in those files.
+- Tests: `event_mask_test` replaced by `event_controller_test`; new `app_lifecycle_test`, `menu_actions_test`, `toolbar_test`, `dnd_test`; `dialog_test` answers the GTK 4 dialogs by pressing their buttons.

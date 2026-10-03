@@ -10,11 +10,13 @@
 //
 //
 
-#ifndef _XGUI_BUTTON_IMPL_H_
-#define _XGUI_BUTTON_IMPL_H_
+#ifndef _XGUI_TOOLBAR_IMPL_H_
+#define _XGUI_TOOLBAR_IMPL_H_
 
 #include "widget_impl.h"
 #include "toolbar.h"
+
+#include <map>
 
 namespace xgui 
 {
@@ -53,7 +55,13 @@ namespace xguimpl
 {
 	struct Toolbar : public Widget
 	{
+		typedef std::map<std::string, std::pair<GtkWidget *, xgui::TbButtonInfo> > ItemsMap;
+
 		xgui::Toolbar * this_tb;
+		/** Buttons by item name, with the description used to rebuild their content. */
+		ItemsMap items;
+		/** "both", "text" or "icons". */
+		std::string style;
 
 		Toolbar ( GtkWidget * real_w );
 		Toolbar ( xgui::Container * parent );
@@ -77,7 +85,14 @@ namespace xguimpl
 		void uncheckButton ( const std::string & name );
 		bool isButtonChecked ( const std::string & name );
 
-		static void OnClick (GtkToolItem *tbutton, Toolbar * xtb);
+		/** Returns the button of an item, or NULL. */
+		GtkWidget * findButton ( const std::string & name );
+		/** Sets up a new button (content, tooltip, signal) and appends it to the toolbar. */
+		void appendButton ( GtkWidget * button, const xgui::TbButtonInfo & btn, char const * signal );
+		/** Rebuilds the icon/label content of a button for the current style. */
+		void setButtonContent ( GtkWidget * button, const xgui::TbButtonInfo & btn );
+
+		static void OnClick (GtkButton *tbutton, Toolbar * xtb);
 	};
 }
 

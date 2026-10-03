@@ -5,6 +5,7 @@ namespace xgui
 	{
 		public:
 			static xgui::Master * Instance();
+			static void SetApplicationId(std::string const &id, bool unique = false);
 			static void Quit();
 			static void RegisterIdleCallback ( xgui::Callback * cbk, xgui::Widget * wid );
 

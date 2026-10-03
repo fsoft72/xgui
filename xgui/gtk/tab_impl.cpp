@@ -145,23 +145,21 @@ namespace xguimpl
 
 		img->ref();
 		GtkWidget * gtkimg = GTK_WIDGET(img->getImpl()->getImage());
-		gtk_box_pack_start(new_box, gtkimg, 0, 0, 0);
+		gtk_box_append(new_box, gtkimg);
 		g_object_set_data_full(G_OBJECT(new_box), "tab-icon", (void*)img,
 	                         (GDestroyNotify)int_item_icon_destroy_notify);
 
 		if (old_txt) {
 			std::string * txt = new std::string(*old_txt);
 			GtkWidget * lbl = gtk_label_new(old_txt->c_str());
-			gtk_box_pack_start(new_box, lbl, 1, 1, 0);
+			gtk_widget_set_hexpand(lbl, TRUE);
+			gtk_box_append(new_box, lbl);
 			g_object_set_data_full(G_OBJECT(new_box), "tab-text", (void*)txt,
 		                         (GDestroyNotify)int_item_text_destroy_notify);
 		}
 
-		if (old_box)
-			gtk_widget_destroy(old_box);
-
+		// gtk_notebook_set_tab_label() releases the old label box
 		gtk_notebook_set_tab_label(GTK_NOTEBOOK(widget), GTK_WIDGET(child), GTK_WIDGET(new_box));
-		gtk_widget_show_all(GTK_WIDGET(new_box));
 	}
 
 	void Tab::setPageLabel ( xgui::Widget * w, const std::string & label)
@@ -179,20 +177,18 @@ namespace xguimpl
 		if (old_img) {
 			old_img->ref();
 			GtkWidget * gtkimg = GTK_WIDGET(old_img->getImpl()->getImage());
-			gtk_box_pack_start(new_box, gtkimg, 0, 0, 0);
+			gtk_box_append(new_box, gtkimg);
 			g_object_set_data_full(G_OBJECT(new_box), "tab-icon", old_img,
 	                                 (GDestroyNotify)int_item_icon_destroy_notify);
 		}
 
 		std::string * text = new std::string(label);
 		GtkWidget * lbl = gtk_label_new(label.c_str());
-		gtk_box_pack_start(new_box, lbl, 1, 1, 0);
+		gtk_widget_set_hexpand(lbl, TRUE);
+			gtk_box_append(new_box, lbl);
 		g_object_set_data_full(G_OBJECT(new_box), "tab-text", text,
 	                         (GDestroyNotify)int_item_text_destroy_notify);
-		if (old_box)
-			gtk_widget_destroy(old_box);
-
+		// gtk_notebook_set_tab_label() releases the old label box
 		gtk_notebook_set_tab_label(GTK_NOTEBOOK(widget), GTK_WIDGET(child), GTK_WIDGET(new_box));
-		gtk_widget_show_all(GTK_WIDGET(new_box));
 	}
 }

@@ -32,6 +32,8 @@
 namespace xgui {
 
 	Master * Master::instance_ = 0;
+	std::string Master::application_id_;
+	bool Master::application_unique_ = false;
 
 	Master::Master()
 	: master_impl_(0), loop_level_(0)
@@ -90,6 +92,13 @@ namespace xgui {
 		if (Master::instance_ == 0)
 			Master::instance_ = new Master();
 		return Master::instance_;
+	}
+
+	DLLEXPORT void Master::SetApplicationId(std::string const &id, bool unique)
+	{
+		if (Master::instance_) XGUI_ERROR("SetApplicationId called after the Master was created, it applies to the next Instance()");
+		Master::application_id_ = id;
+		Master::application_unique_ = unique;
 	}
 
 	DLLEXPORT void Master::Quit()

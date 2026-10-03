@@ -49,6 +49,8 @@ namespace xgui
 			typedef std::set<xgui::Object *> ObjectsPool;
 
 			static Master * instance_;
+			static std::string application_id_;
+			static bool application_unique_;
 			xguimpl::Master * master_impl_;
 			int loop_level_;
 
@@ -69,6 +71,14 @@ namespace xgui
 			DLLEXPORT xguimpl::Master * getImpl() { return master_impl_; }
 
 			DLLEXPORT static Master * Instance();
+
+			/**
+			 * Sets the application id used by backends that register the application with the system
+			 * (GTK: GtkApplication). Must be called before the first Instance() call to take effect.
+			 * @param id     reverse-DNS application id, e.g. "org.example.Editor"
+			 * @param unique true to allow a single running instance of the application
+			 */
+			DLLEXPORT static void SetApplicationId(std::string const &id, bool unique = false);
 
 			DLLEXPORT static void Quit();
 			DLLEXPORT static int Run();

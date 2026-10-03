@@ -5,12 +5,13 @@
 #include "window.h"
 #include "vbox.h"
 #include "entry.h"
-#include "gtk/widget_impl.h"
 
-/** Returns the GTK widget behind an xgui widget. */
-static GtkWidget * gtk_of(xgui::Widget * w)
+/** Returns true when the "focused" property of the widget is set. */
+static bool is_focused(xgui::Widget * w)
 {
-	return static_cast<xguimpl::Widget *>(w->getImpl())->widget;
+	std::string focused;
+	w->get("focused", focused);
+	return focused == "1";
 }
 
 int main()
@@ -21,13 +22,13 @@ int main()
 	xgui::Entry * second = xgui::Master::CreateEntry(box, "second");
 
 	first->set("focused", "1");
-	if (!gtk_widget_is_focus(gtk_of(first))) {
+	if (!is_focused(first)) {
 		std::fprintf(stderr, "first entry did not get the focus\n");
 		return 1;
 	}
 
 	second->set("focused", "1");
-	if (!gtk_widget_is_focus(gtk_of(second)) || gtk_widget_is_focus(gtk_of(first))) {
+	if (!is_focused(second) || is_focused(first)) {
 		std::fprintf(stderr, "focus did not move to the second entry\n");
 		return 1;
 	}

@@ -53,7 +53,8 @@ namespace xguimpl
 	bool Checkbox::get_checkbox_prop ( std::string const &name, std::string &vals )
 	{
 		if ( name == "text" ) {
-			vals = gtk_button_get_label(GTK_BUTTON(widget));
+			const char * label = gtk_check_button_get_label(GTK_CHECK_BUTTON(widget));
+			vals = label ? label : "";
 			return true;
 		}
 		else if ( name == "value" ) {
@@ -62,7 +63,7 @@ namespace xguimpl
 		}
 		else if ( name == "checked" ) {
 			
-			vals = (gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(widget) ) ? "1" : "0");
+			vals = (gtk_check_button_get_active ( GTK_CHECK_BUTTON(widget) ) ? "1" : "0");
 			return true;
 		}
 		else if ( name == "alignment" ) {
@@ -84,7 +85,7 @@ namespace xguimpl
 	bool Checkbox::set_checkbox_prop ( std::string const &name, const std::string &vals )
 	{
 		if ( name == "text" ) {
-			gtk_button_set_label( GTK_BUTTON(widget), vals.c_str() );
+			gtk_check_button_set_label( GTK_CHECK_BUTTON(widget), vals.c_str() );
 			return true;
 		}
 		else if ( name == "value" ) {
@@ -94,7 +95,7 @@ namespace xguimpl
 			return true;
 		}
 		else if ( name == "checked" ) {
-			gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON(widget), (vals == "1" ? true : false) );
+			gtk_check_button_set_active ( GTK_CHECK_BUTTON(widget), (vals == "1" ? true : false) );
 			return true;
 		}
 		else if ( name == "alignment" ) {
@@ -127,7 +128,7 @@ namespace xguimpl
 			return;
 		}
 
-		bool is_active = gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(w) );
+		bool is_active = gtk_check_button_get_active ( GTK_CHECK_BUTTON(w) );
 
 		cb->call( cbox->this_widget, is_active );
 	}

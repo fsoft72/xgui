@@ -21,17 +21,17 @@
 namespace xguimpl
 {
 	Tree::Tree ( GtkWidget * real_w ) 
-	: View (gtk_scrolled_window_new( NULL, NULL )), tree_view( GTK_TREE_VIEW(real_w) ), has_icons(false), has_checks(false),
+	: View (gtk_scrolled_window_new()), tree_view( GTK_TREE_VIEW(real_w) ), has_icons(false), has_checks(false),
 	fg_column_id(0), bg_column_id(1), italic_column_id(2), 
 	bold_column_id(3), underline_column_id(4), strike_column_id(5), check_column_id(6), 
 	icon_column_id(7), field_column_id(8)
 	{
-		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( tree_view ) );
+		gtk_scrolled_window_set_child ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( tree_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	}
 
 	Tree::Tree ( xgui::Container * parent )
-	: View(gtk_scrolled_window_new( NULL, NULL )), tree_view( GTK_TREE_VIEW(gtk_tree_view_new()) ), has_icons(false), has_checks(false),
+	: View(gtk_scrolled_window_new()), tree_view( GTK_TREE_VIEW(gtk_tree_view_new()) ), has_icons(false), has_checks(false),
 	fg_column_id(0), bg_column_id(1), italic_column_id(2), 
 	bold_column_id(3), underline_column_id(4), strike_column_id(5), check_column_id(6), 
 	icon_column_id(7), field_column_id(8)
@@ -51,7 +51,7 @@ namespace xguimpl
 		g_object_set ( G_OBJECT ( check_renderer ), "activatable", TRUE, NULL );
 		icon_renderer = gtk_cell_renderer_pixbuf_new();
 	
-		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( tree_view ) );
+		gtk_scrolled_window_set_child ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( tree_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 
 		g_signal_connect (G_OBJECT (check_renderer), "toggled", G_CALLBACK ( OnCheck ), this);
@@ -61,7 +61,6 @@ namespace xguimpl
 
 	Tree::~Tree() 
 	{ 
-		gtk_widget_destroy ( GTK_WIDGET ( tree_view ) );
 	}
 
 	bool Tree::linkEvent( std::string const &name )
@@ -102,7 +101,7 @@ namespace xguimpl
 		columns_types[underline_column_id] = PANGO_TYPE_UNDERLINE;
 		columns_types[strike_column_id] = G_TYPE_BOOLEAN;
 		columns_types[check_column_id] = G_TYPE_BOOLEAN;
-		columns_types[icon_column_id] = GDK_TYPE_PIXBUF;
+		columns_types[icon_column_id] = GDK_TYPE_TEXTURE;
 		columns_types[field_column_id] = G_TYPE_STRING;
 	
 		GtkTreeStore *store = gtk_tree_store_newv(num_columns, columns_types);
@@ -145,7 +144,7 @@ namespace xguimpl
 				has_icons = true;
 				GtkTreeViewColumn * icon_col = gtk_tree_view_column_new();
 				gtk_tree_view_column_pack_start ( icon_col, icon_renderer, FALSE);
-				gtk_tree_view_column_add_attribute ( icon_col, icon_renderer, "pixbuf", icon_column_id );
+				gtk_tree_view_column_add_attribute ( icon_col, icon_renderer, "texture", icon_column_id );
 
 				int col_pos = 0;
 				if (has_checks) ++col_pos;
@@ -249,8 +248,6 @@ namespace xguimpl
 	{
 		if ( (!tree_view) || (!this_tree->getModel()) ) return;
 
-		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
-			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
@@ -260,8 +257,6 @@ namespace xguimpl
 
 		insertSubTree(parent, child_pos, child);
 	
-		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
-			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		xgui::Callback * refresh_cb = this_tree->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_tree );
@@ -273,16 +268,12 @@ namespace xguimpl
 	{
 		if ( (!tree_view) || (!this_tree->getModel()) ) return;
 	
-		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
-			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
 	
 		removeSubTree(child);
 	
-		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
-			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 
 		xgui::Callback * refresh_cb = this_tree->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_tree );
@@ -298,8 +289,6 @@ namespace xguimpl
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( tree_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
 		
-		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
-			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 		
 		GtkTreeStore *store = GTK_TREE_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( tree_view ) ) );
 		gtk_tree_store_clear ( store );
@@ -312,8 +301,6 @@ namespace xguimpl
 			insertSubTree(0, curr_row_num++, child);
 		}
 	
-		if ( gtk_widget_get_realized ( GTK_WIDGET(tree_view) ) )
-			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( tree_view ) ) );
 	
 		xgui::Callback * refresh_cb = this_tree->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_tree );

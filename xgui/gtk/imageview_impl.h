@@ -9,8 +9,8 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#ifndef _XGUI_BUTTON_IMPL_H_
-#define _XGUI_BUTTON_IMPL_H_
+#ifndef _XGUI_IMAGEVIEW_IMPL_H_
+#define _XGUI_IMAGEVIEW_IMPL_H_
 
 #include "widget_impl.h"
 

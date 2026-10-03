@@ -16,42 +16,17 @@
 #include "image_impl.h"
 #include "master_impl.h"
 
-static GtkWidget * widget_find_by_name (GtkWidget *parent, std::string const &name)
-{
-  GtkWidget *w, *namedw = NULL;
-  GList *children, *l;
-
-  if ((name == gtk_widget_get_name(parent)))
-    namedw = parent;
-
-  else {
-    if (GTK_CONTAINER(parent)) {
-      children = gtk_container_get_children (GTK_CONTAINER(parent));
-      for (l=children; l; l=l->next) {
-        if (GTK_IS_WIDGET(l->data)) {
-          w = GTK_WIDGET (l->data);
-          if ((name == gtk_widget_get_name(w))) {
-            namedw = w;
-            break;
-          }
-          if (GTK_IS_CONTAINER (w)) {
-            namedw = widget_find_by_name (w, name);
-            if (namedw != NULL)
-              break;
-          }
-        }
-      }
-      g_list_free(children);
-    }
-  }
-
-  return namedw;
-}
+/** Data key of the item name stored on every toolbar button. */
+static char const * const ITEM_NAME_KEY = "xgui-tb-item";
 
 namespace xguimpl
 {
-	Toolbar::Toolbar ( GtkWidget * real_w ) : Widget( real_w ) {}
-	Toolbar::Toolbar ( xgui::Container * parent ) : Widget ( gtk_toolbar_new() ) { }
+	Toolbar::Toolbar ( GtkWidget * real_w ) : Widget( real_w ), this_tb(0), style("both") {}
+	Toolbar::Toolbar ( xgui::Container * parent ) : Widget ( gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0) ), this_tb(0), style("both")
+	{
+		// GtkToolbar is gone in GTK 4: a box with the "toolbar" style class looks the same
+		gtk_widget_add_css_class ( widget, "toolbar" );
+	}
 	Toolbar::~Toolbar() { }
 
 	bool Toolbar::linkEvent(std::string const & name) 
@@ -73,134 +48,121 @@ namespace xguimpl
 
 	void Toolbar::setStyle(std::string const &vals)
 	{
-		GtkToolbarStyle style;
-		if (vals == "text") style = GTK_TOOLBAR_TEXT;
-		else if (vals == "icons") style = GTK_TOOLBAR_ICONS;
-		else style = GTK_TOOLBAR_BOTH;
-	
-		gtk_toolbar_set_style ( GTK_TOOLBAR ( widget ), style);
+		style = ((vals == "text") || (vals == "icons")) ? vals : "both";
+		for (ItemsMap::iterator i = items.begin(); i != items.end(); ++i)
+			setButtonContent ( i->second.first, i->second.second );
 	}
 
 	std::string Toolbar::getStyle()
 	{
-		std::string vals;
+		return style;
+	}
 
-		GtkToolbarStyle style = gtk_toolbar_get_style( GTK_TOOLBAR(widget) );
-		if (style == GTK_TOOLBAR_TEXT) vals = "text";
-		else if (style == GTK_TOOLBAR_ICONS) vals = "icons";
-		else vals = "both";
+	void Toolbar::setButtonContent ( GtkWidget * button, const xgui::TbButtonInfo & btn )
+	{
+		bool show_icon = btn.image && (style != "text");
+		// Without an icon the text is always shown, otherwise the button would be empty
+		bool show_text = !btn.text.empty() && ((style != "icons") || !show_icon);
 
-		return vals;
+		GtkWidget * content = gtk_box_new ( GTK_ORIENTATION_VERTICAL, 2 );
+		if (show_icon) gtk_box_append ( GTK_BOX(content), btn.image->getImpl()->getImage() );
+		if (show_text) gtk_box_append ( GTK_BOX(content), gtk_label_new ( btn.text.c_str() ) );
+		gtk_button_set_child ( GTK_BUTTON(button), content );
+	}
+
+	void Toolbar::appendButton ( GtkWidget * button, const xgui::TbButtonInfo & btn, char const * signal )
+	{
+		gtk_widget_set_name ( button, btn.name.c_str() );
+		gtk_button_set_has_frame ( GTK_BUTTON(button), FALSE );
+		g_object_set_data_full ( G_OBJECT(button), ITEM_NAME_KEY, g_strdup ( btn.name.c_str() ), g_free );
+		if ( !btn.tooltip.empty() )
+			gtk_widget_set_tooltip_text ( button, btn.tooltip.c_str() );
+
+		setButtonContent ( button, btn );
+		g_signal_connect ( G_OBJECT ( button ), signal, G_CALLBACK ( OnClick ), this );
+		gtk_box_append ( GTK_BOX(widget), button );
+		items[btn.name] = std::make_pair ( button, btn );
+
+		if ( btn.image ) {
+			btn.image->ref();
+			this_tb->images_.push_back(btn.image);
+		}
 	}
 
 	void Toolbar::addSeparator() 
 	{ 
-		gtk_toolbar_insert ( GTK_TOOLBAR ( widget ), gtk_separator_tool_item_new(), this_tb->nelements_ ); 
+		gtk_box_append ( GTK_BOX(widget), gtk_separator_new ( GTK_ORIENTATION_VERTICAL ) );
 	}
 
 	void Toolbar::addButton ( const xgui::TbButtonInfo & btn )
 	{
-		GtkToolItem * item = gtk_tool_button_new( btn.image ? GTK_WIDGET ( btn.image->getImpl()->getImage() ) : 0, btn.text.c_str());
-		gtk_widget_set_name( GTK_WIDGET(item), btn.name.c_str() );
-
-		if ( !btn.tooltip.empty() )
-			gtk_tool_item_set_tooltip_text ( item, btn.tooltip.c_str());
-
-		gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, this_tb->nelements_ );
-		g_signal_connect ( G_OBJECT ( item ), "clicked", G_CALLBACK ( OnClick ), this );
-
-		if ( btn.image ) {
-			btn.image->ref();
-			this_tb->images_.push_back(btn.image);
-		}
+		appendButton ( gtk_button_new(), btn, "clicked" );
 	}
 	
 	void Toolbar::addToggleButton ( const xgui::TbButtonInfo & btn )
 	{
-		GtkToolItem * item = gtk_toggle_tool_button_new();
-		gtk_widget_set_name( GTK_WIDGET(item), btn.name.c_str() );
-
-		if ( !btn.text.empty() )
-			gtk_tool_button_set_label ( GTK_TOOL_BUTTON ( item ), btn.text.c_str() );
-
-		if ( btn.image ) {
-			gtk_tool_button_set_icon_widget ( GTK_TOOL_BUTTON ( item ), GTK_WIDGET(btn.image->getImpl()->getImage()) );
-			btn.image->ref();
-			this_tb->images_.push_back(btn.image);
-		}
-
-		if ( !btn.tooltip.empty() )
-			gtk_tool_item_set_tooltip_text ( item, btn.tooltip.c_str());
-
-		gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, this_tb->nelements_ );
-		g_signal_connect ( G_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
+		appendButton ( gtk_toggle_button_new(), btn, "toggled" );
 	}
 	
 	void Toolbar::addRadioButtons ( std::vector<xgui::TbButtonInfo> const & checkgroup )
 	{
-		GSList *group = 0;
-		std::vector<xgui::TbButtonInfo>::const_iterator end = checkgroup.end();
-	
-		int button_pos = this_tb->nelements_;
-		for ( std::vector<xgui::TbButtonInfo>::const_iterator btn = checkgroup.begin(); btn != end; ++btn ) {
-			GtkToolItem * item =  gtk_radio_tool_button_new(group);
-			gtk_widget_set_name( GTK_WIDGET(item), btn->name.c_str() );		
-	
-			if ( !btn->text.empty() )
-				gtk_tool_button_set_label ( GTK_TOOL_BUTTON ( item ), btn->text.c_str() );
-			if ( btn->image ) {
-				gtk_tool_button_set_icon_widget ( GTK_TOOL_BUTTON ( item ), GTK_WIDGET( btn->image->getImpl()->getImage() ) );
-				btn->image->ref();
-				this_tb->images_.push_back(btn->image);
-			}
-			if ( !btn->tooltip.empty() )
-				gtk_tool_item_set_tooltip_text ( item, btn->tooltip.c_str() );
-
-			group = gtk_radio_tool_button_get_group ( GTK_RADIO_TOOL_BUTTON ( item ) );
-			gtk_toolbar_insert ( GTK_TOOLBAR( widget ), item, button_pos++ );
-			g_signal_connect ( G_OBJECT ( item ), "toggled", G_CALLBACK ( OnClick ), this );
+		GtkToggleButton * group = 0;
+		for ( std::vector<xgui::TbButtonInfo>::const_iterator btn = checkgroup.begin(); btn != checkgroup.end(); ++btn ) {
+			GtkWidget * button = gtk_toggle_button_new();
+			// As with GTK 3 radio tool buttons, the first button of a group starts active
+			if (group) gtk_toggle_button_set_group ( GTK_TOGGLE_BUTTON(button), group );
+			else gtk_toggle_button_set_active ( GTK_TOGGLE_BUTTON(button), TRUE );
+			appendButton ( button, *btn, "toggled" );
+			if (!group) group = GTK_TOGGLE_BUTTON(button);
 		}
+	}
+
+	GtkWidget * Toolbar::findButton ( const std::string & name )
+	{
+		ItemsMap::iterator i = items.find(name);
+		return (i == items.end()) ? NULL : i->second.first;
 	}
 
 	bool Toolbar::removeButton ( const std::string & name )
 	{
-		GtkWidget * child = widget_find_by_name(widget, name);
+		GtkWidget * child = findButton(name);
 		if (!child) return false;
-		gtk_container_remove(GTK_CONTAINER(widget), child);
+		items.erase(name);
+		gtk_box_remove ( GTK_BOX(widget), child );
 		return true;
 	}
 	
 	void Toolbar::enableButton ( const std::string & name )
 	{
-		GtkWidget * child = widget_find_by_name(widget, name);
-		gtk_widget_set_sensitive(child, TRUE);
+		GtkWidget * child = findButton(name);
+		if (child) gtk_widget_set_sensitive(child, TRUE);
 	}
 	
 	void Toolbar::disableButton ( const std::string & name )
 	{
-		GtkWidget * child = widget_find_by_name(widget, name);
-		gtk_widget_set_sensitive(child, FALSE);
+		GtkWidget * child = findButton(name);
+		if (child) gtk_widget_set_sensitive(child, FALSE);
 	}
 	
 	void Toolbar::checkButton ( const std::string & name )
 	{
-		GtkWidget * child = widget_find_by_name(widget, name);
-		gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(child), TRUE);
+		GtkWidget * child = findButton(name);
+		if (child && GTK_IS_TOGGLE_BUTTON(child)) gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(child), TRUE);
 	}
 	
 	void Toolbar::uncheckButton ( const std::string & name )
 	{
-		GtkWidget * child = widget_find_by_name(widget,name);
-		gtk_toggle_tool_button_set_active (GTK_TOGGLE_TOOL_BUTTON(child), FALSE);
+		GtkWidget * child = findButton(name);
+		if (child && GTK_IS_TOGGLE_BUTTON(child)) gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(child), FALSE);
 	}
 	
 	bool Toolbar::isButtonChecked ( const std::string & name )
 	{
-		GtkWidget * child = widget_find_by_name(widget, name);
-		return gtk_toggle_tool_button_get_active (GTK_TOGGLE_TOOL_BUTTON(child));
+		GtkWidget * child = findButton(name);
+		return child && GTK_IS_TOGGLE_BUTTON(child) && gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(child));
 	}
 
-	void Toolbar::OnClick (GtkToolItem *tbutton, Toolbar * xtb)
+	void Toolbar::OnClick (GtkButton *tbutton, Toolbar * xtb)
 	{
 		xgui::Callback * base_cb = xtb->this_tb->getEvent("onclick");
 		if (!base_cb) return;
@@ -211,11 +173,11 @@ namespace xguimpl
 			return;
 		}
 	
-		std::string item_name = gtk_widget_get_name ( GTK_WIDGET(tbutton) );
+		char const * name = (char const *)g_object_get_data ( G_OBJECT(tbutton), ITEM_NAME_KEY );
+		std::string item_name = name ? name : "";
 		int item_state = 1;
-	
-		if ( (gtk_toggle_tool_button_get_type() == G_OBJECT_TYPE(tbutton)) || (gtk_radio_tool_button_get_type() == G_OBJECT_TYPE(tbutton)) )
-			item_state = gtk_toggle_tool_button_get_active ( GTK_TOGGLE_TOOL_BUTTON(tbutton) );
+		if ( GTK_IS_TOGGLE_BUTTON(tbutton) )
+			item_state = gtk_toggle_button_get_active ( GTK_TOGGLE_BUTTON(tbutton) );
 	
 		cb->call ( xtb->this_tb, item_name, item_state );
 	}

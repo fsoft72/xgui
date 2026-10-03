@@ -87,7 +87,7 @@ namespace xguimpl
 	bold_column_id(3), underline_column_id(4), strike_column_id(5), check_column_id(6), 
 	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false), model_dirty(false), rebuild_idle_id(0) { }
 
-	List::List ( xgui::Container * parent ) : View ( gtk_scrolled_window_new( NULL, NULL ) ), list_view(0), fg_column_id(0), 
+	List::List ( xgui::Container * parent ) : View ( gtk_scrolled_window_new() ), list_view(0), fg_column_id(0), 
 	bg_column_id(1), italic_column_id(2), bold_column_id(3), underline_column_id(4), strike_column_id(5),check_column_id(6), 
 	icon_column_id(7), first_fields_column(8), has_icons(false), has_checks(false), model_dirty(false), rebuild_idle_id(0)
 	{
@@ -108,14 +108,13 @@ namespace xguimpl
 	
 		g_signal_connect (G_OBJECT (check_renderer), "toggled", G_CALLBACK ( OnCheck ), this);
 
-		gtk_container_add ( GTK_CONTAINER ( widget ), GTK_WIDGET ( list_view ) );
+		gtk_scrolled_window_set_child ( GTK_SCROLLED_WINDOW ( widget ), GTK_WIDGET ( list_view ) );
 		gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW ( widget ), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC );
 	}
 
 	List::~List() 
 	{ 
 		if (rebuild_idle_id) g_source_remove(rebuild_idle_id);
-		gtk_widget_destroy ( GTK_WIDGET ( list_view ) );
 	}
 
 	bool List::linkEvent( std::string const &name )
@@ -216,7 +215,7 @@ namespace xguimpl
 		columns_types[underline_column_id] = PANGO_TYPE_UNDERLINE;
 		columns_types[strike_column_id] = G_TYPE_BOOLEAN;
 		columns_types[check_column_id] = G_TYPE_BOOLEAN;
-		columns_types[icon_column_id] = GDK_TYPE_PIXBUF;
+		columns_types[icon_column_id] = GDK_TYPE_TEXTURE;
 	
 		for (int curr_col_num = first_fields_column; curr_col_num < (first_fields_column + num_columns); ++curr_col_num )
 			columns_types[curr_col_num] = G_TYPE_STRING;
@@ -259,7 +258,7 @@ namespace xguimpl
 				has_icons = true;
 				GtkTreeViewColumn * icon_col = gtk_tree_view_column_new();
 				gtk_tree_view_column_pack_start ( icon_col, icon_renderer, FALSE);
-				gtk_tree_view_column_add_attribute ( icon_col, icon_renderer, "pixbuf", icon_column_id );
+				gtk_tree_view_column_add_attribute ( icon_col, icon_renderer, "texture", icon_column_id );
 
 				int col_pos = 0;
 				if (has_checks) ++col_pos;
@@ -375,8 +374,6 @@ namespace xguimpl
 		GtkTreeSelection * sel = gtk_tree_view_get_selection ( GTK_TREE_VIEW ( list_view ) );
 		g_signal_handlers_disconnect_by_func( G_OBJECT(sel), (void*)G_CALLBACK ( OnSelect ), this);
 		
-		if ( gtk_widget_get_realized ( GTK_WIDGET(list_view) ) )
-			gdk_window_freeze_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( list_view ) ) );
 		
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		gtk_list_store_clear ( store );
@@ -410,8 +407,6 @@ namespace xguimpl
 			//if ( this_list->isSelected(child) ) gtk_tree_selection_select_iter ( sel, &curr_ele_iter );
 		}
 	
-		if ( gtk_widget_get_realized ( GTK_WIDGET(list_view) ) )
-			gdk_window_thaw_updates ( gtk_widget_get_parent_window ( GTK_WIDGET ( list_view ) ) );
 	
 		xgui::Callback * refresh_cb = this_list->getEvent("onrefresh");
 		if (refresh_cb) refresh_cb->call( this_list );

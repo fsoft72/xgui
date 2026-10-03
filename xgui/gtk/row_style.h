@@ -77,8 +77,8 @@ namespace xguimpl
 		xgui::Image * icon = sm->getIcon(style);
 		if (icon) {
 			GValue val = G_VALUE_INIT;
-			g_value_init(&val, GDK_TYPE_PIXBUF);
-			g_value_set_object(&val, icon->getImpl()->getPixbuf());
+			g_value_init(&val, GDK_TYPE_TEXTURE);
+			g_value_set_object(&val, icon->getImpl()->getTexture());
 			setRowValue(store, iter, cols.icon, &val);
 			g_value_unset(&val);
 		}

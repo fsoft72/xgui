@@ -18,7 +18,12 @@ namespace xguimpl
 	Image::Image(std::string const &path)
 	: this_image(0), image(0)
 	{
-		image = gdk_pixbuf_new_from_file ( path.c_str(), NULL );
+		GError * error = NULL;
+		image = gdk_texture_new_from_filename ( path.c_str(), &error );
+		if ( error ) {
+			DMESSAGE("Cannot load image " << path << ": " << error->message);
+			g_error_free ( error );
+		}
 	}
 
 	Image::~Image() { if (image) g_object_unref(image); }
@@ -29,19 +34,22 @@ namespace xguimpl
 		this_image = accessor;
 
 		if (image != NULL) {
-			this_image->width_ = gdk_pixbuf_get_width ( image );
-			this_image->height_ = gdk_pixbuf_get_height ( image );
+			this_image->width_ = gdk_texture_get_width ( image );
+			this_image->height_ = gdk_texture_get_height ( image );
 		}
 	}
 
 	bool Image::isValid() { return image != NULL; }
 
-	GtkImage * Image::getImage()
+	GtkWidget * Image::getImage()
 	{
-		return (GtkImage*)gtk_image_new_from_pixbuf(image);
+		// A GtkImage would be scaled to the icon size: a picture keeps the pixel size of the file
+		GtkWidget * picture = gtk_picture_new_for_paintable ( GDK_PAINTABLE ( image ) );
+		gtk_picture_set_can_shrink ( GTK_PICTURE ( picture ), FALSE );
+		return picture;
 	}
 	
-	GdkPixbuf * Image::getPixbuf()
+	GdkTexture * Image::getTexture()
 	{
 		return image;
 	}

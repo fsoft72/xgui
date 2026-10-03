@@ -15,7 +15,6 @@
 
 #include "base.h"
 #include <gtk/gtk.h>
-#include <gdk-pixbuf/gdk-pixbuf.h>
 
 namespace xgui { class Image; }
 
@@ -24,13 +23,14 @@ namespace xguimpl
 	struct Image
 	{
 		xgui::Image *this_image;
-		GdkPixbuf  *image;
+		GdkTexture *image;
 
 		Image(std::string const &path);
 		virtual ~Image();
 
-		GtkImage *getImage();
-		GdkPixbuf *getPixbuf();
+		/** Creates a new widget showing the image at its natural size. */
+		GtkWidget *getImage();
+		GdkTexture *getTexture();
 		void setAccessor(xgui::Image * accessor);
 		bool isValid();
 	};

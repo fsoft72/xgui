@@ -33,8 +33,10 @@ namespace xguimpl
 			// Connect to value-changed for arrow button clicks
 			g_signal_connect ( G_OBJECT ( widget ), "value-changed", G_CALLBACK ( OnValueChanged ), this );
 			// Also connect to text changes for manual input
-			g_signal_connect ( G_OBJECT ( widget ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
-			g_signal_connect ( G_OBJECT ( widget ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
+			// In GTK 4 the text is edited by a delegate GtkText, which emits insert-text/delete-text
+			GtkEditable * delegate = gtk_editable_get_delegate ( GTK_EDITABLE ( widget ) );
+			g_signal_connect ( G_OBJECT ( delegate ), "insert-text", G_CALLBACK ( OnTextInsert ), this );
+			g_signal_connect ( G_OBJECT ( delegate ), "delete-text", G_CALLBACK ( OnTextDelete ), this );
 			return true;
 		}
 
@@ -107,7 +109,7 @@ namespace xguimpl
 			return 0;
 		}
 
-		std::string buf = gtk_entry_get_text ( GTK_ENTRY ( e->widget ) );
+		std::string buf = gtk_editable_get_text ( GTK_EDITABLE ( e->widget ) );
 		return cb->call( e->this_widget, buf);
 	}
 
@@ -117,10 +119,10 @@ namespace xguimpl
 
 		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
 		// Block value-changed to prevent double callback when text input triggers an implicit value update
-		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
+		g_signal_handlers_block_by_func ( G_OBJECT ( e->widget ), (void*)OnValueChanged, e );
 		bool text_approved = true;
 	
-		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
+		std::string text_after_change = gtk_editable_get_text( GTK_EDITABLE(editable) );
 		text_after_change.insert(*position, new_text, new_text_length);
 	
 		xgui::Callback * base_cb = e->this_widget->getEvent("onchange");
@@ -136,7 +138,7 @@ namespace xguimpl
 			gtk_editable_insert_text ( GTK_EDITABLE ( editable ) , new_text, new_text_length, position);
 	
 	
-		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
+		g_signal_handlers_unblock_by_func ( G_OBJECT ( e->widget ), (void*)OnValueChanged, e );
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextInsert, e );
 		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "insert-text" );
 	}
@@ -145,10 +147,10 @@ namespace xguimpl
 	{
 		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
 		// Block value-changed to prevent double callback when text deletion triggers an implicit value update
-		g_signal_handlers_block_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
+		g_signal_handlers_block_by_func ( G_OBJECT ( e->widget ), (void*)OnValueChanged, e );
 		bool deletion_approved = true;
 	
-		std::string text_after_change = gtk_entry_get_text( GTK_ENTRY(editable) );
+		std::string text_after_change = gtk_editable_get_text( GTK_EDITABLE(editable) );
 		text_after_change.erase(start_pos, end_pos - start_pos);
 	
 		xgui::TextCallback * cb = dynamic_cast<xgui::TextCallback *>(e->this_widget->getEvent("onchange"));
@@ -157,7 +159,7 @@ namespace xguimpl
 		if ( deletion_approved ) 
 			gtk_editable_delete_text( GTK_EDITABLE(editable), start_pos, end_pos );
 		
-		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnValueChanged, e );
+		g_signal_handlers_unblock_by_func ( G_OBJECT ( e->widget ), (void*)OnValueChanged, e );
 		g_signal_handlers_unblock_by_func ( G_OBJECT ( editable ), (void*)OnTextDelete, e );
 		g_signal_stop_emission_by_name ( G_OBJECT ( editable ), "delete-text" );
 	}
