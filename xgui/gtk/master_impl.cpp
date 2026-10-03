@@ -40,7 +40,7 @@ static void IdleParameterDestructor( void * cb_info )
 namespace xguimpl
 {
 	Master::Master(xgui::Master * master)
-	: app_tooltips(0), master_(master)
+	: threaded(false), app_tooltips(0), master_(master)
 	{
 		DMESSAGE("XGUI Initialized");
 		int argc = 0;

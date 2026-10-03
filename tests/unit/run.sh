@@ -30,4 +30,8 @@ check "master_impl has no non-literal printf format" \
 check "core and GTK sources compile without -D_DEBUG" \
 	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -fpermissive -w $INCLUDES \$f || exit 1; done"
 
+# Item: Master::threaded must be initialized in the constructor
+check "xguimpl::Master initializes threaded" \
+	grep -Pzq "Master\(xgui::Master \* master\)\s*:\s*threaded\(false\)" xgui/gtk/master_impl.cpp
+
 exit $FAILED
