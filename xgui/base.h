@@ -24,6 +24,7 @@
 #include <set>
 #include <list>
 #include <sstream>
+#include <iostream>
 #include <typeinfo>
 #include <cstdlib>
 #include <algorithm>

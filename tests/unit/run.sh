@@ -26,4 +26,8 @@ check() {
 check "master_impl has no non-literal printf format" \
 	$CPP -fsyntax-only -Wformat -Werror=format-nonliteral -Werror=format-security $INCLUDES xgui/gtk/master_impl.cpp
 
+# Item: release builds (no -D_DEBUG) must compile
+check "core and GTK sources compile without -D_DEBUG" \
+	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -fpermissive -w $INCLUDES \$f || exit 1; done"
+
 exit $FAILED
