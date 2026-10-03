@@ -47,10 +47,13 @@ _gui_check() {
 		LIB_BUILT=1
 	fi
 	$CPP -fpermissive -w -D_DEBUG $INCLUDES "$src" -L"$ROOT" -lxgui -Wl,-rpath,"$ROOT" $(pkg-config gtk+-3.0 --libs) -o "$OUT/gui_test" \
-		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test"
+		&& check "$name" env GDK_BACKEND=broadway BROADWAY_DISPLAY=$BROADWAY_PORT "$OUT/gui_test" "$OUT"
 }
 
 # Item: selection must map to the right model node after sort()
 _gui_check "list selection maps to model after sort" tests/unit/list_sort_test.cpp
+
+# Item: malformed JSON must not crash LoadJson
+_gui_check "LoadJson survives malformed JSON" tests/unit/json_loader_test.cpp
 
 exit $FAILED

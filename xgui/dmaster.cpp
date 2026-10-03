@@ -171,7 +171,12 @@ namespace xgui
 			return 0;
 		}
 
-		std::string node_name = j["type"];
+		if (!j["type"].is_string()) {
+			XGUI_ERROR("JSON 'type' field must be a string");
+			return 0;
+		}
+
+		std::string node_name = j["type"].get<std::string>();
 		xgui::ClassInfo * class_builder = 0;
 
 		class_builder = Instance()->FindClassByTag(node_name);
@@ -250,9 +255,13 @@ namespace xgui
 			return 0;
 		}
 
-		xgui::Object * o = ParseJsonValue(parent, j);
-
-		return o;
+		try {
+			return ParseJsonValue(parent, j);
+		}
+		catch (const std::exception& e) {
+			XGUI_ERROR("JSON error in " << file << ": " << e.what());
+			return 0;
+		}
 	}
 
 	//------------------ TOOLBAR CLASSES INFORMATIONS -----------------------//
