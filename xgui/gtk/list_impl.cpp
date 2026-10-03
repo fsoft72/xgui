@@ -17,26 +17,28 @@
 #include "image.h"
 #include "image_impl.h"
 
+/**
+ * Finds a view column by its xgui id (or by its title as a fallback).
+ * Returns the column and its position in the view, or {NULL, -1} when not found.
+ */
 static std::pair<GtkTreeViewColumn *, int> int_find_column ( GtkTreeView * list_view, std::string const & name )
 {
 	GList * columns = gtk_tree_view_get_columns( GTK_TREE_VIEW(list_view) );
-	GList * cur_column = columns;
-	GtkTreeViewColumn * col_data = 0;
-	unsigned int column_pos = 0;
-	unsigned int curr_col_n = 0;
-	while(cur_column != NULL) {
-		col_data = (GtkTreeViewColumn *)cur_column->data;
-		std::string title = gtk_tree_view_column_get_title(col_data);
-		if (name == title) {
-			column_pos = curr_col_n;
-			break;
+	GtkTreeViewColumn * found = 0;
+	int found_pos = -1;
+	int curr_col_n = 0;
+	for ( GList * cur = columns; cur != NULL && !found; cur = cur->next, ++curr_col_n ) {
+		GtkTreeViewColumn * col_data = (GtkTreeViewColumn *)cur->data;
+		std::string const * id = (std::string const *)g_object_get_data( G_OBJECT(col_data), "xgui-column-id" );
+		char const * title = gtk_tree_view_column_get_title(col_data);
+		if ( (id && *id == name) || (title && name == title) ) {
+			found = col_data;
+			found_pos = curr_col_n;
 		}
-		cur_column = cur_column->next;
-		++curr_col_n;
 	}
 	g_list_free(columns);
 
-	return std::make_pair(col_data, column_pos);
+	return std::make_pair(found, found_pos);
 }
 
 /** Returns true when both iterators point to the same row of the same store. */
@@ -448,7 +450,11 @@ namespace xguimpl
 	void List::sort ( std::string const & column_name, xgui::TextPairCallback * compare_cb )
 	{
 		std::pair<GtkTreeViewColumn *, int> col_data = int_find_column( GTK_TREE_VIEW(list_view), column_name );
-		SortInformations si = { this, compare_cb, has_icons ? col_data.second + first_fields_column - 1 : col_data.second + first_fields_column };
+		if ( !col_data.first ) return;
+
+		// The view also holds the optional checkbox and icon columns, which have no data column of their own
+		int extra_columns = (has_icons ? 1 : 0) + (has_checks ? 1 : 0);
+		SortInformations si = { this, compare_cb, (unsigned int)(col_data.second - extra_columns + first_fields_column) };
 	
 		GtkListStore *store = GTK_LIST_STORE ( gtk_tree_view_get_model ( GTK_TREE_VIEW ( list_view ) ) );
 		gtk_tree_sortable_set_default_sort_func ( GTK_TREE_SORTABLE( store ), (GtkTreeIterCompareFunc)int_sort_func, &si, 0 );

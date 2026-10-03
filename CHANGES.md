@@ -11,3 +11,4 @@
 - Fixed `LoadJson` crashing on malformed input: the `type` field is validated as a string and the whole parse is wrapped in `try/catch`. Added `tests/unit/json_loader_test.cpp`.
 - Fixed the `focused` widget property: the setter calls `gtk_widget_grab_focus()` (it passed a pointer as `gboolean` to `has-focus`), the getter uses `gtk_widget_is_focus()`. Added `tests/unit/focus_test.cpp`.
 - Fixed event masks: the `Widget` constructor now uses `gtk_widget_add_events()` (the GdkWindow does not exist before realization) and includes `GDK_POINTER_MOTION_MASK`. Added `tests/unit/event_mask_test.cpp`.
+- Fixed `int_find_column` in the GTK list: it now returns `{NULL, -1}` when the column is missing (so `delColumn`/`sort` no longer hit the last column) and matches the xgui column id as well as the title. `sort()` now accounts for the checkbox column when computing the data column. Added `tests/unit/list_columns_test.cpp`.
