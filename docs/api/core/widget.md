@@ -354,6 +354,8 @@ Fired when the widget position has changed.
 **Parameters:**
 - `text` - New position of upper-left corner in format `"x y"` (relative to parent)
 
+> **GTK 4:** not supported, `linkEvent("onmove", ...)` returns `false`.
+
 ---
 
 ## Example

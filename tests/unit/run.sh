@@ -7,7 +7,7 @@ cd "$ROOT" || exit 1
 
 CPP=${CPP:-g++}
 GTK_FLAGS=$(pkg-config gtk4 --cflags)
-INCLUDES="-I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS -Wno-deprecated-declarations"
+INCLUDES="-I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS"
 OUT=$(mktemp -d)
 trap 'rm -rf "$OUT"' EXIT
 FAILED=0
@@ -122,7 +122,7 @@ check "GTK backend uses no deprecated GTK 4 API" \
 check "Makefile.gtk uses -Wextra and not -fpermissive" \
 	bash -c '! grep -q -- "-fpermissive" Makefile.gtk && grep -q -- "-Wextra" Makefile.gtk'
 check "sources compile cleanly with -Wall -Wextra -Werror" \
-	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -Wall -Wextra -Wno-unused-parameter -Wno-deprecated-declarations -Werror -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
+	bash -c "for f in xgui/*.cpp xgui/gtk/*.cpp; do $CPP -fsyntax-only -Wall -Wextra -Wno-unused-parameter -Werror -I$ROOT/xgui -I$ROOT/xgui/gtk $GTK_FLAGS \$f || exit 1; done"
 
 # Item: shared mouse button decoding
 _gui_check "button events decode to name and mask" tests/unit/button_decode_test.cpp

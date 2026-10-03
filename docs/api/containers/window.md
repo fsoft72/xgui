@@ -133,6 +133,8 @@ Sets or retrieves the window position on the screen.
 
 **Format:** `"x y"` or `"center"` to position at screen center
 
+> **GTK 4:** not supported. GTK 4 lets the window manager place the windows: `"center"` is accepted and ignored, coordinates are reported as an error, and reading the property returns nothing.
+
 ---
 
 ### `resizable` (Read/Write)

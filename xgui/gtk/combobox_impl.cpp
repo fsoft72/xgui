@@ -90,7 +90,8 @@ namespace xguimpl
 			// Unlike GTK 3, a GtkDropDown always selects an item (the first one) when it has items
 			gtk_widget_set_hexpand ( dropdown, TRUE );
 			g_signal_connect ( dropdown, "notify::selected", G_CALLBACK ( OnSelect ), this );
-			g_signal_connect ( dropdown, "activate", G_CALLBACK ( OnSubmit ), this );
+			if ( g_signal_lookup ( "activate", GTK_TYPE_DROP_DOWN ) )
+				g_signal_connect ( dropdown, "activate", G_CALLBACK ( OnSubmit ), this );
 			gtk_box_append ( GTK_BOX(widget), dropdown );
 			return;
 		}
@@ -330,7 +331,8 @@ namespace xguimpl
 	void Combobox::popup()
 	{
 		if ( menu_button ) gtk_menu_button_popup ( GTK_MENU_BUTTON(menu_button) );
-		else if ( dropdown ) g_signal_emit_by_name ( dropdown, "activate" );
+		// GtkDropDown can be opened by code through its "activate" signal, available since GTK 4.18
+		else if ( dropdown && g_signal_lookup ( "activate", GTK_TYPE_DROP_DOWN ) ) g_signal_emit_by_name ( dropdown, "activate" );
 	}
 
 	void Combobox::popdown()

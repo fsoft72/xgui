@@ -22,7 +22,7 @@ Adds a new menu item.
 - `parent_id` - ID of the parent menu item, or empty string to add at root level
 - `id` - Identification string assigned to the new menu item
 - `text` - The displayed menu item text
-- `icon` - Optional pointer to an Image displayed near the menu item text (default: `0`)
+- `icon` - Optional pointer to an Image displayed near the menu item text (default: `0`). GTK 4 menus usually do not draw it.
 - `type` - Type of menu item (default: `""`):
   - `""` - Standard menu item
   - `"separator"` - Creates a line separator
@@ -140,6 +140,8 @@ This widget has no additional properties beyond those inherited from `Widget`.
 ## Events
 
 ### `onselect` (xgui::TextStatusCallback)
+
+> The GTK backend reports the selection of an item to `onclick` or, when it is not linked, to `onselect`.
 
 Fired when the user clicks on a menu item.
 

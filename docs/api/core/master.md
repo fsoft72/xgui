@@ -29,6 +29,18 @@ Returns the current instance of the Master class or creates a new instance if it
 
 ---
 
+#### `static void SetApplicationId(std::string const &id, bool unique = false)`
+
+Sets the application id used by the backends that register the application with the system. On the GTK backend it is the id of the `GtkApplication` driving the event loop. It must be called before the first `Instance()` call (or before the Master is created again after `Quit()`).
+
+**Parameters:**
+- `id` - Reverse-DNS application id, e.g. `"org.example.Editor"`. An invalid id is reported and the default one is used.
+- `unique` - `true` to allow a single running instance: a second process becomes a remote instance and cannot show windows of its own (default: `false`)
+
+When it is not called, the GTK backend uses `org.xgui.<program name>` and allows any number of instances.
+
+---
+
 ### Event Loop
 
 #### `static void Quit()`
@@ -135,6 +147,8 @@ Terminates the XGUI threading environment. This function should be called on app
 #### `static void GuiLock()`
 
 Locks the GUI for thread-safe operations.
+
+> **GTK 4:** GTK is not thread safe: the lock only serializes the threads that call `GuiLock()`/`GuiUnlock()`. The safe way to update the GUI from another thread is `RegisterIdleCallback()`, which runs the callback in the GUI thread.
 
 ---
 

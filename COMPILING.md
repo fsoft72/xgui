@@ -9,10 +9,11 @@ For detailed macOS compilation instructions, see [COMPILING_MACOS.md](COMPILING_
 
 ## Dependencies
 
-### Linux/GTK+
-	1 - libgtk+-2.0-dev
+### Linux/GTK
+	1 - libgtk-4-dev (GTK 4.12 or newer, developed and tested with GTK 4.20)
 	2 - swig (optional for Python bindings)
-	3 - python-dev (optional for Python bindings)
+	3 - python3-dev (optional for Python bindings)
+	4 - gtk4-broadwayd (optional, to run the unit tests on a headless display: make -f Makefile.gtk unit)
 
 ### macOS
 	1 - Xcode Command Line Tools (includes clang)
@@ -24,7 +25,7 @@ For detailed macOS compilation instructions, see [COMPILING_MACOS.md](COMPILING_
 We are providing different Makefiles:
 
 	1 - Makefile.gnustep	 - for compiling for GNU Step
-	2 - Makefile.gtk	 - for compiling for GTK+
+	2 - Makefile.gtk	 - for compiling for GTK 4
 	3 - Makefile.osx	 - for compiling for macOS (latest versions supported)
 
 you can start compiling using:
